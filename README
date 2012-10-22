@@ -1,0 +1,29 @@
+Vindicator is a full featured user management plugin for Bukkit based
+Minecraft servers.
+
+Features:
+  - CraftIRC integration
+  - Local storage
+    - MySQL
+    - SQLite
+  - Integration with global banning systems
+    - MCBans
+    - MCBouncer
+  - IP logging
+    - Alerts for alternate accounts
+  - IP/Player banning
+    - Support for IPv4
+    - Support for IPV6
+    - Ban types
+      - Permanent
+      - Temporary
+  - IP/Player kicking
+  - IP/Player noting
+    - Importance levels
+      - Severe
+      - Warning
+      - Information
+    - Visibility levels
+      - Public
+      - Private
+  - Player tickets

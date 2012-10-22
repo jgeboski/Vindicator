@@ -1,0 +1,12 @@
+name: Vindicator
+version: ${project.version}
+description: A user management plugin
+authors: [jgeboski, tritania]
+main: org.jgeboski.vindicator.Vindicator
+softdepend: []
+
+commands:
+
+
+permissions:
+
