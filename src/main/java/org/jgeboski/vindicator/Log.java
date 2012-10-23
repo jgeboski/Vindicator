@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.Vindicator;
+package org.jgeboski.vindicator;
 
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;

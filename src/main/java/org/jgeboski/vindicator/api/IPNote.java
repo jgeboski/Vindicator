@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.Vindicator.api;
+package org.jgeboski.vindicator.api;
 
 public class IPNote extends TargetObject
 {
