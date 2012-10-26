@@ -26,46 +26,30 @@ import java.sql.SQLException;
 
 public class SQLStatement
 {
-    private Connection connection;
+    private Connection        connection;
+    private PreparedStatement pstatement;
 
     private String sql;
     private Object args[];
 
-    private enum Type
-    {
-        DEFAULT,
-        QUERY,
-        UPDATE
-    }
-
     public SQLStatement(Connection connection)
     {
         this.connection = connection;
+        this.pstatement = null;
     }
 
-    private Object prepareStatement(Type type)
+    private void prepareStatement()
         throws SQLException
     {
-        PreparedStatement pstmt;
-        Object            ret;
-
         if(sql == null)
-            return null;
+            return;
 
-        ret   = null;
-        pstmt = connection.prepareStatement(sql);
+        close();
+
+        pstatement = connection.prepareStatement(sql);
 
         for(int i = 0; i < args.length; i++)
-            pstmt.setObject(i + 1, args[i]);
-
-        switch(type) {
-        case DEFAULT: ret = pstmt.execute();       break;
-        case QUERY:   ret = pstmt.executeQuery();  break;
-        case UPDATE:  ret = pstmt.executeUpdate(); break;
-        }
-
-        pstmt.close();
-        return ret;
+            pstatement.setObject(i + 1, args[i]);
     }
 
     public void store(Object ... args)
@@ -100,18 +84,45 @@ public class SQLStatement
     public boolean execute()
         throws SQLException
     {
-        return (Boolean) prepareStatement(Type.DEFAULT);
+        prepareStatement();
+
+        if(pstatement == null)
+            return false;
+
+        return pstatement.execute();
     }
 
-    public ResultSet executeQuery(Object ... args)
+    public ResultSet executeQuery()
         throws SQLException
     {
-        return (ResultSet) prepareStatement(Type.QUERY);
+        prepareStatement();
+
+        if(pstatement == null)
+            return null;
+
+        return pstatement.executeQuery();
     }
 
-    public int executeUpdate(Object ... args)
+    public int executeUpdate()
         throws SQLException
     {
-        return (Integer) prepareStatement(Type.UPDATE);
+        prepareStatement();
+
+        if(pstatement == null)
+            return 0;
+
+        return pstatement.executeUpdate();
+    }
+
+    public void close()
+    {
+        if(pstatement == null)
+            return;
+
+        try {
+            pstatement.close();
+        } catch(SQLException e) { }
+
+        pstatement = null;
     }
 }

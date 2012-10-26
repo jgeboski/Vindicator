@@ -24,8 +24,8 @@ public enum SQLType
 
     public static SQLType fromURL(String url)
     {
-        String     strs[];
-        String     str;
+        String strs[];
+        String str;
 
         str  = url.toLowerCase();
         strs = str.split(":", 3);
