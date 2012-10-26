@@ -24,13 +24,23 @@ public class Configuration extends YamlConfiguration
 {
     private File file;
 
-    
+    public String storeDriver;
+    public String storeURL;
+    public String storeUser;
+    public String storePass;
+    public String storePrefix;
 
     public Configuration(File file)
     {
         this.file = file;
 
-        
+        this.storeDriver = "sql";
+        this.storeUser   = null;
+        this.storePass   = null;
+        this.storePrefix = null;
+        this.storeURL    = String.format("jdbc:sqlite:%s%sdatabase.sqlite",
+                                         file.getParent(),
+                                         file.separator);
     }
 
     public void load()
@@ -41,7 +51,11 @@ public class Configuration extends YamlConfiguration
             Log.warning("Unable to load: %s", file.toString());
         }
 
-        
+        storeDriver = getString("storage.driver", storeDriver);
+        storeURL    = getString("storage.url",    storeURL);
+        storeUser   = getString("storage.user",   storeUser);
+        storePass   = getString("storage.pass",   storePass);
+        storePrefix = getString("storage.prefix", storePrefix);
 
         if(!file.exists())
             save();
@@ -49,7 +63,11 @@ public class Configuration extends YamlConfiguration
 
     public void save()
     {
-        
+        set("storage.driver", storeDriver);
+        set("storage.url",    storeURL);
+        set("storage.user",   storeUser);
+        set("storage.pass",   storePass);
+        set("storage.prefix", storePrefix);
 
         try {
             super.save(file);

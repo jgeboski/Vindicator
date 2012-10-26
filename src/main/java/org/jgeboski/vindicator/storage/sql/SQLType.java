@@ -15,33 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator;
+package org.jgeboski.vindicator.storage.sql;
 
-import java.io.File;
-
-import org.bukkit.plugin.java.JavaPlugin;
-
-public class Vindicator extends JavaPlugin
+public enum SQLType
 {
-    public static final String pluginName = "Vindicator";
+    MYSQL,
+    SQLITE;
 
-    public Configuration  config;
-    private EventListener events;
-
-    public void onLoad()
+    public static SQLType fromURL(String url)
     {
-        config  = new Configuration(new File(getDataFolder(), "config.yml"));
-        events  = new EventListener(this);
-    }
+        String     strs[];
+        String     str;
 
-    public void onEnable()
-    {
-        config.load();
-        
-    }
+        str  = url.toLowerCase();
+        strs = str.split(":", 3);
 
-    public void onDisable()
-    {
-        
+        if((strs.length < 2) || !strs[0].equals("jdbc"))
+            return null;
+
+        for(SQLType t : SQLType.values()) {
+            str = t.toString();
+
+            if(str.equalsIgnoreCase(strs[1]))
+                return t;
+        }
+
+        return null;
     }
 }
