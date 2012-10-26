@@ -21,27 +21,47 @@ import java.io.File;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import org.jgeboski.vindicator.api.Ban;
+import org.jgeboski.vindicator.api.TargetObject;
+import org.jgeboski.vindicator.storage.Storage;
+import org.jgeboski.vindicator.storage.StorageSQL;
+
 public class Vindicator extends JavaPlugin
 {
     public static final String pluginName = "Vindicator";
 
-    public Configuration  config;
+    public Configuration config;
+    public Storage       storage;
+
     private EventListener events;
 
     public void onLoad()
     {
         config  = new Configuration(new File(getDataFolder(), "config.yml"));
+        storage = null;
+
         events  = new EventListener(this);
     }
 
     public void onEnable()
     {
         config.load();
+
+        /* For now, SQL only */
+        storage = new StorageSQL(config.storeURL,  config.storeUser,
+                                 config.storePass, config.storePrefix);
+
+        if(!storage.onEnable()) {
+            setEnabled(false);
+            return;
+        }
+
         
     }
 
     public void onDisable()
     {
-        
+        if(storage != null)
+            storage.onDisable();
     }
 }

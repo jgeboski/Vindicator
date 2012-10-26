@@ -31,12 +31,24 @@ public class TargetObject
     public static final int NOTE_WARN   = 1 << 7;
     public static final int NOTE_SEVR   = 1 << 8;
 
+    private int    id;
     private String target;
     private String issuer;
     private String message;
     private long   timeout;
     private long   time;
     private int    flags;
+
+    public TargetObject()
+    {
+        this.id      = 0;
+        this.target  = null;
+        this.issuer  = null;
+        this.message = null;
+        this.timeout = 0;
+        this.time    = 0;
+        this.flags   = 0;
+    }
 
     public TargetObject(String target, String issuer, String message,
                         long timeout, int flags)
@@ -48,6 +60,7 @@ public class TargetObject
             flags   = TEMPORARY;
         }
 
+        this.id      = 0;
         this.target  = target;
         this.issuer  = issuer;
         this.message = message;
@@ -59,6 +72,11 @@ public class TargetObject
     public boolean hasFlag(int flag)
     {
         return ((flags & flag) != 0);
+    }
+
+    public int getId()
+    {
+        return id;
     }
 
     public String getTarget()
@@ -91,6 +109,11 @@ public class TargetObject
         return flags;
     }
 
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
     public void setTarget(String target)
     {
         this.target = target;
@@ -114,5 +137,10 @@ public class TargetObject
     public void setTime(long time)
     {
         this.time = time;
+    }
+
+    public void setFlags(int flags)
+    {
+        this.flags = flags;
     }
 }
