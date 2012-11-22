@@ -19,10 +19,10 @@ package org.jgeboski.vindicator;
 
 import java.io.File;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import org.jgeboski.vindicator.api.Ban;
-import org.jgeboski.vindicator.api.TargetObject;
+import org.jgeboski.vindicator.api.VindicatorAPI;
 import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageSQL;
 
@@ -32,6 +32,7 @@ public class Vindicator extends JavaPlugin
 
     public Configuration config;
     public Storage       storage;
+    public VindicatorAPI api;
 
     private EventListener events;
 
@@ -39,6 +40,7 @@ public class Vindicator extends JavaPlugin
     {
         config  = new Configuration(new File(getDataFolder(), "config.yml"));
         storage = null;
+        api     = new VindicatorAPI();
 
         events  = new EventListener(this);
     }
@@ -63,5 +65,19 @@ public class Vindicator extends JavaPlugin
     {
         if(storage != null)
             storage.onDisable();
+    }
+
+    public void reload()
+    {
+        config.load();
+    }
+
+    public boolean hasPermissionM(CommandSender sender, String perm)
+    {
+        if(sender.hasPermission(perm))
+            return true;
+        
+        Message.severe(sender, "You don't have permission for that");
+        return false;
     }
 }

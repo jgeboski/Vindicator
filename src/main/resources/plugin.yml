@@ -6,7 +6,66 @@ main: org.jgeboski.vindicator.Vindicator
 softdepend: []
 
 commands:
-
+  ban:
+    description: Ban a player or IP from the server
+    aliases: []
+    usage: /<command> <player/IP> [reason]
+  kick:
+    description: Kick a player or IP from the server
+    aliases: []
+    usage: /<command> <player/IP> [reason]
+  lookup:
+    description: Lookup a player or IP
+    aliases: []
+    usage: /<command> <player/IP>
+  noteadd:
+    description: Add a player or IP note
+    aliases: [addnote, newnote]
+    usage: /<command> [-p] <player/IP> <note>
+  noterem:
+    description: Remove a player or IP note
+    aliases: [delnote, notedel, remnote]
+    usage: /<command> <player/IP> <index>
+  unban:
+    description: Unban a player or IP from the server
+    aliases: [pardon]
+    usage: /<command> <player/IP>
+  vindicator:
+    description: Vindicator management
+    aliases: [vind]
+    usage: /<command> reload
 
 permissions:
-
+  vindicator.ban:
+    description: Ban a player or IP from the server
+    default: op
+  vindicator.kick:
+    description: Kick a player or IP from the server
+    default: op
+  vindicator.note:
+    description: Access to the note command
+    default: op
+    children:
+      vindicator.note.add: true
+      vindicator.note.public: true
+      vindicator.note.rem: true
+  vindicator.note.add:
+    description: Add a player or IP note
+    default: op
+  vindicator.note.add.public:
+    description: Add a public player or IP note
+    default: op
+  vindicator.note.rem:
+    description: Remove a player or IP note
+    default: op
+  vindicator.unban:
+    description: Unban a player or IP from the server
+    default: op
+  vindicator.manage:
+    description: Access to the vindicator command
+    default: op
+  vindicator.manage.reload:
+    description: Reload Vindicator
+    default: op
+    children:
+      vindicator.manage: true

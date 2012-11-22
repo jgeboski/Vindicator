@@ -19,17 +19,12 @@ package org.jgeboski.vindicator.api;
 
 public class TargetObject
 {
-    public static final int PERMANENT   = 1 << 0;
-    public static final int TEMPORARY   = 1 << 1;
+    public static final int PUBLIC      = 1 << 0;
 
-    public static final int PLAYER_BAN  = 1 << 2;
-    public static final int PLAYER_NOTE = 1 << 3;
-    public static final int IP_BAN      = 1 << 4;
-    public static final int IP_NOTE     = 1 << 5;
-
-    public static final int NOTE_INFO   = 1 << 6;
-    public static final int NOTE_WARN   = 1 << 7;
-    public static final int NOTE_SEVR   = 1 << 8;
+    public static final int PLAYER_BAN  = 1 << 1;
+    public static final int PLAYER_NOTE = 1 << 2;
+    public static final int IP_BAN      = 1 << 3;
+    public static final int IP_NOTE     = 1 << 4;
 
     private int    id;
     private String target;
@@ -53,18 +48,11 @@ public class TargetObject
     public TargetObject(String target, String issuer, String message,
                         long timeout, int flags)
     {
-        if(timeout < 0) {
-            flags   = PERMANENT;
-            timeout = 0;
-        } else {
-            flags   = TEMPORARY;
-        }
-
         this.id      = 0;
         this.target  = target;
         this.issuer  = issuer;
         this.message = message;
-        this.timeout = 0;
+        this.timeout = timeout;
         this.time    = System.currentTimeMillis();
         this.flags   = flags;
     }

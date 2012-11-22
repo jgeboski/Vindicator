@@ -30,17 +30,24 @@ public class Configuration extends YamlConfiguration
     public String storePass;
     public String storePrefix;
 
+    public boolean mustReason;
+    public String  defBanReason;
+    public String  defKickReason;
+
     public Configuration(File file)
     {
         this.file = file;
+
+        this.mustReason    = false;
+        this.defBanReason  = "You have been banned";
+        this.defKickReason = "You have been kicked";
 
         this.storeDriver = "sql";
         this.storeUser   = null;
         this.storePass   = null;
         this.storePrefix = null;
         this.storeURL    = String.format("jdbc:sqlite:%s%sdatabase.sqlite",
-                                         file.getParent(),
-                                         file.separator);
+                                         file.getParent(), file.separator);
     }
 
     public void load()
@@ -51,11 +58,15 @@ public class Configuration extends YamlConfiguration
             Log.warning("Unable to load: %s", file.toString());
         }
 
-        storeDriver = getString("storage.driver", storeDriver);
-        storeURL    = getString("storage.url",    storeURL);
-        storeUser   = getString("storage.user",   storeUser);
-        storePass   = getString("storage.pass",   storePass);
-        storePrefix = getString("storage.prefix", storePrefix);
+        mustReason    = getBoolean("settings.must-reason", mustReason);
+        defBanReason  = getString("settings.default-kick", defBanReason);
+        defKickReason = getString("settings.default-ban",  defKickReason);
+
+        storeDriver   = getString("storage.driver",        storeDriver);
+        storeURL      = getString("storage.url",           storeURL);
+        storeUser     = getString("storage.user",          storeUser);
+        storePass     = getString("storage.pass",          storePass);
+        storePrefix   = getString("storage.prefix",        storePrefix);
 
         if(!file.exists())
             save();
@@ -63,11 +74,15 @@ public class Configuration extends YamlConfiguration
 
     public void save()
     {
-        set("storage.driver", storeDriver);
-        set("storage.url",    storeURL);
-        set("storage.user",   storeUser);
-        set("storage.pass",   storePass);
-        set("storage.prefix", storePrefix);
+        set("settings.must-reason",  mustReason);
+        set("settings.default-kick", defBanReason);
+        set("settings.default-ban",  defKickReason);
+
+        set("storage.driver",        storeDriver);
+        set("storage.url",           storeURL);
+        set("storage.user",          storeUser);
+        set("storage.pass",          storePass);
+        set("storage.prefix",        storePrefix);
 
         try {
             super.save(file);
