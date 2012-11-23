@@ -59,7 +59,11 @@ public class VindicatorAPI
         to.addFlag(TargetObject.BAN);
 
         storage.add(to);
-        kick(issuer, "Banned: " + reason);
+
+        if(to.hasFlag(TargetObject.IP))
+            kickIP(target, "Banned: " + reason);
+        else
+            kick(target, "Banned: " + reason);
 
         vind.broadcast("vindicator.message.ban",
                        "Banned placed for %s by %s: %s",
@@ -69,8 +73,13 @@ public class VindicatorAPI
     public void kick(String issuer, String target, String reason)
         throws APIException
     {
-        if(!kick(issuer, reason))
-            throw new APIException("Player %s not found", target);
+        if(IPUtils.isAddress(target)) {
+            if(!kickIP(target, reason))
+                throw new APIException("Player(s) for %s not found", target);
+        } else {
+            if(!kick(target, reason))
+                throw new APIException("Player %s not found", target);
+        }
 
         vind.broadcast("vindicator.message.kick",
                        "Kick placed for %s by %s: %s",
@@ -187,15 +196,23 @@ public class VindicatorAPI
         return true;
     }
 
-    private void kickIP(String target, String message)
+    private boolean kickIP(String target, String message)
     {
         String ip;
+        int    i;
+
+        i = 0;
 
         for(Player p : vind.getServer().getOnlinePlayers()) {
             ip = p.getAddress().getAddress().getHostAddress();
 
             if(ip.equals(target))
-                p.kickPlayer(message);
+                continue;
+            
+            p.kickPlayer(message);
+            i++;
         }
+
+        return (i > 0);
     }
 }
