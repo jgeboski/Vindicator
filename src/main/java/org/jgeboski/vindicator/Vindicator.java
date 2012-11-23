@@ -31,6 +31,7 @@ import com.ensifera.animosity.craftirc.EndPoint;
 import com.ensifera.animosity.craftirc.RelayedMessage;
 
 import org.jgeboski.vindicator.api.VindicatorAPI;
+import org.jgeboski.vindicator.command.*;
 import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageSQL;
 
@@ -87,7 +88,13 @@ public class Vindicator extends JavaPlugin
             return;
         }
 
-        
+       getCommand("ban").setExecutor(new CBan(this));
+       getCommand("kick").setExecutor(new CKick(this));
+       getCommand("lookup").setExecutor(new CLookup(this));
+       getCommand("noteadd").setExecutor(new CNoteAdd(this));
+       getCommand("noterem").setExecutor(new CNoteRem(this));
+       getCommand("unban").setExecutor(new CUnban(this));
+       getCommand("vindicator").setExecutor(new CVindicator(this));
     }
 
     public void onDisable()
