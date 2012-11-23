@@ -42,6 +42,9 @@ permissions:
   vindicator.kick:
     description: Kick a player or IP from the server
     default: op
+  vindicator.lookup:
+    description: Lookup a player or IP
+    default: op
   vindicator.note:
     description: Access to the note command
     default: op

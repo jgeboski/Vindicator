@@ -61,6 +61,15 @@ public class VindicatorAPI
     }
 
 
+    /* Lookups */
+
+    public TargetObject[] lookup(String issuer, String target)
+        throws APIException
+    {
+        return new TargetObject[0];
+    }
+
+
     /* Note adding */
 
     public void noteAdd(String issuer, String target, String note, boolean pub)
