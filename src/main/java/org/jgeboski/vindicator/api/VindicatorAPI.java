@@ -135,6 +135,7 @@ public class VindicatorAPI
         throws APIException
     {
         TargetObject bt;
+        String       reason;
 
         bt = null;
 
@@ -149,11 +150,17 @@ public class VindicatorAPI
         if(bt == null)
             throw new APIException("Ban for %d not found", target);
 
+        target = bt.getTarget();
+        reason = bt.getMessage();
+
         storage.remove(bt);
+
+        if(vind.config.unbanNote)
+            noteAdd(issuer, target, "Unbanned: " + reason, false);
 
         vind.broadcast("vindicator.message.unban",
                        "Ban removed for %s by %s: %s",
-                       bt.getTarget(), issuer, bt.getMessage());
+                       target, issuer, reason);
     }
 
     private int getTypeFlag(String target, int ifname, int ifaddress)

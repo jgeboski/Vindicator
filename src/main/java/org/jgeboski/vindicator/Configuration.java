@@ -30,6 +30,7 @@ public class Configuration extends YamlConfiguration
     public String storePass;
     public String storePrefix;
 
+    public boolean unbanNote;
     public boolean mustReason;
     public String  defBanReason;
     public String  defKickReason;
@@ -42,6 +43,7 @@ public class Configuration extends YamlConfiguration
     {
         this.file = file;
 
+        this.unbanNote     = false;
         this.mustReason    = false;
         this.defBanReason  = "You have been banned";
         this.defKickReason = "You have been kicked";
@@ -66,19 +68,20 @@ public class Configuration extends YamlConfiguration
             Log.warning("Unable to load: %s", file.toString());
         }
 
-        mustReason    = getBoolean("settings.must-reason", mustReason);
-        defBanReason  = getString("settings.default-kick", defBanReason);
-        defKickReason = getString("settings.default-ban",  defKickReason);
+        unbanNote     = getBoolean("settings.unban-to-note", unbanNote);
+        mustReason    = getBoolean("settings.must-reason",   mustReason);
+        defBanReason  = getString("settings.default-kick",   defBanReason);
+        defKickReason = getString("settings.default-ban",    defKickReason);
 
-        storeDriver   = getString("storage.driver",        storeDriver);
-        storeURL      = getString("storage.url",           storeURL);
-        storeUser     = getString("storage.user",          storeUser);
-        storePass     = getString("storage.pass",          storePass);
-        storePrefix   = getString("storage.prefix",        storePrefix);
+        storeDriver   = getString("storage.driver",          storeDriver);
+        storeURL      = getString("storage.url",             storeURL);
+        storeUser     = getString("storage.user",            storeUser);
+        storePass     = getString("storage.pass",            storePass);
+        storePrefix   = getString("storage.prefix",          storePrefix);
 
-        ircEnabled    = getBoolean("irc.enabled",          ircEnabled);
-        ircColored    = getBoolean("irc.colored",          ircEnabled);
-        ircTag        = getString("irc.tag",               ircTag);
+        ircEnabled    = getBoolean("irc.enabled",            ircEnabled);
+        ircColored    = getBoolean("irc.colored",            ircEnabled);
+        ircTag        = getString("irc.tag",                 ircTag);
 
         if(!file.exists())
             save();
@@ -86,19 +89,20 @@ public class Configuration extends YamlConfiguration
 
     public void save()
     {
-        set("settings.must-reason",  mustReason);
-        set("settings.default-kick", defBanReason);
-        set("settings.default-ban",  defKickReason);
+        set("settings.unban-to-note", unbanNote);
+        set("settings.must-reason",   mustReason);
+        set("settings.default-kick",  defBanReason);
+        set("settings.default-ban",   defKickReason);
 
-        set("storage.driver",        storeDriver);
-        set("storage.url",           storeURL);
-        set("storage.user",          storeUser);
-        set("storage.pass",          storePass);
-        set("storage.prefix",        storePrefix);
+        set("storage.driver",         storeDriver);
+        set("storage.url",            storeURL);
+        set("storage.user",           storeUser);
+        set("storage.pass",           storePass);
+        set("storage.prefix",         storePrefix);
 
-        set("irc.enabled",           ircEnabled);
-        set("irc.colored",           ircEnabled);
-        set("irc.tag",               ircTag);
+        set("irc.enabled",            ircEnabled);
+        set("irc.colored",            ircEnabled);
+        set("irc.tag",                ircTag);
 
         try {
             super.save(file);
