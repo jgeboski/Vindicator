@@ -34,6 +34,10 @@ public class Configuration extends YamlConfiguration
     public String  defBanReason;
     public String  defKickReason;
 
+    public boolean ircEnabled;
+    public boolean ircColored;
+    public String  ircTag;
+
     public Configuration(File file)
     {
         this.file = file;
@@ -42,12 +46,16 @@ public class Configuration extends YamlConfiguration
         this.defBanReason  = "You have been banned";
         this.defKickReason = "You have been kicked";
 
-        this.storeDriver = "sql";
-        this.storeUser   = null;
-        this.storePass   = null;
-        this.storePrefix = null;
-        this.storeURL    = String.format("jdbc:sqlite:%s%sdatabase.sqlite",
-                                         file.getParent(), file.separator);
+        this.storeDriver   = "sql";
+        this.storeUser     = null;
+        this.storePass     = null;
+        this.storePrefix   = null;
+        this.storeURL      = String.format("jdbc:sqlite:%s%sdatabase.sqlite",
+                                           file.getParent(), file.separator);
+
+        this.ircEnabled    = false;
+        this.ircColored    = true;
+        this.ircTag        = "vindicator";
     }
 
     public void load()
@@ -68,6 +76,10 @@ public class Configuration extends YamlConfiguration
         storePass     = getString("storage.pass",          storePass);
         storePrefix   = getString("storage.prefix",        storePrefix);
 
+        ircEnabled    = getBoolean("irc.enabled",          ircEnabled);
+        ircColored    = getBoolean("irc.colored",          ircEnabled);
+        ircTag        = getString("irc.tag",               ircTag);
+
         if(!file.exists())
             save();
     }
@@ -83,6 +95,10 @@ public class Configuration extends YamlConfiguration
         set("storage.user",          storeUser);
         set("storage.pass",          storePass);
         set("storage.prefix",        storePrefix);
+
+        set("irc.enabled",           ircEnabled);
+        set("irc.colored",           ircEnabled);
+        set("irc.tag",               ircTag);
 
         try {
             super.save(file);
