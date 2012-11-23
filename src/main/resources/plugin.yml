@@ -45,25 +45,6 @@ permissions:
   vindicator.lookup:
     description: Lookup a player or IP
     default: op
-  vindicator.note:
-    description: Access to the note command
-    default: op
-    children:
-      vindicator.note.add: true
-      vindicator.note.public: true
-      vindicator.note.rem: true
-  vindicator.note.add:
-    description: Add a player or IP note
-    default: op
-  vindicator.note.add.public:
-    description: Add a public player or IP note
-    default: op
-  vindicator.note.rem:
-    description: Remove a player or IP note
-    default: op
-  vindicator.unban:
-    description: Unban a player or IP from the server
-    default: op
   vindicator.manage:
     description: Access to the vindicator command
     default: op
@@ -72,3 +53,41 @@ permissions:
     default: op
     children:
       vindicator.manage: true
+  vindicator.note:
+    description: Access to the note command
+    default: op
+    children:
+      vindicator.note.add: true
+      vindicator.note.private: true
+      vindicator.note.rem: true
+  vindicator.note.add:
+    description: Add a player or IP note
+    default: op
+  vindicator.note.add.private:
+    description: Add a private player or IP note
+    default: op
+  vindicator.note.rem:
+    description: Remove a player or IP note
+    default: op
+  vindicator.unban:
+    description: Unban a player or IP from the server
+    default: op
+
+  vindicator.message.ban:
+    description: Receive a message upon a ban
+    default: op
+  vindicator.message.kick:
+    description: Receive a message upon a kick
+    default: op
+  vindicator.message.note.add:
+    description: Receive a message upon a note addition
+    default: op
+  vindicator.message.note.add.private:
+    description: Receive a message upon a private note addition
+    default: op
+  vindicator.message.note.rem:
+    description: Receive a message upon a private note removal
+    default: op
+  vindicator.message.unban:
+    description: Receive a message upon an unban
+    default: op

@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.jgeboski.vindicator.api.TargetObject;
-import org.jgeboski.vindicator.Log;
+import org.jgeboski.vindicator.exception.StorageException;
 import org.jgeboski.vindicator.storage.sql.Database;
 import org.jgeboski.vindicator.storage.sql.SQLStatement;
 
@@ -39,7 +39,10 @@ public class StorageSQL implements Storage
 
     public StorageSQL(String url, String username, String password,
                       String prefix)
+        throws StorageException
     {
+        SQLStatement stmt;
+
         this.url      = url;
         this.username = username;
         this.password = password;
@@ -47,26 +50,15 @@ public class StorageSQL implements Storage
 
         if(prefix != null)
             TABLE_TARGETS = prefix + TABLE_TARGETS;
-    }
-
-    public StorageSQL(String url)
-    {
-        this(url, null, null, null);
-    }
-
-    public boolean onEnable()
-    {
-        SQLStatement stmt;
 
         try {
             database = new Database(url, username, password, prefix);
         } catch(SQLException e) {
-            Log.severe(e.getMessage());
-            return false;
+            throw new StorageException(e);
         }
 
         if(database.hasTable(TABLE_TARGETS))
-            return true;
+            return;
 
         stmt = database.createStatement();
 
@@ -85,25 +77,26 @@ public class StorageSQL implements Storage
             stmt.executeUpdate();
             stmt.close();
         } catch(SQLException e) {
-            Log.severe(e.getMessage());
-            return false;
+            throw new StorageException(e);
         }
-
-        return true;
     }
 
-    public void onDisable()
+    public StorageSQL(String url)
+        throws StorageException
+    {
+        this(url, null, null, null);
+    }
+
+    public void close()
     {
         if(database != null)
             database.close();
     }
 
-    public boolean add(TargetObject to)
+    public void add(TargetObject to)
+        throws StorageException
     {
         SQLStatement stmt;
-
-        if(to == null)
-            return false;
 
         stmt = database.createStatement();
 
@@ -118,23 +111,19 @@ public class StorageSQL implements Storage
             stmt.execute();
             stmt.close();
         } catch(SQLException e) {
-            Log.severe(e.getMessage());
-            return false;
+            throw new StorageException(e);
         }
-
-        return true;
     }
 
-    public boolean remove(int id)
+    public void remove(int id)
+        throws StorageException
     {
         SQLStatement stmt;
-        int          ret;
 
         if(id < 1)
-            return false;
+            return;
 
         stmt = database.createStatement();
-        ret  = 0;
 
         stmt.store(
             "DELETE FROM", TABLE_TARGETS,
@@ -142,21 +131,21 @@ public class StorageSQL implements Storage
             id);
 
         try {
-            ret = stmt.executeUpdate();
+            stmt.executeUpdate();
             stmt.close();
         } catch(SQLException e) {
-            Log.severe(e.getMessage());
+            throw new StorageException(e);
         }
-
-        return (ret > 0);
     }
 
-    public boolean remove(TargetObject to)
+    public void remove(TargetObject to)
+        throws StorageException
     {
-        return remove(to.getId());
+        remove(to.getId());
     }
 
     public TargetObject[] getTargets(String target)
+        throws StorageException
     {
         ArrayList<TargetObject> ret;
 
@@ -197,7 +186,7 @@ public class StorageSQL implements Storage
 
             stmt.close();
         } catch(SQLException e) {
-            Log.severe(e.getMessage());
+            throw new StorageException(e);
         }
 
         return ret.toArray(new TargetObject[0]);

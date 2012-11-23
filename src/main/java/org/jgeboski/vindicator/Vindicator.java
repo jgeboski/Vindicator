@@ -31,16 +31,14 @@ import com.ensifera.animosity.craftirc.EndPoint;
 import com.ensifera.animosity.craftirc.RelayedMessage;
 
 import org.jgeboski.vindicator.api.VindicatorAPI;
+import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.command.*;
-import org.jgeboski.vindicator.storage.Storage;
-import org.jgeboski.vindicator.storage.StorageSQL;
 
 public class Vindicator extends JavaPlugin
 {
     public static final String pluginName = "Vindicator";
 
     public Configuration config;
-    public Storage       storage;
     public VindicatorAPI api;
 
     private EventListener events;
@@ -51,8 +49,7 @@ public class Vindicator extends JavaPlugin
     public void onLoad()
     {
         config   = new Configuration(new File(getDataFolder(), "config.yml"));
-        storage  = null;
-        api      = new VindicatorAPI();
+        api      = null;
         events   = new EventListener(this);
 
         craftirc = null;
@@ -65,6 +62,13 @@ public class Vindicator extends JavaPlugin
         Plugin p;
 
         config.load();
+
+        try {
+            api = new VindicatorAPI(this);
+        } catch(APIException e) {
+            setEnabled(false);
+            return;
+        }
 
         if(config.ircEnabled) {
             pm = getServer().getPluginManager();
@@ -79,22 +83,13 @@ public class Vindicator extends JavaPlugin
                 config.ircEnabled = false;
         }
 
-        /* For now, SQL only */
-        storage = new StorageSQL(config.storeURL,  config.storeUser,
-                                 config.storePass, config.storePrefix);
-
-        if(!storage.onEnable()) {
-            setEnabled(false);
-            return;
-        }
-
-       getCommand("ban").setExecutor(new CBan(this));
-       getCommand("kick").setExecutor(new CKick(this));
-       getCommand("lookup").setExecutor(new CLookup(this));
-       getCommand("noteadd").setExecutor(new CNoteAdd(this));
-       getCommand("noterem").setExecutor(new CNoteRem(this));
-       getCommand("unban").setExecutor(new CUnban(this));
-       getCommand("vindicator").setExecutor(new CVindicator(this));
+        getCommand("ban").setExecutor(new CBan(this));
+        getCommand("kick").setExecutor(new CKick(this));
+        getCommand("lookup").setExecutor(new CLookup(this));
+        getCommand("noteadd").setExecutor(new CNoteAdd(this));
+        getCommand("noterem").setExecutor(new CNoteRem(this));
+        getCommand("unban").setExecutor(new CUnban(this));
+        getCommand("vindicator").setExecutor(new CVindicator(this));
     }
 
     public void onDisable()
@@ -102,8 +97,7 @@ public class Vindicator extends JavaPlugin
         if(config.ircEnabled)
             craftirc.unregisterEndPoint(config.ircTag);
 
-        if(storage != null)
-            storage.onDisable();
+        api.close();
     }
 
     public void reload()

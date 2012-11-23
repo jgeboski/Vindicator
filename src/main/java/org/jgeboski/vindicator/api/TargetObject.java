@@ -19,12 +19,13 @@ package org.jgeboski.vindicator.api;
 
 public class TargetObject
 {
-    public static final int PUBLIC      = 1 << 0;
+    public static final int PRIVATE = 1 << 0;
 
-    public static final int PLAYER_BAN  = 1 << 1;
-    public static final int PLAYER_NOTE = 1 << 2;
-    public static final int IP_BAN      = 1 << 3;
-    public static final int IP_NOTE     = 1 << 4;
+    public static final int IP      = 1 << 1;
+    public static final int PLAYER  = 1 << 2;
+
+    public static final int BAN     = 1 << 3;
+    public static final int NOTE    = 1 << 4;
 
     private int    id;
     private String target;
@@ -34,19 +35,8 @@ public class TargetObject
     private long   time;
     private int    flags;
 
-    public TargetObject()
-    {
-        this.id      = 0;
-        this.target  = null;
-        this.issuer  = null;
-        this.message = null;
-        this.timeout = 0;
-        this.time    = 0;
-        this.flags   = 0;
-    }
-
     public TargetObject(String target, String issuer, String message,
-                        long timeout, int flags)
+                        long timeout)
     {
         this.id      = 0;
         this.target  = target;
@@ -54,7 +44,22 @@ public class TargetObject
         this.message = message;
         this.timeout = timeout;
         this.time    = System.currentTimeMillis();
-        this.flags   = flags;
+        this.flags   = 0;
+    }
+
+    public TargetObject(String target, String issuer, String message)
+    {
+        this(target, issuer, message, 0);
+    }
+
+    public TargetObject()
+    {
+        this(null, null, null, 0);
+    }
+
+    public void addFlag(int flag)
+    {
+        flags |= flag;
     }
 
     public boolean hasFlag(int flag)

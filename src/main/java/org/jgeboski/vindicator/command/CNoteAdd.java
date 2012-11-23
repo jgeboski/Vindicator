@@ -22,7 +22,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.api.VindicatorAPI;
-import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
@@ -39,7 +39,7 @@ public class CNoteAdd implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        boolean pub;
+        boolean priv;
         String  note;
 
         if(!vind.hasPermissionM(sender, "vindicator.note.add"))
@@ -50,7 +50,7 @@ public class CNoteAdd implements CommandExecutor
             return true;
         }
 
-        pub = false;
+        priv = false;
 
         if(args[0].startsWith("-")) {
             if(!args[0].equals("-p")) {
@@ -58,16 +58,16 @@ public class CNoteAdd implements CommandExecutor
                 return true;
             }
 
-            if(!vind.hasPermissionM(sender, "vindicator.note.add.public"))
+            if(!vind.hasPermissionM(sender, "vindicator.note.add.private"))
                 return true;
 
-            pub = true;
+            priv = true;
         }
 
         note = Utils.strjoin(args, " ", 1);
 
         try {
-            vind.api.noteAdd(sender.getName(), args[0], note, pub);
+            vind.api.noteAdd(sender.getName(), args[0], note, priv);
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
         }

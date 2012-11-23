@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.api;
+package org.jgeboski.vindicator.exception;
 
-public class IPNote extends TargetObject
+public class APIException extends Exception
 {
-    public IPNote(String target, String issuer, String message, long timeout)
+    public APIException(String format, Object ... args)
     {
-        super(target, issuer, message, timeout, TargetObject.IP_NOTE);
+        super(String.format(format, args));
     }
 
-    public IPNote(String target, String issuer, String message)
+    public APIException(Throwable cause)
     {
-        super(target, issuer, message, 0, TargetObject.IP_NOTE);
+        super(cause);
     }
 }

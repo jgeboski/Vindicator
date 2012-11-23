@@ -18,16 +18,21 @@
 package org.jgeboski.vindicator.storage;
 
 import org.jgeboski.vindicator.api.TargetObject;
+import org.jgeboski.vindicator.exception.StorageException;
 
 public interface Storage
 {
-    public boolean onEnable();
-    public void onDisable();
+    public void close();
 
-    public boolean add(TargetObject to);
+    public void add(TargetObject to)
+        throws StorageException;
 
-    public boolean remove(int id);
-    public boolean remove(TargetObject to);
+    public void remove(int id)
+        throws StorageException;
 
-    public TargetObject[] getTargets(String target);
+    public void remove(TargetObject to)
+        throws StorageException;
+
+    public TargetObject[] getTargets(String target)
+        throws StorageException;
 }

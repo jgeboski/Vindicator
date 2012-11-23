@@ -15,12 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.api;
+package org.jgeboski.vindicator.exception;
 
-public class APIException extends Exception
+public class StorageException extends APIException
 {
-    public APIException(String format, Object ... args)
+    public StorageException(String format, Object ... args)
     {
-        super(String.format(format, args));
+        super(format, args);
+    }
+
+    public StorageException(Throwable cause)
+    {
+        super(cause);
     }
 }
