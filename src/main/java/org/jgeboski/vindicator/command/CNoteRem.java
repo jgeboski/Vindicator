@@ -40,7 +40,7 @@ public class CNoteRem implements CommandExecutor
     {
         int index;
 
-        if(!vind.hasPermissionM(sender, "vindicator.note.rem"))
+        if(!vind.hasPermissionM(sender, "vindicator.noterem"))
             return true;
 
         if(args.length < 2) {

@@ -42,7 +42,7 @@ public class CNoteAdd implements CommandExecutor
         boolean priv;
         String  note;
 
-        if(!vind.hasPermissionM(sender, "vindicator.note.add"))
+        if(!vind.hasPermissionM(sender, "vindicator.noteadd"))
             return true;
 
         if(args.length < 2) {
@@ -58,7 +58,7 @@ public class CNoteAdd implements CommandExecutor
                 return true;
             }
 
-            if(!vind.hasPermissionM(sender, "vindicator.note.add.private"))
+            if(!vind.hasPermissionM(sender, "vindicator.noteadd.private"))
                 return true;
 
             priv = true;

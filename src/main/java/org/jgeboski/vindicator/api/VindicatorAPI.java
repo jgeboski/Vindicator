@@ -103,7 +103,7 @@ public class VindicatorAPI
         to.addFlag(getTypeFlag(target, TargetObject.PLAYER, TargetObject.IP));
         to.addFlag(TargetObject.NOTE);
 
-        perm = "vindicator.message.note.add";
+        perm = "vindicator.message.noteadd";
 
         if(priv) {
             to.addFlag(TargetObject.PRIVATE);
@@ -120,6 +120,8 @@ public class VindicatorAPI
         throws APIException
     {
         TargetObject[] tos;
+        String         perm;
+
         int i;
         int n;
 
@@ -133,10 +135,14 @@ public class VindicatorAPI
         if(n != index)
             throw new APIException("Note index %d not found", index);
 
+        perm = "vindicator.message.noterem";
+
+        if(tos[i].hasFlag(TargetObject.PRIVATE))
+            perm += ".private";
+
         storage.remove(tos[i]);
 
-        vind.broadcast("vindicator.message.note.rem",
-                       "Note removed for %s by %s: %s",
+        vind.broadcast(perm, "Note removed for %s by %s: %s",
                        tos[i].getTarget(), issuer, tos[i].getMessage());
     }
 
