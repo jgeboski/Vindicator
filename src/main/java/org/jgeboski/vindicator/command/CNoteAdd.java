@@ -39,7 +39,7 @@ public class CNoteAdd implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        boolean priv;
+        boolean pub;
         String  note;
 
         if(!vind.hasPermissionM(sender, "vindicator.noteadd"))
@@ -50,7 +50,7 @@ public class CNoteAdd implements CommandExecutor
             return true;
         }
 
-        priv = false;
+        pub = false;
 
         if(args[0].startsWith("-")) {
             if(!args[0].equals("-p")) {
@@ -58,16 +58,16 @@ public class CNoteAdd implements CommandExecutor
                 return true;
             }
 
-            if(!vind.hasPermissionM(sender, "vindicator.noteadd.private"))
+            if(!vind.hasPermissionM(sender, "vindicator.noteadd.public"))
                 return true;
 
-            priv = true;
+            pub = true;
         }
 
         note = Utils.strjoin(args, " ", 1);
 
         try {
-            vind.api.noteAdd(sender.getName(), args[0], note, priv);
+            vind.api.noteAdd(sender.getName(), args[0], note, pub);
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
         }

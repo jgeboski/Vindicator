@@ -62,17 +62,17 @@ permissions:
     default: op
     children:
       vindicator.message.noteadd: true
-  vindicator.noteadd.private:
-    description: Add a private player or IP note
+  vindicator.noteadd.public:
+    description: Add a public player or IP note
     default: op
     children:
-      vindicator.message.noteadd.private: true
+      vindicator.message.noteadd.public: true
   vindicator.noterem:
     description: Remove a player or IP note
     default: op
     children:
       vindicator.message.noterem: true
-      vindicator.message.noterem.private: true
+      vindicator.message.noterem.public: true
   vindicator.unban:
     description: Unban a player or IP from the server
     default: op
@@ -88,14 +88,14 @@ permissions:
   vindicator.message.noteadd:
     description: Receive a message upon a note addition
     default: op
-  vindicator.message.noteadd.private:
-    description: Receive a message upon a private note addition
+  vindicator.message.noteadd.public:
+    description: Receive a message upon a public note addition
     default: op
   vindicator.message.noterem:
     description: Receive a message upon a note removal
     default: op
-  vindicator.message.noterem.private:
-    description: Receive a message upon a private note removal
+  vindicator.message.noterem.public:
+    description: Receive a message upon a public note removal
     default: op
   vindicator.message.unban:
     description: Receive a message upon an unban

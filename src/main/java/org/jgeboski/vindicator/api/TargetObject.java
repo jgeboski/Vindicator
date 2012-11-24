@@ -19,13 +19,13 @@ package org.jgeboski.vindicator.api;
 
 public class TargetObject
 {
-    public static final int PRIVATE = 1 << 0;
+    public static final int PUBLIC = 1 << 0;
 
-    public static final int IP      = 1 << 1;
-    public static final int PLAYER  = 1 << 2;
+    public static final int IP     = 1 << 1;
+    public static final int PLAYER = 1 << 2;
 
-    public static final int BAN     = 1 << 3;
-    public static final int NOTE    = 1 << 4;
+    public static final int BAN    = 1 << 3;
+    public static final int NOTE   = 1 << 4;
 
     private int    id;
     private String target;

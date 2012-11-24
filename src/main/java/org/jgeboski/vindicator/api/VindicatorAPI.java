@@ -92,7 +92,7 @@ public class VindicatorAPI
         return new TargetObject[0];
     }
 
-    public void noteAdd(String issuer, String target, String note, boolean priv)
+    public void noteAdd(String issuer, String target, String note, boolean pub)
         throws APIException
     {
         TargetObject to;
@@ -105,9 +105,9 @@ public class VindicatorAPI
 
         perm = "vindicator.message.noteadd";
 
-        if(priv) {
-            to.addFlag(TargetObject.PRIVATE);
-            perm += ".private";
+        if(pub) {
+            to.addFlag(TargetObject.PUBLIC);
+            perm += ".public";
         }
 
         storage.add(to);
@@ -137,8 +137,8 @@ public class VindicatorAPI
 
         perm = "vindicator.message.noterem";
 
-        if(tos[i].hasFlag(TargetObject.PRIVATE))
-            perm += ".private";
+        if(tos[i].hasFlag(TargetObject.PUBLIC))
+            perm += ".public";
 
         storage.remove(tos[i]);
 
