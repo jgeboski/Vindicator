@@ -17,6 +17,8 @@
 
 package org.jgeboski.vindicator.api;
 
+import org.jgeboski.vindicator.util.Utils;
+
 public class TargetObject
 {
     public static final int PUBLIC = 1 << 0;
@@ -43,7 +45,7 @@ public class TargetObject
         this.issuer  = issuer;
         this.message = message;
         this.timeout = timeout;
-        this.time    = System.currentTimeMillis();
+        this.time    = Utils.time();
         this.flags   = 0;
     }
 

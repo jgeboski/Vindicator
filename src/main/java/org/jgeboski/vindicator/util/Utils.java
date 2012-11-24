@@ -17,34 +17,29 @@
 
 package org.jgeboski.vindicator.util;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Utils
 {
-    public static String strjoin(String[] strs, String glue, int start, int end)
-    {
-        String ret;
-        int    i;
-
-        if(start > strs.length)
-            return new String();
-
-        if(end > strs.length)
-            end = strs.length;
-
-        ret = strs[start];
-
-        for(i = (start + 1); i < strs.length; i++)
-            ret.concat(glue + strs[i]);
-
-        return ret;
-    }
-
-    public static String strjoin(String[] strs, String glue, int start)
-    {
-        return strjoin(strs, glue, start, strs.length);
-    }
-
     public static boolean isMinecraftName(String str)
     {
         return str.matches("\\w{2,16}");
+    }
+
+    public static long time()
+    {
+        return System.currentTimeMillis() / 1000;
+    }
+
+    public static String timestr(String format, long secs)
+    {
+        SimpleDateFormat sdf;
+        Date             date;
+
+        sdf  = new SimpleDateFormat(format);
+        date = new Date(secs * 1000);
+
+        return sdf.format(date);
     }
 }

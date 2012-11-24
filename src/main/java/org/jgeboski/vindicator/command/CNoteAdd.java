@@ -24,7 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.jgeboski.vindicator.api.VindicatorAPI;
 import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.Message;
-import org.jgeboski.vindicator.util.Utils;
+import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.Vindicator;
 
 public class CNoteAdd implements CommandExecutor
@@ -64,7 +64,7 @@ public class CNoteAdd implements CommandExecutor
             pub = true;
         }
 
-        note = Utils.strjoin(args, " ", 1);
+        note = StrUtils.strjoin(args, " ", 1);
 
         try {
             vind.api.noteAdd(sender.getName(), args[0], note, pub);

@@ -24,7 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.jgeboski.vindicator.api.VindicatorAPI;
 import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.Message;
-import org.jgeboski.vindicator.util.Utils;
+import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.Vindicator;
 
 public class CKick implements CommandExecutor
@@ -57,7 +57,7 @@ public class CKick implements CommandExecutor
 
             reason = vind.config.defKickReason;
         } else {
-            reason = Utils.strjoin(args, " ", 1);
+            reason = StrUtils.strjoin(args, " ", 1);
         }
 
         try {

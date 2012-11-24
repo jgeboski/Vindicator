@@ -48,7 +48,7 @@ public class VindicatorAPI
         storage.close();
     }
 
-    public void ban(String issuer, String target, String reason)
+    public void ban(String issuer, String target, String reason, long timeout)
         throws APIException
     {
         TargetObject to;
