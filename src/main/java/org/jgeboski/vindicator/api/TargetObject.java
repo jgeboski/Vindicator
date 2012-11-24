@@ -37,26 +37,20 @@ public class TargetObject
     private long   time;
     private int    flags;
 
-    public TargetObject(String target, String issuer, String message,
-                        long timeout)
+    public TargetObject(String target, String issuer, String message)
     {
         this.id      = 0;
         this.target  = target;
         this.issuer  = issuer;
         this.message = message;
-        this.timeout = timeout;
+        this.timeout = 0;
         this.time    = Utils.time();
         this.flags   = 0;
     }
 
-    public TargetObject(String target, String issuer, String message)
-    {
-        this(target, issuer, message, 0);
-    }
-
     public TargetObject()
     {
-        this(null, null, null, 0);
+        this(null, null, null);
     }
 
     public void addFlag(int flag)

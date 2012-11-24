@@ -26,6 +26,10 @@ commands:
     description: Remove a player or IP note
     aliases: [delnote, notedel, remnote]
     usage: /<command> <player/IP> <index>
+  tmpban:
+    description: Temporarily ban a player or IP from the server
+    aliases: [tempban, tban]
+    usage: /<command> <player/IP> <time> [reason]
   unban:
     description: Unban a player or IP from the server
     aliases: [pardon]
@@ -73,6 +77,11 @@ permissions:
     children:
       vindicator.message.noterem: true
       vindicator.message.noterem.public: true
+  vindicator.tmpban:
+    description: Temporarily ban a player or IP from the server
+    default: op
+    children:
+      vindicator.message.tmpban: true
   vindicator.unban:
     description: Unban a player or IP from the server
     default: op

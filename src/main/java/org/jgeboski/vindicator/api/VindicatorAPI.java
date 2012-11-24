@@ -52,11 +52,15 @@ public class VindicatorAPI
         throws APIException
     {
         TargetObject to;
+        String       tstr;
 
-        to = new TargetObject(issuer, target, reason, 0);
+        to = new TargetObject(issuer, target, reason);
 
         to.addFlag(getTypeFlag(target, TargetObject.PLAYER, TargetObject.IP));
         to.addFlag(TargetObject.BAN);
+
+        if(timeout > 0)
+            to.setTimeout(Utils.time() * timeout);
 
         storage.add(to);
 
@@ -68,6 +72,19 @@ public class VindicatorAPI
         vind.broadcast("vindicator.message.ban",
                        "Banned placed for %s by %s: %s",
                        target, issuer, reason);
+
+        if(timeout > 0) {
+            tstr = Utils.timestr("EEE, d MMM 'at' HH:mm z", to.getTimeout());
+
+            vind.broadcast("vindicator.message.ban",
+                           "Temporary ban will be removed: %s", tstr);
+        }
+    }
+
+    public void ban(String issuer, String target, String reason)
+        throws APIException
+    {
+        ban(issuer, target, reason, 0);
     }
 
     public void kick(String issuer, String target, String reason)
@@ -98,7 +115,7 @@ public class VindicatorAPI
         TargetObject to;
         String       perm;
 
-        to = new TargetObject(issuer, target, note, 0);
+        to = new TargetObject(issuer, target, note);
 
         to.addFlag(getTypeFlag(target, TargetObject.PLAYER, TargetObject.IP));
         to.addFlag(TargetObject.NOTE);
