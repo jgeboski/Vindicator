@@ -205,7 +205,7 @@ public class VindicatorAPI
         }
 
         if(bt == null)
-            throw new APIException("Ban for %d not found", target);
+            throw new APIException("Ban for %s not found", target);
 
         target = bt.getTarget();
         reason = bt.getMessage();
