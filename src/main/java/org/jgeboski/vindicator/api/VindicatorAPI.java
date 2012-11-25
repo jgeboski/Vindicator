@@ -158,7 +158,7 @@ public class VindicatorAPI
                        target, issuer, note);
     }
 
-    public void noteRem(String issuer, String target, int index)
+    public void noteRem(String target, String issuer, int index)
         throws APIException
     {
         TargetObject[] tos;
@@ -168,14 +168,15 @@ public class VindicatorAPI
         int n;
 
         tos = storage.getTargets(target);
+        index--;
 
         for(i = n = 0; (n < index) && (i < tos.length); i++) {
-            if(!tos[i].hasFlag(TargetObject.NOTE))
+            if(tos[i].hasFlag(TargetObject.NOTE))
                 n++;
         }
 
-        if(n != index)
-            throw new APIException("Note index %d not found", index);
+        if((n != index) || (i >= tos.length))
+            throw new APIException("Note index %d not found", (index + 1));
 
         perm = "vindicator.message.noterem";
 
@@ -199,7 +200,7 @@ public class VindicatorAPI
         for(TargetObject to : storage.getTargets(target)) {
             if(!to.hasFlag(TargetObject.BAN))
                 continue;
-            
+
             bt = to;
             break;
         }
@@ -256,7 +257,7 @@ public class VindicatorAPI
 
             if(ip.equals(target))
                 continue;
-            
+
             p.kickPlayer(message);
             i++;
         }
