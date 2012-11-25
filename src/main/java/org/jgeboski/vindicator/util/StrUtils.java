@@ -69,19 +69,22 @@ public class StrUtils
                 continue;
             }
 
-            if((i != (e + 1)) || ((e + 1) <= cstr.length))
+            e++;
+
+            if((i != e) || (e > cstr.length))
                 continue;
 
-            switch(cstr[e + 1]) {
+            switch(cstr[e]) {
             case 'm':
-                mod = 60;
-
-                if(((e + 2) <= cstr.length) && (cstr[e + 2] == 'o'))
-                    mod *= 43200;
+                if(((e + 1) < cstr.length) && (cstr[e + 1] == 'o'))
+                    mod = 2592000;
+                else
+                    mod = 60;
                 break;
 
             case 'h': mod = 3600;     break;
             case 'd': mod = 86400;    break;
+            case 'w': mod = 604800;   break;
             case 'y': mod = 31536000; break;
             default:  mod = 1;
             }
