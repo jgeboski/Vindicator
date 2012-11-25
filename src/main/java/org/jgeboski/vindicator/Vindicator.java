@@ -106,7 +106,15 @@ public class Vindicator extends JavaPlugin
         if(config.ircEnabled)
             craftirc.unregisterEndPoint(config.ircTag);
 
+        api.close();
         config.load();
+
+        try {
+            api = new VindicatorAPI(this);
+        } catch(APIException e) {
+            setEnabled(false);
+            return;
+        }
 
         if(config.ircEnabled && !registerEndPoint(config.ircTag, vPoint))
             config.ircEnabled = false;
