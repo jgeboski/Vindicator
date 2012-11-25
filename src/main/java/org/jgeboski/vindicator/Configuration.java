@@ -19,6 +19,7 @@ package org.jgeboski.vindicator;
 
 import java.io.File;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jgeboski.vindicator.util.Log;
 
 public class Configuration extends YamlConfiguration
 {

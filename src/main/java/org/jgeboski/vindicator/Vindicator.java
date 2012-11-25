@@ -31,8 +31,10 @@ import com.ensifera.animosity.craftirc.EndPoint;
 import com.ensifera.animosity.craftirc.RelayedMessage;
 
 import org.jgeboski.vindicator.api.VindicatorAPI;
-import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.command.*;
+import org.jgeboski.vindicator.exception.APIException;
+import org.jgeboski.vindicator.util.Log;
+import org.jgeboski.vindicator.util.Message;
 
 public class Vindicator extends JavaPlugin
 {
