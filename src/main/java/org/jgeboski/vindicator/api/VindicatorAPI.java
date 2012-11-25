@@ -177,7 +177,7 @@ public class VindicatorAPI
         bt = null;
 
         for(TargetObject to : storage.getTargets(target)) {
-            if(!to.hasFlag(TargetObject.NOTE))
+            if(!to.hasFlag(TargetObject.BAN))
                 continue;
             
             bt = to;
