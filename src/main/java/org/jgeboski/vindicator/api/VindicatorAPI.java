@@ -82,7 +82,8 @@ public class VindicatorAPI
         if(timeout > 0) {
             vind.broadcast("vindicator.message.ban",
                            "Temporary ban will be removed: %s",
-                           to.getTimeoutStr());
+                           Utils.timestr("EEE, d MMM 'at' HH:mm z",
+                                         to.getTimeout()));
         }
     }
 

@@ -22,6 +22,8 @@ import java.util.Date;
 
 public class Utils
 {
+    public static final String dateFormat = "MM-dd-yy kk:mm:ss";
+
     public static boolean isMinecraftName(String str)
     {
         return str.matches("\\w{2,16}");
@@ -38,6 +40,17 @@ public class Utils
         Date             date;
 
         sdf  = new SimpleDateFormat(format);
+        date = new Date(secs * 1000);
+
+        return sdf.format(date);
+    }
+
+    public static String timestr(long secs)
+    {
+        SimpleDateFormat sdf;
+        Date             date;
+
+        sdf  = new SimpleDateFormat(dateFormat);
         date = new Date(secs * 1000);
 
         return sdf.format(date);
