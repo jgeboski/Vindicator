@@ -56,7 +56,7 @@ public class CNoteRem implements CommandExecutor
         }
 
         try {
-            vind.api.noteRem(sender.getName(), args[0], index);
+            vind.api.noteRem(args[0], sender.getName(), index);
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
         }

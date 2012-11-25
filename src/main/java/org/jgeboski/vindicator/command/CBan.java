@@ -61,7 +61,7 @@ public class CBan implements CommandExecutor
         }
 
         try {
-            vind.api.ban(sender.getName(), args[0], reason);
+            vind.api.ban(args[0], sender.getName(), reason);
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
         }

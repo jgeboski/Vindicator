@@ -67,7 +67,7 @@ public class CNoteAdd implements CommandExecutor
         note = StrUtils.strjoin(args, " ", 1);
 
         try {
-            vind.api.noteAdd(sender.getName(), args[0], note, pub);
+            vind.api.noteAdd(args[0], sender.getName(), note, pub);
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
         }

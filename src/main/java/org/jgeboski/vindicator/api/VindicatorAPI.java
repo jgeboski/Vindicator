@@ -50,7 +50,7 @@ public class VindicatorAPI
         storage.close();
     }
 
-    public void ban(String issuer, String target, String reason, long timeout)
+    public void ban(String target, String issuer, String reason, long timeout)
         throws APIException
     {
         TargetObject to;
@@ -60,7 +60,7 @@ public class VindicatorAPI
                 throw new APIException("Ban already exists for %s", target);
         }
 
-        to = new TargetObject(issuer, target, reason);
+        to = new TargetObject(target, issuer, reason);
 
         to.addFlag(getTypeFlag(target, TargetObject.PLAYER, TargetObject.IP));
         to.addFlag(TargetObject.BAN);
@@ -86,13 +86,13 @@ public class VindicatorAPI
         }
     }
 
-    public void ban(String issuer, String target, String reason)
+    public void ban(String target, String issuer, String reason)
         throws APIException
     {
-        ban(issuer, target, reason, 0);
+        ban(target, issuer, reason, 0);
     }
 
-    public void kick(String issuer, String target, String reason)
+    public void kick(String target, String issuer, String reason)
         throws APIException
     {
         if(IPUtils.isAddress(target)) {
@@ -134,13 +134,13 @@ public class VindicatorAPI
         return ret.toArray(new TargetObject[0]);
     }
 
-    public void noteAdd(String issuer, String target, String note, boolean pub)
+    public void noteAdd(String target, String issuer, String note, boolean pub)
         throws APIException
     {
         TargetObject to;
         String       perm;
 
-        to = new TargetObject(issuer, target, note);
+        to = new TargetObject(target, issuer, note);
 
         to.addFlag(getTypeFlag(target, TargetObject.PLAYER, TargetObject.IP));
         to.addFlag(TargetObject.NOTE);
@@ -188,7 +188,7 @@ public class VindicatorAPI
                        tos[i].getTarget(), issuer, tos[i].getMessage());
     }
 
-    public void unban(String issuer, String target)
+    public void unban(String target, String issuer)
         throws APIException
     {
         TargetObject bt;

@@ -47,7 +47,7 @@ public class CUnban implements CommandExecutor
         }
 
         try {
-            vind.api.unban(sender.getName(), args[0]);
+            vind.api.unban(args[0], sender.getName());
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
         }

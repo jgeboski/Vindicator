@@ -61,7 +61,7 @@ public class CKick implements CommandExecutor
         }
 
         try {
-            vind.api.kick(sender.getName(), args[0], reason);
+            vind.api.kick(args[0], sender.getName(), reason);
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
         }

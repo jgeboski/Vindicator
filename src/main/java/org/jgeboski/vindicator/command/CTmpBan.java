@@ -70,7 +70,7 @@ public class CTmpBan implements CommandExecutor
         }
 
         try {
-            vind.api.ban(sender.getName(), args[0], reason, secs);
+            vind.api.ban(args[0], sender.getName(), reason, secs);
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
         }
