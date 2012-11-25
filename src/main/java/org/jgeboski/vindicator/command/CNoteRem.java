@@ -38,8 +38,6 @@ public class CNoteRem implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        int index;
-
         if(!vind.hasPermissionM(sender, "vindicator.noterem"))
             return true;
 
@@ -49,14 +47,7 @@ public class CNoteRem implements CommandExecutor
         }
 
         try {
-            index = Integer.parseInt(args[1]);
-        } catch(NumberFormatException e) {
-            Message.severe(sender, "Invalid note index: %s", args[1]);
-            return true;
-        }
-
-        try {
-            vind.api.noteRem(args[0], sender.getName(), index);
+            vind.api.noteRem(args[0], sender.getName(), args[1]);
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
         }

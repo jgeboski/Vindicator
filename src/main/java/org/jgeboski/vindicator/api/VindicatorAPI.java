@@ -189,6 +189,20 @@ public class VindicatorAPI
                        tos[i].getTarget(), issuer, tos[i].getMessage());
     }
 
+    public void noteRem(String target, String issuer, String index)
+        throws APIException
+    {
+        int i;
+
+        try {
+            i = Integer.parseInt(index);
+        } catch(NumberFormatException e) {
+            throw new APIException("Invalid note index: %s", index);
+        }
+
+        noteRem(target, issuer, i);
+    }
+
     public void unban(String target, String issuer)
         throws APIException
     {
