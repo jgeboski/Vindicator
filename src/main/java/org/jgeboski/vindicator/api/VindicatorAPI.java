@@ -54,6 +54,11 @@ public class VindicatorAPI
         TargetObject to;
         String       tstr;
 
+        for(TargetObject o : storage.getTargets(target)) {
+            if(o.hasFlag(TargetObject.BAN))
+                throw new APIException("Ban already exists for %s", target);
+        }
+
         to = new TargetObject(issuer, target, reason);
 
         to.addFlag(getTypeFlag(target, TargetObject.PLAYER, TargetObject.IP));
