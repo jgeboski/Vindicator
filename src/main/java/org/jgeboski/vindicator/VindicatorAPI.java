@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.api;
+package org.jgeboski.vindicator;
 
 import java.util.ArrayList;
 
@@ -25,6 +25,7 @@ import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.exception.StorageException;
 import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageSQL;
+import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.IPUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;

@@ -17,7 +17,6 @@
 
 package org.jgeboski.vindicator.storage;
 
-import org.jgeboski.vindicator.api.TargetObject;
 import org.jgeboski.vindicator.exception.StorageException;
 
 public interface Storage
