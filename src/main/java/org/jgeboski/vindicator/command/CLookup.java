@@ -17,6 +17,7 @@
 
 package org.jgeboski.vindicator.command;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,12 +51,30 @@ public class CLookup implements CommandExecutor
         }
 
         try {
-            tos = vind.api.lookup(sender.getName(), args[0]);
+            tos = vind.api.lookup(args[0]);
         } catch(APIException e) {
             Message.severe(sender, e.getMessage());
+            return true;
         }
 
-        /* Display lookup results */
+        Message.info(sender, "The account record of %s:", args[0]);
+
+        if(tos.length < 1) {
+            Message.info(sender, "  The account of %s has no records");
+            return true;
+        }
+
+        for(TargetObject to : tos) {
+            if(to.hasFlag(TargetObject.BAN)) {
+                Message.info(sender, "  %s[%s] Ban (by: %s): %s",
+                             ChatColor.RED, to.getTimeStr(), to.getIssuer(),
+                             to.getMessage());
+            } else if(to.hasFlag(TargetObject.NOTE)) {
+                Message.info(sender, "  %s[%s] Note #%d (by: %s): %s",
+                             ChatColor.YELLOW, to.getId(), to.getTimeStr(),
+                             to.getIssuer(), to.getMessage());
+            }
+        }
 
         return true;
     }

@@ -21,6 +21,8 @@ import org.jgeboski.vindicator.util.Utils;
 
 public class TargetObject
 {
+    public static final String dateFormat = "EEE, d MMM 'at' HH:mm z";
+
     public static final int PUBLIC = 1 << 0;
 
     public static final int IP     = 1 << 1;
@@ -88,9 +90,19 @@ public class TargetObject
         return timeout;
     }
 
+    public String getTimeoutStr()
+    {
+        return Utils.timestr(dateFormat, timeout);
+    }
+
     public long getTime()
     {
         return time;
+    }
+
+    public String getTimeStr()
+    {
+        return Utils.timestr(dateFormat, time);
     }
 
     public int getFlags()

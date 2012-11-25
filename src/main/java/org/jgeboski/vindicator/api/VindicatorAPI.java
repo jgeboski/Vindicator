@@ -17,6 +17,8 @@
 
 package org.jgeboski.vindicator.api;
 
+import java.util.ArrayList;
+
 import org.bukkit.entity.Player;
 
 import org.jgeboski.vindicator.exception.APIException;
@@ -52,7 +54,6 @@ public class VindicatorAPI
         throws APIException
     {
         TargetObject to;
-        String       tstr;
 
         for(TargetObject o : storage.getTargets(target)) {
             if(o.hasFlag(TargetObject.BAN))
@@ -79,10 +80,9 @@ public class VindicatorAPI
                        target, issuer, reason);
 
         if(timeout > 0) {
-            tstr = Utils.timestr("EEE, d MMM 'at' HH:mm z", to.getTimeout());
-
             vind.broadcast("vindicator.message.ban",
-                           "Temporary ban will be removed: %s", tstr);
+                           "Temporary ban will be removed: %s",
+                           to.getTimeoutStr());
         }
     }
 
@@ -108,10 +108,30 @@ public class VindicatorAPI
                        target, issuer, reason);
     }
 
-    public TargetObject[] lookup(String issuer, String target)
+    public TargetObject[] lookup(String target)
         throws APIException
     {
-        return new TargetObject[0];
+        ArrayList<TargetObject> ret;
+        int b;
+        int n;
+
+        ret = new ArrayList<TargetObject>();
+        b = n = 0;
+
+        for(TargetObject to : storage.getTargets(target)) {
+            if(to.hasFlag(TargetObject.BAN)) {
+                ret.add(b, to);
+                b++;
+            } else if(to.hasFlag(TargetObject.NOTE)) {
+                to.setId(n + 1);
+                ret.add(b + n, to);
+                n++;
+            } else {
+                ret.add(to);
+            }
+        }
+
+        return ret.toArray(new TargetObject[0]);
     }
 
     public void noteAdd(String issuer, String target, String note, boolean pub)
