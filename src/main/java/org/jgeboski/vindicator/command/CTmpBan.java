@@ -66,7 +66,7 @@ public class CTmpBan implements CommandExecutor
 
             reason = vind.config.defBanReason;
         } else {
-            reason = StrUtils.strjoin(args, " ", 1);
+            reason = StrUtils.strjoin(args, " ", 2);
         }
 
         try {

@@ -66,7 +66,7 @@ public class VindicatorAPI
         to.addFlag(TargetObject.BAN);
 
         if(timeout > 0)
-            to.setTimeout(Utils.time() * timeout);
+            to.setTimeout(Utils.time() + timeout);
 
         storage.add(to);
 
@@ -82,7 +82,7 @@ public class VindicatorAPI
         if(timeout > 0) {
             vind.broadcast("vindicator.message.ban",
                            "Temporary ban will be removed: %s",
-                           Utils.timestr("EEE, d MMM 'at' HH:mm z",
+                           Utils.timestr("EEE, MMM d 'at' h:m a z",
                                          to.getTimeout()));
         }
     }
