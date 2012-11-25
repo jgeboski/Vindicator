@@ -34,8 +34,8 @@ public class StrUtils
 
         ret = strs[start];
 
-        for(i = (start + 1); i < strs.length; i++)
-            ret.concat(glue + strs[i]);
+        for(i = (start + 1); i < end; i++)
+            ret += glue + strs[i];
 
         return ret;
     }
