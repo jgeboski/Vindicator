@@ -41,6 +41,7 @@ public class CLookup implements CommandExecutor
                              String label, String[] args)
     {
         TargetObject[] tos;
+        String         type;
 
         if(!vind.hasPermissionM(sender, "vindicator.lookup"))
             return true;
@@ -57,22 +58,24 @@ public class CLookup implements CommandExecutor
             return true;
         }
 
-        Message.info(sender, "The account record of %s:", args[0]);
+        Message.info(sender, "The records for %s:", args[0]);
 
         if(tos.length < 1) {
-            Message.info(sender, "  The account of %s has no records");
+            Message.info(sender, "There are no records for %s", args[0]);
             return true;
         }
 
         for(TargetObject to : tos) {
+            type = to.hasFlag(TargetObject.IP) ? "IP" : "Player";
+
             if(to.hasFlag(TargetObject.BAN)) {
-                Message.info(sender, "  %s[%s] Ban (by: %s): %s",
-                             ChatColor.RED, to.getTimeStr(), to.getIssuer(),
-                             to.getMessage());
-            } else if(to.hasFlag(TargetObject.NOTE)) {
-                Message.info(sender, "  %s[%s] Note #%d (by: %s): %s",
-                             ChatColor.YELLOW, to.getId(), to.getTimeStr(),
+                Message.info(sender, "%s[%s] %s Ban (by: %s): %s",
+                             ChatColor.RED, to.getTimeStr(), type,
                              to.getIssuer(), to.getMessage());
+            } else if(to.hasFlag(TargetObject.NOTE)) {
+                Message.info(sender, "%s[%s] %s Note #%d (by: %s): %s",
+                             ChatColor.YELLOW, to.getTimeStr(), type,
+                             to.getId(), to.getIssuer(), to.getMessage());
             }
         }
 
