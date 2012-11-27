@@ -68,7 +68,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
         RBan run;
         int  type;
 
-        type = getTypeFlag(sender, target, RObject.PLAYER, RObject.IP);
+        target = getTarget(target);
+        type   = getTypeFlag(sender, target, RObject.PLAYER, RObject.IP);
 
         if(type < 0)
             return;
@@ -95,15 +96,18 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void kick(CommandSender sender, String target, String reason)
     {
         if(IPUtils.isAddress(target)) {
-            if(!kickIP(target, reason)) {
-                Message.severe(sender, "Player(s) for %s not found", target);
+            if(kickIP(target, reason))
                 return;
-            }
-        } else {
-            if(!kick(target, reason)) {
-                Message.severe(sender, "Player %s not found", target);
-                return;
-            }
+
+            Message.severe(sender, "Player(s) for %s not found", target);
+            return;
+        }
+
+        target = getTarget(target);
+
+        if(!kick(target, reason)) {
+            Message.severe(sender, "Player %s not found", target);
+            return;
         }
 
         vind.broadcast("vindicator.message.kick",
@@ -113,6 +117,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
     public void lookup(CommandSender sender, String target)
     {
+        target = getTarget(target);
         execute(new RLookup(this, sender, target));
     }
 
@@ -122,7 +127,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
         RNoteAdd run;
         int  type;
 
-        type = getTypeFlag(sender, target, RObject.PLAYER, RObject.IP);
+        target = getTarget(target);
+        type   = getTypeFlag(sender, target, RObject.PLAYER, RObject.IP);
 
         if(type < 0)
             return;
@@ -138,6 +144,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
     public void noteRem(CommandSender sender, String target, int index)
     {
+        target = getTarget(target);
         execute(new RNoteRem(this, sender, target, index));
     }
 
@@ -157,7 +164,23 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
     public void unban(CommandSender sender, String target)
     {
+        target = getTarget(target);
         execute(new RUnban(this, sender, target));
+    }
+
+    private String getTarget(String target)
+    {
+        Player p;
+
+        if(!vind.config.autoComplete)
+            return target;
+
+        p = vind.getServer().getPlayer(target);
+
+        if(p != null)
+            return p.getName();
+
+        return target;
     }
 
     private int getTypeFlag(CommandSender sender, String target, int ifname,

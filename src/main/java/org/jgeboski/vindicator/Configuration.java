@@ -38,10 +38,11 @@ public class Configuration extends YamlConfiguration
     public String storePass;
     public String storePrefix;
 
-    public boolean unbanNote;
     public boolean mustReason;
     public String  defBanReason;
     public String  defKickReason;
+    public boolean unbanNote;
+    public boolean autoComplete;
 
     public boolean ircEnabled;
     public boolean ircColored;
@@ -62,10 +63,11 @@ public class Configuration extends YamlConfiguration
         this.poolMaxSize   = 10;
         this.poolKeepAlive = 5000;
 
-        this.unbanNote     = false;
         this.mustReason    = false;
         this.defBanReason  = "You have been banned";
         this.defKickReason = "You have been kicked";
+        this.unbanNote     = false;
+        this.autoComplete  = true;
 
         this.ircEnabled    = false;
         this.ircColored    = true;
@@ -95,10 +97,11 @@ public class Configuration extends YamlConfiguration
         poolKeepAlive = cs.getLong("keep-alive", poolKeepAlive);
 
         cs            = getConfigurationSection("settings");
-        unbanNote     = cs.getBoolean("unban-to-note", unbanNote);
         mustReason    = cs.getBoolean("must-reason",   mustReason);
         defBanReason  = cs.getString("default-kick",   defBanReason);
         defKickReason = cs.getString("default-ban",    defKickReason);
+        unbanNote     = cs.getBoolean("unban-to-note", unbanNote);
+        autoComplete  = cs.getBoolean("auto-complete", autoComplete);
 
         cs            = getConfigurationSection("irc");
         ircEnabled    = cs.getBoolean("enabled", ircEnabled);
@@ -126,10 +129,11 @@ public class Configuration extends YamlConfiguration
         cs.set("keep-alive", poolKeepAlive);
 
         cs = getConfigurationSection("settings");
-        cs.set("unban-to-note", unbanNote);
         cs.set("must-reason",   mustReason);
         cs.set("default-kick",  defBanReason);
         cs.set("default-ban",   defKickReason);
+        cs.set("unban-to-note", unbanNote);
+        cs.set("auto-complete", autoComplete);
 
         cs = getConfigurationSection("irc");
         cs.set("enabled", ircEnabled);
