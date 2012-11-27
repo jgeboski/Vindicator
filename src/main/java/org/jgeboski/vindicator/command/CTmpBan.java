@@ -21,6 +21,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.Vindicator;
@@ -66,7 +67,12 @@ public class CTmpBan implements CommandExecutor
             reason = StrUtils.strjoin(args, " ", 2);
         }
 
-        vind.api.ban(sender, args[0], reason, secs);
+        try {
+            vind.api.ban(sender, args[0], reason, secs);
+        } catch(APIException e) {
+            Message.severe(sender, e.getMessage());
+        }
+
         return true;
     }
 }

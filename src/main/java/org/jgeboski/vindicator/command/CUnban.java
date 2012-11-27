@@ -21,6 +21,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.Vindicator;
 
@@ -44,7 +45,12 @@ public class CUnban implements CommandExecutor
             return true;
         }
 
-        vind.api.unban(sender, args[0]);
+        try {
+            vind.api.unban(sender, args[0]);
+        } catch(APIException e) {
+            Message.severe(sender, e.getMessage());
+        }
+
         return true;
     }
 }

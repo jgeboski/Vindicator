@@ -19,6 +19,7 @@ package org.jgeboski.vindicator;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +32,6 @@ import org.jgeboski.vindicator.runnable.*;
 import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageSQL;
 import org.jgeboski.vindicator.util.IPUtils;
-import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
@@ -64,6 +64,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
     public void ban(CommandSender sender, String target, String message,
                     long timeout)
+        throws APIException
     {
         RBan run;
         int  type;
@@ -80,7 +81,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if(timeout > 0)
             run.setTimeout(Utils.time() + timeout);
 
-        execute(run);
+        execrun(run);
 
         if(run.hasFlag(RObject.IP))
             kickIP(target, "Banned: " + message);
@@ -89,26 +90,25 @@ public class VindicatorAPI extends ThreadPoolExecutor
     }
 
     public void ban(CommandSender sender, String target, String reason)
+        throws APIException
     {
         ban(sender, target, reason, 0);
     }
 
     public void kick(CommandSender sender, String target, String reason)
+        throws APIException
     {
         if(IPUtils.isAddress(target)) {
             if(kickIP(target, reason))
                 return;
 
-            Message.severe(sender, "Player(s) for %s not found", target);
-            return;
+            throw new APIException("Player(s) for %s not found", target);
         }
 
         target = getTarget(target);
 
-        if(!kick(target, reason)) {
-            Message.severe(sender, "Player %s not found", target);
-            return;
-        }
+        if(!kick(target, reason))
+            throw new APIException("Player %s not found", target);
 
         vind.broadcast("vindicator.message.kick",
                        "Kick placed for %s by %s: %s",
@@ -116,13 +116,15 @@ public class VindicatorAPI extends ThreadPoolExecutor
     }
 
     public void lookup(CommandSender sender, String target)
+        throws APIException
     {
         target = getTarget(target);
-        execute(new RLookup(this, sender, target));
+        execrun(new RLookup(this, sender, target));
     }
 
     public void noteAdd(CommandSender sender, String target, String message,
                         boolean pub)
+        throws APIException
     {
         RNoteAdd run;
         int  type;
@@ -139,33 +141,46 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if(pub)
             run.addFlag(RObject.PUBLIC);
 
-        execute(run);
+        execrun(run);
     }
 
     public void noteRem(CommandSender sender, String target, int index)
+        throws APIException
     {
         target = getTarget(target);
-        execute(new RNoteRem(this, sender, target, index));
+        execrun(new RNoteRem(this, sender, target, index));
     }
 
     public void noteRem(CommandSender sender, String target, String index)
+        throws APIException
     {
         int i;
 
         try {
             i = Integer.parseInt(index);
         } catch(NumberFormatException e) {
-            Message.severe(sender, "Invalid note index: %s", index);
-            return;
+            throw new APIException("Invalid note index: %s", index);
         }
 
         noteRem(sender, target, i);
     }
 
     public void unban(CommandSender sender, String target)
+        throws APIException
     {
         target = getTarget(target);
         execute(new RUnban(this, sender, target));
+    }
+
+    private void execrun(Runnable command)
+        throws APIException
+    {
+        try {
+            super.execute(command);
+        } catch(RejectedExecutionException e) {
+            throw new APIException("Failed to execute command. ",
+                                   "Is the thread pool shutdown?");
+        }
     }
 
     private String getTarget(String target)
@@ -185,6 +200,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
     private int getTypeFlag(CommandSender sender, String target, int ifname,
                             int ifaddress)
+        throws APIException
     {
         if(Utils.isMinecraftName(target))
             return ifname;
@@ -192,8 +208,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if(IPUtils.isAddress(target))
             return ifaddress;
 
-        Message.severe(sender, "Invalid player/IP: %s", target);
-        return -1;
+        throw new APIException("Invalid player/IP: %s", target);
     }
 
     private boolean kick(String target, String message)

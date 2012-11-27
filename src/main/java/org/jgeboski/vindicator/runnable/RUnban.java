@@ -19,6 +19,7 @@ package org.jgeboski.vindicator.runnable;
 
 import org.bukkit.command.CommandSender;
 
+import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.VindicatorAPI;
@@ -61,9 +62,14 @@ public class RUnban extends RObject implements Runnable
                   "Ban removed for %s by %s: %s",
                   bt.getTarget(), issuer, bt.getMessage());
 
-        if(api.vind.config.unbanNote) {
-            api.noteAdd(sender, bt.getTarget(),
-                        "Unbanned: " + bt.getMessage(), false);
+        if(!api.vind.config.unbanNote)
+            return;
+
+        try {
+            api.noteAdd(sender, bt.getTarget(), "Unbanned: " + bt.getMessage(),
+                        false);
+        } catch(APIException e) {
+            Message.severe(sender, e.getMessage());
         }
     }
 }
