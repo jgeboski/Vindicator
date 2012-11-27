@@ -15,36 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.command;
+package org.jgeboski.vindicator.runnable;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.util.Message;
-import org.jgeboski.vindicator.Vindicator;
+import org.jgeboski.vindicator.VindicatorAPI;
 
-public class CNoteRem implements CommandExecutor
+public class RNoteAdd extends RObject implements Runnable
 {
-    protected Vindicator vind;
-
-    public CNoteRem(Vindicator vind)
+    public RNoteAdd(VindicatorAPI api, CommandSender sender, String target,
+                    String message)
     {
-        this.vind = vind;
+        super(api, sender, target, message);
+        addFlag(RObject.NOTE);
     }
 
-    public boolean onCommand(CommandSender sender, Command command,
-                             String label, String[] args)
+    public void run()
     {
-        if(!vind.hasPermissionM(sender, "vindicator.noterem"))
-            return true;
+        String perm;
 
-        if(args.length < 2) {
-            Message.info(sender, command.getUsage());
-            return true;
-        }
+        perm = "vindicator.message.noteadd";
 
-        vind.api.noteRem(sender, args[0], args[1]);
-        return true;
+        if(hasFlag(RObject.PUBLIC))
+            perm += ".public";
+
+        if(!add(this))
+            return;
+
+        broadcast(perm, "Note added for %s by %s: %s", target, issuer, message);
     }
 }

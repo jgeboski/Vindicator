@@ -31,6 +31,10 @@ public class Configuration extends YamlConfiguration
     public String storePass;
     public String storePrefix;
 
+    public int  poolMinSize;
+    public int  poolMaxSize;
+    public long poolKeepAlive;
+
     public boolean unbanNote;
     public boolean mustReason;
     public String  defBanReason;
@@ -48,6 +52,10 @@ public class Configuration extends YamlConfiguration
         this.mustReason    = false;
         this.defBanReason  = "You have been banned";
         this.defKickReason = "You have been kicked";
+
+        this.poolMinSize   = 2;
+        this.poolMaxSize   = 10;
+        this.poolKeepAlive = 5000;
 
         this.storeDriver   = "sql";
         this.storeUser     = null;
@@ -74,6 +82,10 @@ public class Configuration extends YamlConfiguration
         defBanReason  = getString("settings.default-kick",   defBanReason);
         defKickReason = getString("settings.default-ban",    defKickReason);
 
+        poolMinSize   = getInt("pool.min-size",              poolMinSize);
+        poolMaxSize   = getInt("pool.max-size",              poolMaxSize);
+        poolKeepAlive = getLong("pool.keep-alive",           poolKeepAlive);
+
         storeDriver   = getString("storage.driver",          storeDriver);
         storeURL      = getString("storage.url",             storeURL);
         storeUser     = getString("storage.user",            storeUser);
@@ -94,6 +106,10 @@ public class Configuration extends YamlConfiguration
         set("settings.must-reason",   mustReason);
         set("settings.default-kick",  defBanReason);
         set("settings.default-ban",   defKickReason);
+
+        set("pool.min-size",          poolMinSize);
+        set("pool.max-size",          poolMaxSize);
+        set("pool.keep-alive",        poolKeepAlive);
 
         set("storage.driver",         storeDriver);
         set("storage.url",            storeURL);

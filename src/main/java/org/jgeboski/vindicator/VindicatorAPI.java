@@ -17,20 +17,25 @@
 
 package org.jgeboski.vindicator;
 
-import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.exception.StorageException;
+import org.jgeboski.vindicator.runnable.*;
 import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageSQL;
-import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.IPUtils;
+import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
-public class VindicatorAPI
+public class VindicatorAPI extends ThreadPoolExecutor
 {
     public Vindicator vind;
     public Storage    storage;
@@ -38,6 +43,11 @@ public class VindicatorAPI
     public VindicatorAPI(Vindicator vind)
         throws APIException
     {
+        super(vind.config.poolMinSize, vind.config.poolMaxSize,
+              vind.config.poolKeepAlive, TimeUnit.MILLISECONDS,
+              new LinkedBlockingQueue<Runnable>(),
+              Executors.defaultThreadFactory());
+
         this.vind = vind;
 
         /* For now, SQL only */
@@ -51,201 +61,115 @@ public class VindicatorAPI
         storage.close();
     }
 
-    public void ban(String target, String issuer, String reason, long timeout)
-        throws APIException
+    public void ban(CommandSender sender, String target, String message,
+                    long timeout)
     {
-        TargetObject to;
+        RBan run;
+        int  type;
 
-        for(TargetObject o : storage.getTargets(target)) {
-            if(o.hasFlag(TargetObject.BAN))
-                throw new APIException("Ban already exists for %s", target);
-        }
+        type = getTypeFlag(sender, target, RObject.PLAYER, RObject.IP);
 
-        to = new TargetObject(target, issuer, reason);
+        if(type < 0)
+            return;
 
-        to.addFlag(getTypeFlag(target, TargetObject.PLAYER, TargetObject.IP));
-        to.addFlag(TargetObject.BAN);
+        run = new RBan(this, sender, target, message);
+        run.addFlag(type);
 
         if(timeout > 0)
-            to.setTimeout(Utils.time() + timeout);
+            run.setTimeout(Utils.time() + timeout);
 
-        storage.add(to);
+        execute(run);
 
-        if(to.hasFlag(TargetObject.IP))
-            kickIP(target, "Banned: " + reason);
+        if(run.hasFlag(RObject.IP))
+            kickIP(target, "Banned: " + message);
         else
-            kick(target, "Banned: " + reason);
-
-        vind.broadcast("vindicator.message.ban",
-                       "Banned placed for %s by %s: %s",
-                       target, issuer, reason);
-
-        if(timeout > 0) {
-            vind.broadcast("vindicator.message.ban",
-                           "Temporary ban will be removed: %s",
-                           Utils.timestr("EEE, MMM d 'at' h:m a z",
-                                         to.getTimeout()));
-        }
+            kick(target, "Banned: " + message);
     }
 
-    public void ban(String target, String issuer, String reason)
-        throws APIException
+    public void ban(CommandSender sender, String target, String reason)
     {
-        ban(target, issuer, reason, 0);
+        ban(sender, target, reason, 0);
     }
 
-    public void kick(String target, String issuer, String reason)
-        throws APIException
+    public void kick(CommandSender sender, String target, String reason)
     {
         if(IPUtils.isAddress(target)) {
-            if(!kickIP(target, reason))
-                throw new APIException("Player(s) for %s not found", target);
+            if(!kickIP(target, reason)) {
+                Message.severe(sender, "Player(s) for %s not found", target);
+                return;
+            }
         } else {
-            if(!kick(target, reason))
-                throw new APIException("Player %s not found", target);
+            if(!kick(target, reason)) {
+                Message.severe(sender, "Player %s not found", target);
+                return;
+            }
         }
 
         vind.broadcast("vindicator.message.kick",
                        "Kick placed for %s by %s: %s",
-                       target, issuer, reason);
+                       target, sender.getName(), reason);
     }
 
-    public TargetObject[] lookup(String target)
-        throws APIException
+    public void lookup(CommandSender sender, String target)
     {
-        ArrayList<TargetObject> ret;
-        int b;
-        int n;
-
-        ret = new ArrayList<TargetObject>();
-        b = n = 0;
-
-        for(TargetObject to : storage.getTargets(target)) {
-            if(to.hasFlag(TargetObject.BAN)) {
-                ret.add(b, to);
-                b++;
-            } else if(to.hasFlag(TargetObject.NOTE)) {
-                to.setId(n + 1);
-                ret.add(b + n, to);
-                n++;
-            } else {
-                ret.add(to);
-            }
-        }
-
-        return ret.toArray(new TargetObject[0]);
+        execute(new RLookup(this, sender, target));
     }
 
-    public void noteAdd(String target, String issuer, String note, boolean pub)
-        throws APIException
+    public void noteAdd(CommandSender sender, String target, String message,
+                        boolean pub)
     {
-        TargetObject to;
-        String       perm;
+        RNoteAdd run;
+        int  type;
 
-        to = new TargetObject(target, issuer, note);
+        type = getTypeFlag(sender, target, RObject.PLAYER, RObject.IP);
 
-        to.addFlag(getTypeFlag(target, TargetObject.PLAYER, TargetObject.IP));
-        to.addFlag(TargetObject.NOTE);
+        if(type < 0)
+            return;
 
-        perm = "vindicator.message.noteadd";
+        run = new RNoteAdd(this, sender, target, message);
+        run.addFlag(type);
 
-        if(pub) {
-            to.addFlag(TargetObject.PUBLIC);
-            perm += ".public";
-        }
+        if(pub)
+            run.addFlag(RObject.PUBLIC);
 
-        storage.add(to);
-
-        vind.broadcast(perm, "Note added for %s by %s: %s",
-                       target, issuer, note);
+        execute(run);
     }
 
-    public void noteRem(String target, String issuer, int index)
-        throws APIException
+    public void noteRem(CommandSender sender, String target, int index)
     {
-        TargetObject[] tos;
-        String         perm;
-
-        int i;
-        int n;
-
-        tos = storage.getTargets(target);
-        index--;
-
-        for(i = n = 0; (n < index) && (i < tos.length); i++) {
-            if(tos[i].hasFlag(TargetObject.NOTE))
-                n++;
-        }
-
-        if((n != index) || (i >= tos.length))
-            throw new APIException("Note index %d not found", (index + 1));
-
-        perm = "vindicator.message.noterem";
-
-        if(tos[i].hasFlag(TargetObject.PUBLIC))
-            perm += ".public";
-
-        storage.remove(tos[i]);
-
-        vind.broadcast(perm, "Note removed for %s by %s: %s",
-                       tos[i].getTarget(), issuer, tos[i].getMessage());
+        execute(new RNoteRem(this, sender, target, index));
     }
 
-    public void noteRem(String target, String issuer, String index)
-        throws APIException
+    public void noteRem(CommandSender sender, String target, String index)
     {
         int i;
 
         try {
             i = Integer.parseInt(index);
         } catch(NumberFormatException e) {
-            throw new APIException("Invalid note index: %s", index);
+            Message.severe(sender, "Invalid note index: %s", index);
+            return;
         }
 
-        noteRem(target, issuer, i);
+        noteRem(sender, target, i);
     }
 
-    public void unban(String target, String issuer)
-        throws APIException
+    public void unban(CommandSender sender, String target)
     {
-        TargetObject bt;
-        String       reason;
-
-        bt = null;
-
-        for(TargetObject to : storage.getTargets(target)) {
-            if(!to.hasFlag(TargetObject.BAN))
-                continue;
-
-            bt = to;
-            break;
-        }
-
-        if(bt == null)
-            throw new APIException("Ban for %s not found", target);
-
-        target = bt.getTarget();
-        reason = bt.getMessage();
-
-        storage.remove(bt);
-
-        if(vind.config.unbanNote)
-            noteAdd(issuer, target, "Unbanned: " + reason, false);
-
-        vind.broadcast("vindicator.message.unban",
-                       "Ban removed for %s by %s: %s",
-                       target, issuer, reason);
+        execute(new RUnban(this, sender, target));
     }
 
-    private int getTypeFlag(String target, int ifname, int ifaddress)
-        throws APIException
+    private int getTypeFlag(CommandSender sender, String target, int ifname,
+                            int ifaddress)
     {
         if(Utils.isMinecraftName(target))
             return ifname;
-        else if(IPUtils.isAddress(target))
+
+        if(IPUtils.isAddress(target))
             return ifaddress;
-        else
-            throw new APIException("Invalid player/IP: %s", target);
+
+        Message.severe(sender, "Invalid player/IP: %s", target);
+        return -1;
     }
 
     private boolean kick(String target, String message)

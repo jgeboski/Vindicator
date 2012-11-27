@@ -21,11 +21,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.Vindicator;
-import org.jgeboski.vindicator.VindicatorAPI;
 
 public class CKick implements CommandExecutor
 {
@@ -60,12 +58,7 @@ public class CKick implements CommandExecutor
             reason = StrUtils.strjoin(args, " ", 1);
         }
 
-        try {
-            vind.api.kick(args[0], sender.getName(), reason);
-        } catch(APIException e) {
-            Message.severe(sender, e.getMessage());
-        }
-
+        vind.api.kick(sender, args[0], reason);
         return true;
     }
 }

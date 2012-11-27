@@ -17,6 +17,7 @@
 
 package org.jgeboski.vindicator.storage;
 
+import org.bukkit.command.CommandSender;
 import org.jgeboski.vindicator.util.Utils;
 
 public class TargetObject
@@ -29,13 +30,13 @@ public class TargetObject
     public static final int BAN    = 1 << 3;
     public static final int NOTE   = 1 << 4;
 
-    private int    id;
-    private String target;
-    private String issuer;
-    private String message;
-    private long   timeout;
-    private long   time;
-    private int    flags;
+    protected int    id;
+    protected String target;
+    protected String issuer;
+    protected String message;
+    protected long   timeout;
+    protected long   time;
+    protected int    flags;
 
     public TargetObject(String target, String issuer, String message)
     {
@@ -48,9 +49,14 @@ public class TargetObject
         this.flags   = 0;
     }
 
+    public TargetObject(CommandSender sender, String target, String message)
+    {
+        this(sender.getName(), null, null);
+    }
+
     public TargetObject()
     {
-        this(null, null, null);
+        this((String) null, null, null);
     }
 
     public void addFlag(int flag)
