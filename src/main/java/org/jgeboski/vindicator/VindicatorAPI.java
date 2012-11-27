@@ -58,6 +58,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
     public void close()
     {
+        shutdownNow();
         storage.close();
     }
 
