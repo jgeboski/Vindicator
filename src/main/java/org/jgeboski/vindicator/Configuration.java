@@ -18,22 +18,25 @@
 package org.jgeboski.vindicator;
 
 import java.io.File;
+
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+
 import org.jgeboski.vindicator.util.Log;
 
 public class Configuration extends YamlConfiguration
 {
     private File file;
 
+    public int  poolMinSize;
+    public int  poolMaxSize;
+    public long poolKeepAlive;
+
     public String storeDriver;
     public String storeURL;
     public String storeUser;
     public String storePass;
     public String storePrefix;
-
-    public int  poolMinSize;
-    public int  poolMaxSize;
-    public long poolKeepAlive;
 
     public boolean unbanNote;
     public boolean mustReason;
@@ -48,21 +51,21 @@ public class Configuration extends YamlConfiguration
     {
         this.file = file;
 
-        this.unbanNote     = false;
-        this.mustReason    = false;
-        this.defBanReason  = "You have been banned";
-        this.defKickReason = "You have been kicked";
-
-        this.poolMinSize   = 2;
-        this.poolMaxSize   = 10;
-        this.poolKeepAlive = 5000;
-
         this.storeDriver   = "sql";
         this.storeUser     = null;
         this.storePass     = null;
         this.storePrefix   = null;
         this.storeURL      = String.format("jdbc:sqlite:%s%sdatabase.sqlite",
                                            file.getParent(), file.separator);
+
+        this.poolMinSize   = 2;
+        this.poolMaxSize   = 10;
+        this.poolKeepAlive = 5000;
+
+        this.unbanNote     = false;
+        this.mustReason    = false;
+        this.defBanReason  = "You have been banned";
+        this.defKickReason = "You have been kicked";
 
         this.ircEnabled    = false;
         this.ircColored    = true;
@@ -71,30 +74,36 @@ public class Configuration extends YamlConfiguration
 
     public void load()
     {
+        ConfigurationSection cs;
+
         try {
             super.load(file);
         } catch(Exception e) {
             Log.warning("Unable to load: %s", file.toString());
         }
 
-        unbanNote     = getBoolean("settings.unban-to-note", unbanNote);
-        mustReason    = getBoolean("settings.must-reason",   mustReason);
-        defBanReason  = getString("settings.default-kick",   defBanReason);
-        defKickReason = getString("settings.default-ban",    defKickReason);
+        cs            = getConfigurationSection("storage");
+        storeDriver   = cs.getString("driver", storeDriver);
+        storeURL      = cs.getString("url",    storeURL);
+        storeUser     = cs.getString("user",   storeUser);
+        storePass     = cs.getString("pass",   storePass);
+        storePrefix   = cs.getString("prefix", storePrefix);
 
-        poolMinSize   = getInt("pool.min-size",              poolMinSize);
-        poolMaxSize   = getInt("pool.max-size",              poolMaxSize);
-        poolKeepAlive = getLong("pool.keep-alive",           poolKeepAlive);
+        cs            = getConfigurationSection("pool");
+        poolMinSize   = cs.getInt("min-size",    poolMinSize);
+        poolMaxSize   = cs.getInt("max-size",    poolMaxSize);
+        poolKeepAlive = cs.getLong("keep-alive", poolKeepAlive);
 
-        storeDriver   = getString("storage.driver",          storeDriver);
-        storeURL      = getString("storage.url",             storeURL);
-        storeUser     = getString("storage.user",            storeUser);
-        storePass     = getString("storage.pass",            storePass);
-        storePrefix   = getString("storage.prefix",          storePrefix);
+        cs            = getConfigurationSection("settings");
+        unbanNote     = cs.getBoolean("unban-to-note", unbanNote);
+        mustReason    = cs.getBoolean("must-reason",   mustReason);
+        defBanReason  = cs.getString("default-kick",   defBanReason);
+        defKickReason = cs.getString("default-ban",    defKickReason);
 
-        ircEnabled    = getBoolean("irc.enabled",            ircEnabled);
-        ircColored    = getBoolean("irc.colored",            ircEnabled);
-        ircTag        = getString("irc.tag",                 ircTag);
+        cs            = getConfigurationSection("irc");
+        ircEnabled    = cs.getBoolean("enabled", ircEnabled);
+        ircColored    = cs.getBoolean("colored", ircEnabled);
+        ircTag        = cs.getString("tag",      ircTag);
 
         if(!file.exists())
             save();
@@ -102,29 +111,47 @@ public class Configuration extends YamlConfiguration
 
     public void save()
     {
-        set("settings.unban-to-note", unbanNote);
-        set("settings.must-reason",   mustReason);
-        set("settings.default-kick",  defBanReason);
-        set("settings.default-ban",   defKickReason);
+        ConfigurationSection cs;
 
-        set("pool.min-size",          poolMinSize);
-        set("pool.max-size",          poolMaxSize);
-        set("pool.keep-alive",        poolKeepAlive);
+        cs = getConfigurationSection("storage");
+        cs.set("driver", storeDriver);
+        cs.set("url",    storeURL);
+        cs.set("user",   storeUser);
+        cs.set("pass",   storePass);
+        cs.set("prefix", storePrefix);
 
-        set("storage.driver",         storeDriver);
-        set("storage.url",            storeURL);
-        set("storage.user",           storeUser);
-        set("storage.pass",           storePass);
-        set("storage.prefix",         storePrefix);
+        cs = getConfigurationSection("pool");
+        cs.set("min-size",   poolMinSize);
+        cs.set("max-size",   poolMaxSize);
+        cs.set("keep-alive", poolKeepAlive);
 
-        set("irc.enabled",            ircEnabled);
-        set("irc.colored",            ircEnabled);
-        set("irc.tag",                ircTag);
+        cs = getConfigurationSection("settings");
+        cs.set("unban-to-note", unbanNote);
+        cs.set("must-reason",   mustReason);
+        cs.set("default-kick",  defBanReason);
+        cs.set("default-ban",   defKickReason);
+
+        cs = getConfigurationSection("irc");
+        cs.set("enabled", ircEnabled);
+        cs.set("colored", ircEnabled);
+        cs.set("tag",     ircTag);
 
         try {
             super.save(file);
         } catch(Exception e) {
             Log.warning("Unable to save: %s", file.toString());
         }
+    }
+
+    public ConfigurationSection getConfigurationSection(String path)
+    {
+        ConfigurationSection ret;
+
+        ret = super.getConfigurationSection(path);
+
+        if(ret == null)
+            ret = createSection(path);
+
+        return ret;
     }
 }
