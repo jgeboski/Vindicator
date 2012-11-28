@@ -28,7 +28,8 @@ public class TargetObject
     public static final int PLAYER = 1 << 2;
 
     public static final int BAN    = 1 << 3;
-    public static final int NOTE   = 1 << 4;
+    public static final int MUTE   = 1 << 4;
+    public static final int NOTE   = 1 << 5;
 
     protected int    id;
     protected String target;

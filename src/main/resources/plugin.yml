@@ -18,6 +18,10 @@ commands:
     description: Lookup a player or IP
     aliases: []
     usage: /<command> <player/IP>
+  mute:
+    description: Mute a player
+    aliases: []
+    usage: /<command> <player> [time] [reason]
   noteadd:
     description: Add a player or IP note
     aliases: [addnote, newnote]
@@ -34,6 +38,10 @@ commands:
     description: Unban a player or IP from the server
     aliases: [pardon]
     usage: /<command> <player/IP>
+  unmute:
+    description: Unmute a player
+    aliases: []
+    usage: /<command> <player>
   vindicator:
     description: Vindicator management
     aliases: [vind]
@@ -61,6 +69,11 @@ permissions:
     default: op
     children:
       vindicator.manage: true
+  vindicator.mute:
+    description: Mute a player
+    default: op
+    children:
+      vindicator.message.mute: true
   vindicator.noteadd:
     description: Add a player or IP note
     default: op
@@ -87,12 +100,20 @@ permissions:
     default: op
     children:
       vindicator.message.unban: true
+  vindicator.unmute:
+    description: Unmute a player
+    default: op
+    children:
+      vindicator.message.unmute: true
 
   vindicator.message.ban:
     description: Receive a message upon a ban
     default: op
   vindicator.message.kick:
     description: Receive a message upon a kick
+    default: op
+  vindicator.message.mute:
+    description: Receive a message upon a mute
     default: op
   vindicator.message.noteadd:
     description: Receive a message upon a note addition
@@ -108,4 +129,7 @@ permissions:
     default: op
   vindicator.message.unban:
     description: Receive a message upon an unban
+    default: op
+  vindicator.message.unmute:
+    description: Receive a message upon an unmute
     default: op

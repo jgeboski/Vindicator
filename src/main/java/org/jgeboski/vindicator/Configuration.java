@@ -41,6 +41,7 @@ public class Configuration extends YamlConfiguration
     public boolean mustReason;
     public String  defBanReason;
     public String  defKickReason;
+    public String  defMuteReason;
     public boolean unbanNote;
     public boolean autoComplete;
 
@@ -66,6 +67,7 @@ public class Configuration extends YamlConfiguration
         this.mustReason    = false;
         this.defBanReason  = "You have been banned";
         this.defKickReason = "You have been kicked";
+        this.defMuteReason = "You have been muted";
         this.unbanNote     = false;
         this.autoComplete  = true;
 
@@ -100,6 +102,7 @@ public class Configuration extends YamlConfiguration
         mustReason    = cs.getBoolean("must-reason",   mustReason);
         defBanReason  = cs.getString("default-kick",   defBanReason);
         defKickReason = cs.getString("default-ban",    defKickReason);
+        defMuteReason = cs.getString("default-mute",   defMuteReason);
         unbanNote     = cs.getBoolean("unban-to-note", unbanNote);
         autoComplete  = cs.getBoolean("auto-complete", autoComplete);
 
@@ -132,6 +135,7 @@ public class Configuration extends YamlConfiguration
         cs.set("must-reason",   mustReason);
         cs.set("default-kick",  defBanReason);
         cs.set("default-ban",   defKickReason);
+        cs.set("default-mute",  defMuteReason);
         cs.set("unban-to-note", unbanNote);
         cs.set("auto-complete", autoComplete);
 

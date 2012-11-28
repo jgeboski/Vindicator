@@ -122,6 +122,24 @@ public class VindicatorAPI extends ThreadPoolExecutor
         execrun(new RLookup(this, sender, target));
     }
 
+    public void mute(CommandSender sender, String target, String message,
+                     long timeout)
+        throws APIException
+    {
+        RMute run;
+
+        if(!Utils.isMinecraftName(target))
+            throw new APIException("Invalid player: %s", target);
+
+        target = getTarget(target);
+        run    = new RMute(this, sender, target, message);
+
+        if(timeout > 0)
+            run.setTimeout(Utils.time() + timeout);
+
+        execrun(run);
+    }
+
     public void noteAdd(CommandSender sender, String target, String message,
                         boolean pub)
         throws APIException
@@ -170,6 +188,13 @@ public class VindicatorAPI extends ThreadPoolExecutor
     {
         target = getTarget(target);
         execute(new RUnban(this, sender, target));
+    }
+
+    public void unmute(CommandSender sender, String target)
+        throws APIException
+    {
+        target = getTarget(target);
+        execute(new RUnmute(this, sender, target));
     }
 
     private void execrun(Runnable command)
