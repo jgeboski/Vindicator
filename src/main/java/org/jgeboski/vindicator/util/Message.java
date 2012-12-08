@@ -50,7 +50,7 @@ public class Message
      **/
     public static void warning(CommandSender sender, String format, Object ... args)
     {
-        if(sender instanceof Player)
+        if (sender instanceof Player)
             format = ChatColor.YELLOW + format;
 
         toSender(sender, format, args);
@@ -67,7 +67,7 @@ public class Message
      **/
     public static void severe(CommandSender sender, String format, Object ... args)
     {
-        if(sender instanceof Player)
+        if (sender instanceof Player)
             format = ChatColor.RED + format;
 
         toSender(sender, format, args);
@@ -86,9 +86,9 @@ public class Message
     {
         String msg = String.format(format, args);
 
-        if(sender instanceof Player) {
+        if (sender instanceof Player) {
             msg = String.format("%s[%s]%s %s", ChatColor.DARK_AQUA,
-                Vindicator.pluginName, ChatColor.WHITE, msg);
+                                Vindicator.pluginName, ChatColor.WHITE, msg);
         } else {
             msg = String.format("[%s] %s ", Vindicator.pluginName, msg);
             msg = ChatColor.stripColor(msg);

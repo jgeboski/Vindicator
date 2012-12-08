@@ -39,25 +39,25 @@ public class RBan extends RObject implements Runnable
 
         tos = getTargets(target);
 
-        if(tos == null)
+        if (tos == null)
             return;
 
-        for(TargetObject to : tos) {
-            if(!to.hasFlag(TargetObject.BAN))
+        for (TargetObject to : tos) {
+            if (!to.hasFlag(TargetObject.BAN))
                 continue;
 
             Message.severe(sender, "Ban already exists for %s", target);
             return;
         }
 
-        if(!add(this))
+        if (!add(this))
             return;
 
         broadcast("vindicator.message.ban",
                   "Banned placed for %s by %s: %s",
                   target, issuer, message);
 
-        if(timeout > 0) {
+        if (timeout > 0) {
             broadcast("vindicator.message.ban",
                       "Temporary ban will be removed: %s",
                       Utils.timestr("EEE, MMM d 'at' h:m a z", timeout));

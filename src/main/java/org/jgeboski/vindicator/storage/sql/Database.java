@@ -38,13 +38,13 @@ public class Database
         this.prefix = prefix;
         this.type   = SQLType.fromURL(url);
 
-        if(type == null)
+        if (type == null)
             throw new SQLException("No support found for " + url);
 
-        if(type == SQLType.SQLITE) {
+        if (type == SQLType.SQLITE) {
             try {
                 Class.forName("org.sqlite.JDBC").newInstance();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
                 return;
             }
@@ -64,7 +64,7 @@ public class Database
     {
         try {
             connection.close();
-        } catch(SQLException e) { }
+        } catch (SQLException e) { }
     }
 
     public SQLType getType()
@@ -81,7 +81,7 @@ public class Database
             rs  = databasemd.getTables(null, null, table, null);
             ret = rs.next();
             rs.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             ret = false;
         }
 

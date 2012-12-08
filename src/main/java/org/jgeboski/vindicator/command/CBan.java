@@ -40,16 +40,16 @@ public class CBan implements CommandExecutor
     {
         String reason;
 
-        if(!vind.hasPermissionM(sender, "vindicator.ban"))
+        if (!vind.hasPermissionM(sender, "vindicator.ban"))
             return true;
 
-        if(args.length < 1) {
+        if (args.length < 1) {
             Message.info(sender, command.getUsage());
             return true;
         }
 
-        if(args.length == 1) {
-            if(vind.config.mustReason) {
+        if (args.length == 1) {
+            if (vind.config.mustReason) {
                 Message.severe(sender, "A reason must be specified");
                 return true;
             }
@@ -61,7 +61,7 @@ public class CBan implements CommandExecutor
 
         try {
             vind.api.ban(sender, args[0], reason);
-        } catch(APIException e) {
+        } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
 

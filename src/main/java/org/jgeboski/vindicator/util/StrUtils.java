@@ -26,15 +26,15 @@ public class StrUtils
         String ret;
         int    i;
 
-        if(start > strs.length)
+        if (start > strs.length)
             return new String();
 
-        if(end > strs.length)
+        if (end > strs.length)
             end = strs.length;
 
         ret = strs[start];
 
-        for(i = (start + 1); i < end; i++)
+        for (i = (start + 1); i < end; i++)
             ret += glue + strs[i];
 
         return ret;
@@ -60,9 +60,9 @@ public class StrUtils
         cstr = str.toLowerCase().toCharArray();
         time = 0;
 
-        for(i = s = e = 0; i < cstr.length; i++) {
-            if(Character.isDigit(cstr[i])) {
-                if(s == 0)
+        for (i = s = e = 0; i < cstr.length; i++) {
+            if (Character.isDigit(cstr[i])) {
+                if (s == 0)
                     s = i;
 
                 e = i;
@@ -71,12 +71,12 @@ public class StrUtils
 
             e++;
 
-            if((i != e) || (e > cstr.length))
+            if ((i != e) || (e > cstr.length))
                 continue;
 
-            switch(cstr[e]) {
+            switch (cstr[e]) {
             case 'm':
-                if(((e + 1) < cstr.length) && (cstr[e + 1] == 'o'))
+                if (((e + 1) < cstr.length) && (cstr[e + 1] == 'o'))
                     mod = 2592000;
                 else
                     mod = 60;
@@ -94,7 +94,7 @@ public class StrUtils
 
             try {
                 time += Integer.parseInt(sstr) * mod;
-            } catch(NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 continue;
             }
         }

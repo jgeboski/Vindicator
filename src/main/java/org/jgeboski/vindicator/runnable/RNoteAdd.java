@@ -37,10 +37,10 @@ public class RNoteAdd extends RObject implements Runnable
 
         perm = "vindicator.message.noteadd";
 
-        if(hasFlag(RObject.PUBLIC))
+        if (hasFlag(RObject.PUBLIC))
             perm += ".public";
 
-        if(!add(this))
+        if (!add(this))
             return;
 
         broadcast(perm, "Note added for %s by %s: %s", target, issuer, message);

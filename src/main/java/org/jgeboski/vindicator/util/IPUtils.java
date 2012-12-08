@@ -35,7 +35,7 @@ public class IPUtils
 
         ia = getAddress(str);
 
-        if(ia == null)
+        if (ia == null)
             return false;
 
         return (ia instanceof Inet4Address);
@@ -47,7 +47,7 @@ public class IPUtils
 
         ia = getAddress(str);
 
-        if(ia == null)
+        if (ia == null)
             return false;
 
         return (ia instanceof Inet6Address);
@@ -59,7 +59,7 @@ public class IPUtils
 
         try {
             ia = InetAddress.getByName(str);
-        } catch(UnknownHostException e) {
+        } catch (UnknownHostException e) {
             return null;
         }
 

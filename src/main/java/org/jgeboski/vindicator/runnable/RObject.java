@@ -69,7 +69,7 @@ public class RObject extends TargetObject
         try {
             api.storage.add(to);
             return true;
-        } catch(StorageException e) {
+        } catch (StorageException e) {
             Message.severe(sender, "An error occurred! Check the server log!");
             Log.severe(e.getMessage());
         }
@@ -82,7 +82,7 @@ public class RObject extends TargetObject
         try {
             api.storage.remove(to);
             return true;
-        } catch(StorageException e) {
+        } catch (StorageException e) {
             Message.severe(sender, "An error occurred! Check the server log!");
             Log.severe(e.getMessage());
         }
@@ -94,7 +94,7 @@ public class RObject extends TargetObject
     {
         try {
             return api.storage.getTargets(target);
-        } catch(StorageException e) {
+        } catch (StorageException e) {
             Message.severe(sender, "An error occurred! Check the server log!");
             Log.severe(e.getMessage());
         }

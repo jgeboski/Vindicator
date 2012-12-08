@@ -39,23 +39,23 @@ public class RUnmute extends RObject implements Runnable
         tos = getTargets(target);
         bt  = null;
 
-        if(tos == null)
+        if (tos == null)
             return;
 
-        for(TargetObject to : tos) {
-            if(!to.hasFlag(TargetObject.MUTE))
+        for (TargetObject to : tos) {
+            if (!to.hasFlag(TargetObject.MUTE))
                 continue;
 
             bt = to;
             break;
         }
 
-        if(bt == null) {
+        if (bt == null) {
             Message.info(sender, "Mute for %s not found", target);
             return;
         }
 
-        if(!remove(bt))
+        if (!remove(bt))
             return;
 
         broadcast("vindicator.message.unmute",

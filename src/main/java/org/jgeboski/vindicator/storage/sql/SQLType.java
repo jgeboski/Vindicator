@@ -30,13 +30,13 @@ public enum SQLType
         str  = url.toLowerCase();
         strs = str.split(":", 3);
 
-        if((strs.length < 2) || !strs[0].equals("jdbc"))
+        if ((strs.length < 2) || !strs[0].equals("jdbc"))
             return null;
 
-        for(SQLType t : SQLType.values()) {
+        for (SQLType t : SQLType.values()) {
             str = t.toString();
 
-            if(str.equalsIgnoreCase(strs[1]))
+            if (str.equalsIgnoreCase(strs[1]))
                 return t;
         }
 

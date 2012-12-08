@@ -38,17 +38,17 @@ public class CVindicator implements CommandExecutor
     {
         String cmd;
 
-        if(!vind.hasPermissionM(sender, "vindicator.vindicator"))
+        if (!vind.hasPermissionM(sender, "vindicator.vindicator"))
             return true;
 
-        if(args.length < 1) {
+        if (args.length < 1) {
             Message.info(sender, command.getUsage());
             return true;
         }
 
         cmd = args[0].toLowerCase();
 
-        if(cmd.matches("reload|rel"))
+        if (cmd.matches("reload|rel"))
             reload(sender);
         else
             Message.info(sender, command.getUsage());
@@ -58,7 +58,7 @@ public class CVindicator implements CommandExecutor
 
     private void reload(CommandSender sender)
     {
-        if(!vind.hasPermissionM(sender, "vindicator.manage.reload"))
+        if (!vind.hasPermissionM(sender, "vindicator.manage.reload"))
             return;
 
         vind.reload();

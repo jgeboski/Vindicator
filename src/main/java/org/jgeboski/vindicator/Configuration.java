@@ -82,7 +82,7 @@ public class Configuration extends YamlConfiguration
 
         try {
             super.load(file);
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.warning("Unable to load: %s", file.toString());
         }
 
@@ -111,7 +111,7 @@ public class Configuration extends YamlConfiguration
         ircColored    = cs.getBoolean("colored", ircEnabled);
         ircTag        = cs.getString("tag",      ircTag);
 
-        if(!file.exists())
+        if (!file.exists())
             save();
     }
 
@@ -146,7 +146,7 @@ public class Configuration extends YamlConfiguration
 
         try {
             super.save(file);
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.warning("Unable to save: %s", file.toString());
         }
     }
@@ -157,7 +157,7 @@ public class Configuration extends YamlConfiguration
 
         ret = super.getConfigurationSection(path);
 
-        if(ret == null)
+        if (ret == null)
             ret = createSection(path);
 
         return ret;

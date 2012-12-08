@@ -43,25 +43,25 @@ public class RNoteRem extends RObject implements Runnable
         tos = getTargets(target);
         id--;
 
-        if(tos == null)
+        if (tos == null)
             return;
 
-        for(i = n = 0; (n < id) && (i < tos.length); i++) {
-            if(tos[i].hasFlag(TargetObject.NOTE))
+        for (i = n = 0; (n < id) && (i < tos.length); i++) {
+            if (tos[i].hasFlag(TargetObject.NOTE))
                 n++;
         }
 
-        if((n != id) || (i >= tos.length)) {
+        if ((n != id) || (i >= tos.length)) {
             Message.severe(sender, "Note index %d not found", (id + 1));
             return;
         }
 
         perm = "vindicator.message.noterem";
 
-        if(tos[i].hasFlag(TargetObject.PUBLIC))
+        if (tos[i].hasFlag(TargetObject.PUBLIC))
             perm += ".public";
 
-        if(!remove(tos[i]))
+        if (!remove(tos[i]))
             return;
 
         broadcast(perm, "Note removed for %s by %s: %s",

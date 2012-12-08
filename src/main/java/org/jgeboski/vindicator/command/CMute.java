@@ -42,10 +42,10 @@ public class CMute implements CommandExecutor
         long   secs;
         int    offs;
 
-        if(!vind.hasPermissionM(sender, "vindicator.mute"))
+        if (!vind.hasPermissionM(sender, "vindicator.mute"))
             return true;
 
-        if(args.length < 1) {
+        if (args.length < 1) {
             Message.info(sender, command.getUsage());
             return true;
         }
@@ -53,15 +53,15 @@ public class CMute implements CommandExecutor
         secs = 0;
         offs = 1;
 
-        if(args.length > 1) {
+        if (args.length > 1) {
             secs = StrUtils.strsecs(args[1]);
 
-            if(secs > 0)
+            if (secs > 0)
                 offs++;
         }
 
-        if(args.length < (offs + 1)) {
-            if(vind.config.mustReason) {
+        if (args.length < (offs + 1)) {
+            if (vind.config.mustReason) {
                 Message.severe(sender, "A reason must be specified");
                 return true;
             }
@@ -73,7 +73,7 @@ public class CMute implements CommandExecutor
 
         try {
             vind.api.mute(sender, args[0], reason, secs);
-        } catch(APIException e) {
+        } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
 

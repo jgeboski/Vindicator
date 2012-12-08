@@ -37,17 +37,17 @@ public class CNoteRem implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        if(!vind.hasPermissionM(sender, "vindicator.noterem"))
+        if (!vind.hasPermissionM(sender, "vindicator.noterem"))
             return true;
 
-        if(args.length < 2) {
+        if (args.length < 2) {
             Message.info(sender, command.getUsage());
             return true;
         }
 
         try {
             vind.api.noteRem(sender, args[0], args[1]);
-        } catch(APIException e) {
+        } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
 

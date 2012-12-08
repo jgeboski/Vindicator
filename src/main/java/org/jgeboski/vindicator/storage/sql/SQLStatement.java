@@ -41,14 +41,14 @@ public class SQLStatement
     private void prepareStatement()
         throws SQLException
     {
-        if(sql == null)
+        if (sql == null)
             return;
 
         close();
 
         pstatement = connection.prepareStatement(sql);
 
-        for(int i = 0; i < args.length; i++)
+        for (int i = 0; i < args.length; i++)
             pstatement.setObject(i + 1, args[i]);
     }
 
@@ -59,25 +59,25 @@ public class SQLStatement
         this.sql  = new String();
         this.args = new Object[0];
 
-        if(args.length < 1)
+        if (args.length < 1)
             return;
 
         sql += (String) args[0];
 
-        for(i = 1; (i < args.length) && (args[i] != null); i++)
+        for (i = 1; (i < args.length) && (args[i] != null); i++)
             sql += " " + (String) args[i];
 
-        if(sql.length() < 1) {
+        if (sql.length() < 1) {
             sql = null;
             return;
         }
 
-        if(!sql.endsWith(";"))
+        if (!sql.endsWith(";"))
             sql += ";";
 
         i++;
 
-        if(i < args.length)
+        if (i < args.length)
             this.args = Arrays.copyOfRange(args, i, args.length);
     }
 
@@ -86,7 +86,7 @@ public class SQLStatement
     {
         prepareStatement();
 
-        if(pstatement == null)
+        if (pstatement == null)
             return false;
 
         return pstatement.execute();
@@ -97,7 +97,7 @@ public class SQLStatement
     {
         prepareStatement();
 
-        if(pstatement == null)
+        if (pstatement == null)
             return null;
 
         return pstatement.executeQuery();
@@ -108,7 +108,7 @@ public class SQLStatement
     {
         prepareStatement();
 
-        if(pstatement == null)
+        if (pstatement == null)
             return 0;
 
         return pstatement.executeUpdate();
@@ -116,12 +116,12 @@ public class SQLStatement
 
     public void close()
     {
-        if(pstatement == null)
+        if (pstatement == null)
             return;
 
         try {
             pstatement.close();
-        } catch(SQLException e) { }
+        } catch (SQLException e) { }
 
         pstatement = null;
     }

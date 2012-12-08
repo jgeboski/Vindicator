@@ -47,16 +47,16 @@ public class StorageSQL implements Storage
         this.password = password;
         this.prefix   = prefix;
 
-        if(prefix != null)
+        if (prefix != null)
             TABLE_TARGETS = prefix + TABLE_TARGETS;
 
         try {
             database = new Database(url, username, password, prefix);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new StorageException(e);
         }
 
-        if(database.hasTable(TABLE_TARGETS))
+        if (database.hasTable(TABLE_TARGETS))
             return;
 
         stmt = database.createStatement();
@@ -75,7 +75,7 @@ public class StorageSQL implements Storage
         try {
             stmt.executeUpdate();
             stmt.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new StorageException(e);
         }
     }
@@ -88,7 +88,7 @@ public class StorageSQL implements Storage
 
     public void close()
     {
-        if(database != null)
+        if (database != null)
             database.close();
     }
 
@@ -109,7 +109,7 @@ public class StorageSQL implements Storage
         try {
             stmt.execute();
             stmt.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new StorageException(e);
         }
     }
@@ -119,7 +119,7 @@ public class StorageSQL implements Storage
     {
         SQLStatement stmt;
 
-        if(id < 1)
+        if (id < 1)
             return;
 
         stmt = database.createStatement();
@@ -132,7 +132,7 @@ public class StorageSQL implements Storage
         try {
             stmt.executeUpdate();
             stmt.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new StorageException(e);
         }
     }
@@ -152,7 +152,7 @@ public class StorageSQL implements Storage
         ResultSet    rs;
         TargetObject to;
 
-        if(target == null)
+        if (target == null)
             return new TargetObject[0];
 
         stmt = database.createStatement();
@@ -166,10 +166,10 @@ public class StorageSQL implements Storage
         try {
             rs = stmt.executeQuery();
 
-            if(rs == null)
+            if (rs == null)
                 return new TargetObject[0];
 
-            while(rs.next()) {
+            while (rs.next()) {
                 to = new TargetObject();
 
                 to.setId(rs.getInt("id"));
@@ -184,7 +184,7 @@ public class StorageSQL implements Storage
             }
 
             stmt.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new StorageException(e);
         }
 

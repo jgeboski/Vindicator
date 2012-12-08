@@ -41,23 +41,23 @@ public class CTmpBan implements CommandExecutor
         String reason;
         long   secs;
 
-        if(!vind.hasPermissionM(sender, "vindicator.tmpban"))
+        if (!vind.hasPermissionM(sender, "vindicator.tmpban"))
             return true;
 
-        if(args.length < 2) {
+        if (args.length < 2) {
             Message.info(sender, command.getUsage());
             return true;
         }
 
         secs = StrUtils.strsecs(args[1]);
 
-        if(secs == 0) {
+        if (secs == 0) {
             Message.severe(sender, "Invalid time specified");
             return true;
         }
 
-        if(args.length == 2) {
-            if(vind.config.mustReason) {
+        if (args.length == 2) {
+            if (vind.config.mustReason) {
                 Message.severe(sender, "A reason must be specified");
                 return true;
             }
@@ -69,7 +69,7 @@ public class CTmpBan implements CommandExecutor
 
         try {
             vind.api.ban(sender, args[0], reason, secs);
-        } catch(APIException e) {
+        } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
 

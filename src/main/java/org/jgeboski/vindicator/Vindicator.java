@@ -66,21 +66,21 @@ public class Vindicator extends JavaPlugin
 
         try {
             api = new VindicatorAPI(this);
-        } catch(APIException e) {
+        } catch (APIException e) {
             setEnabled(false);
             return;
         }
 
-        if(config.ircEnabled) {
+        if (config.ircEnabled) {
             pm = getServer().getPluginManager();
             p  = pm.getPlugin("CraftIRC");
 
-            if((p != null) && p.isEnabled()) {
+            if ((p != null) && p.isEnabled()) {
                 craftirc = (CraftIRC) p;
                 vPoint   = new VPoint();
             }
 
-            if(!registerEndPoint(config.ircTag, vPoint))
+            if (!registerEndPoint(config.ircTag, vPoint))
                 config.ircEnabled = false;
         }
 
@@ -98,7 +98,7 @@ public class Vindicator extends JavaPlugin
 
     public void onDisable()
     {
-        if(config.ircEnabled)
+        if (config.ircEnabled)
             craftirc.unregisterEndPoint(config.ircTag);
 
         api.close();
@@ -106,7 +106,7 @@ public class Vindicator extends JavaPlugin
 
     public void reload()
     {
-        if(config.ircEnabled)
+        if (config.ircEnabled)
             craftirc.unregisterEndPoint(config.ircTag);
 
         api.close();
@@ -114,21 +114,21 @@ public class Vindicator extends JavaPlugin
 
         try {
             api = new VindicatorAPI(this);
-        } catch(APIException e) {
+        } catch (APIException e) {
             setEnabled(false);
             return;
         }
 
-        if(config.ircEnabled && !registerEndPoint(config.ircTag, vPoint))
+        if (config.ircEnabled && !registerEndPoint(config.ircTag, vPoint))
             config.ircEnabled = false;
     }
 
     private boolean registerEndPoint(String tag, Object ep)
     {
-        if(craftirc == null)
+        if (craftirc == null)
             return false;
 
-        if(craftirc.registerEndPoint(tag, (EndPoint) ep))
+        if (craftirc.registerEndPoint(tag, (EndPoint) ep))
             return true;
 
         Log.severe("Unable to register CraftIRC tag: %s", tag);
@@ -137,7 +137,7 @@ public class Vindicator extends JavaPlugin
 
     public boolean hasPermissionM(CommandSender sender, String perm)
     {
-        if(sender.hasPermission(perm))
+        if (sender.hasPermission(perm))
             return true;
         
         Message.severe(sender, "You don't have permission for that");
@@ -150,26 +150,26 @@ public class Vindicator extends JavaPlugin
 
         msg = String.format(format, args);
 
-        for(Player p : getServer().getOnlinePlayers()) {
-            if(p.hasPermission(perm))
+        for (Player p : getServer().getOnlinePlayers()) {
+            if (p.hasPermission(perm))
                 Message.info(p, msg);
         }
 
         Log.info(format, args);
 
-        if(!config.ircEnabled)
+        if (!config.ircEnabled)
             return;
 
         RelayedMessage rmsg = craftirc.newMsg(vPoint, null, "chat");
 
-        if(!config.ircColored)
+        if (!config.ircColored)
             msg = ChatColor.stripColor(msg);
 
         rmsg.setField("realSender", pluginName);
         rmsg.setField("sender",     pluginName);
         rmsg.setField("message",    msg);
 
-        if(rmsg.post())
+        if (rmsg.post())
             return;
 
         registerEndPoint(config.ircTag, vPoint);

@@ -37,17 +37,17 @@ public class CLookup implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        if(!vind.hasPermissionM(sender, "vindicator.lookup"))
+        if (!vind.hasPermissionM(sender, "vindicator.lookup"))
             return true;
 
-        if(args.length < 1) {
+        if (args.length < 1) {
             Message.info(sender, command.getUsage());
             return true;
         }
 
         try {
             vind.api.lookup(sender, args[0]);
-        } catch(APIException e) {
+        } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
 

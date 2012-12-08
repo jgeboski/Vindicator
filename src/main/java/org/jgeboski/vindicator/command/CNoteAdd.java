@@ -41,23 +41,23 @@ public class CNoteAdd implements CommandExecutor
         boolean pub;
         String  note;
 
-        if(!vind.hasPermissionM(sender, "vindicator.noteadd"))
+        if (!vind.hasPermissionM(sender, "vindicator.noteadd"))
             return true;
 
-        if(args.length < 2) {
+        if (args.length < 2) {
             Message.info(sender, command.getUsage());
             return true;
         }
 
         pub = false;
 
-        if(args[0].startsWith("-")) {
-            if(!args[0].equals("-p")) {
+        if (args[0].startsWith("-")) {
+            if (!args[0].equals("-p")) {
                 Message.info(sender, command.getUsage());
                 return true;
             }
 
-            if(!vind.hasPermissionM(sender, "vindicator.noteadd.public"))
+            if (!vind.hasPermissionM(sender, "vindicator.noteadd.public"))
                 return true;
 
             pub = true;
@@ -67,7 +67,7 @@ public class CNoteAdd implements CommandExecutor
 
         try {
             vind.api.noteAdd(sender, args[0], note, pub);
-        } catch(APIException e) {
+        } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
 

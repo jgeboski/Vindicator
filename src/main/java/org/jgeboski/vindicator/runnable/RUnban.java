@@ -39,36 +39,36 @@ public class RUnban extends RObject implements Runnable
         tos = getTargets(target);
         bt  = null;
 
-        if(tos == null)
+        if (tos == null)
             return;
 
-        for(TargetObject to : tos) {
-            if(!to.hasFlag(TargetObject.BAN))
+        for (TargetObject to : tos) {
+            if (!to.hasFlag(TargetObject.BAN))
                 continue;
 
             bt = to;
             break;
         }
 
-        if(bt == null) {
+        if (bt == null) {
             Message.info(sender, "Ban for %s not found", target);
             return;
         }
 
-        if(!remove(bt))
+        if (!remove(bt))
             return;
 
         broadcast("vindicator.message.unban",
                   "Ban removed for %s by %s: %s",
                   bt.getTarget(), issuer, bt.getMessage());
 
-        if(!api.vind.config.unbanNote)
+        if (!api.vind.config.unbanNote)
             return;
 
         try {
             api.noteAdd(sender, bt.getTarget(), "Unbanned: " + bt.getMessage(),
                         false);
-        } catch(APIException e) {
+        } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
     }
