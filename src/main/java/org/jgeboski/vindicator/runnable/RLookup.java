@@ -40,6 +40,7 @@ public class RLookup extends RObject implements Runnable
         TargetObject[]          tos;
         String type;
 
+        int m;
         int b;
         int n;
 
@@ -49,18 +50,19 @@ public class RLookup extends RObject implements Runnable
             return;
 
         tmp = new ArrayList<TargetObject>();
-        b   = n = 0;
+        m   = b = n = 0;
 
         for (TargetObject to : getTargets(target)) {
             if (to.hasFlag(TargetObject.BAN)) {
-                tmp.add(b, to);
+                tmp.add(m + b, to);
                 b++;
             } else if (to.hasFlag(TargetObject.NOTE)) {
                 to.setId(n + 1);
                 tmp.add(b + n, to);
                 n++;
-            } else {
-                tmp.add(to);
+            } else if (to.hasFlag(TargetObject.MUTE)) {
+                tmp.add(m, to);
+                m++;
             }
         }
 
@@ -83,6 +85,10 @@ public class RLookup extends RObject implements Runnable
                 Message.info(sender, "%s[%s] %s Note #%d (by: %s): %s",
                              ChatColor.YELLOW, Utils.timestr(to.getTime()),
                              type, to.getId(), to.getIssuer(), to.getMessage());
+            } else if (to.hasFlag(TargetObject.MUTE)) {
+                Message.info(sender, "%s[%s] Muted (by: %s): %s",
+                             ChatColor.RED, Utils.timestr(to.getTime()),
+                             to.getIssuer(), to.getMessage());
             }
         }
     }
