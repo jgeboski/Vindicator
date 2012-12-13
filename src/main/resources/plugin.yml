@@ -127,6 +127,9 @@ permissions:
   vindicator.message.noterem.public:
     description: Receive a message upon a public note removal
     default: op
+  vindicator.message.notify:
+    description: Receive a message if there are notes/bans
+    default: op
   vindicator.message.unban:
     description: Receive a message upon an unban
     default: op

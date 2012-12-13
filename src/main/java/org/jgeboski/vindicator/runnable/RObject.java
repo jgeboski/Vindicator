@@ -49,6 +49,13 @@ public class RObject extends TargetObject
         this(api, sender, null, null);
     }
 
+    public RObject(VindicatorAPI api, String target)
+    {
+        super(target, null, null);
+
+        this.api = api;
+    }
+
     public CommandSender getSender()
     {
         return sender;

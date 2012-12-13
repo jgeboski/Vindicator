@@ -84,6 +84,8 @@ public class Vindicator extends JavaPlugin
                 config.ircEnabled = false;
         }
 
+        events.register();
+
         getCommand("ban").setExecutor(new CBan(this));
         getCommand("kick").setExecutor(new CKick(this));
         getCommand("lookup").setExecutor(new CLookup(this));

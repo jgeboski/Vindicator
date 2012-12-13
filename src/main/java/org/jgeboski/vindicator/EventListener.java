@@ -20,7 +20,11 @@ package org.jgeboski.vindicator;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.plugin.PluginManager;
+
+import org.jgeboski.vindicator.runnable.RLogin;
 
 public class EventListener implements Listener
 {
@@ -39,5 +43,12 @@ public class EventListener implements Listener
         pm.registerEvents(this, vdict);
     }
 
-    
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event)
+    {
+        RLogin run;
+
+        run = new RLogin(vdict.api, event);
+        run.run();
+    }
 }
