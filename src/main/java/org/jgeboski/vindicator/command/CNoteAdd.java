@@ -24,6 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
+import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
 public class CNoteAdd implements CommandExecutor
@@ -41,7 +42,7 @@ public class CNoteAdd implements CommandExecutor
         boolean pub;
         String  note;
 
-        if (!vind.hasPermissionM(sender, "vindicator.noteadd"))
+        if (!Utils.hasPermission(sender, "vindicator.noteadd"))
             return true;
 
         if (args.length < 2) {
@@ -57,7 +58,7 @@ public class CNoteAdd implements CommandExecutor
                 return true;
             }
 
-            if (!vind.hasPermissionM(sender, "vindicator.noteadd.public"))
+            if (!Utils.hasPermission(sender, "vindicator.noteadd.public"))
                 return true;
 
             pub = true;

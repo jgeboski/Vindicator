@@ -24,6 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
+import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
 public class CTmpBan implements CommandExecutor
@@ -41,7 +42,7 @@ public class CTmpBan implements CommandExecutor
         String reason;
         long   secs;
 
-        if (!vind.hasPermissionM(sender, "vindicator.tmpban"))
+        if (!Utils.hasPermission(sender, "vindicator.tmpban"))
             return true;
 
         if (args.length < 2) {

@@ -20,9 +20,44 @@ package org.jgeboski.vindicator.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 public class Utils
 {
     public static final String dateFormat = "MM-dd-yy kk:mm:ss";
+
+    public static void broadcast(String perm, String format, Object ... args)
+    {
+        String msg;
+
+        msg = String.format(format, args);
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.hasPermission(perm))
+                Message.info(p, msg);
+        }
+
+        Log.info(format, args);
+    }
+
+    public static boolean hasPermission(CommandSender sender, String perm,
+                                        boolean errmsg)
+    {
+        if (sender.hasPermission(perm))
+            return true;
+
+        if (errmsg)
+            Message.severe(sender, "You don't have permission for that.");
+
+        return false;
+    }
+
+    public static boolean hasPermission(CommandSender sender, String perm)
+    {
+        return hasPermission(sender, perm, true);
+    }
 
     public static boolean isMinecraftName(String str)
     {

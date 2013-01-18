@@ -23,6 +23,7 @@ import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.util.Message;
+import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
 public class CUnban implements CommandExecutor
@@ -37,7 +38,7 @@ public class CUnban implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        if (!vind.hasPermissionM(sender, "vindicator.unban"))
+        if (!Utils.hasPermission(sender, "vindicator.unban"))
             return true;
 
         if (args.length < 1) {

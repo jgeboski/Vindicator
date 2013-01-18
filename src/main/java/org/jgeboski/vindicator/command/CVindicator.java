@@ -22,6 +22,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.util.Message;
+import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
 public class CVindicator implements CommandExecutor
@@ -38,7 +39,7 @@ public class CVindicator implements CommandExecutor
     {
         String cmd;
 
-        if (!vind.hasPermissionM(sender, "vindicator.vindicator"))
+        if (!Utils.hasPermission(sender, "vindicator.vindicator"))
             return true;
 
         if (args.length < 1) {
@@ -58,7 +59,7 @@ public class CVindicator implements CommandExecutor
 
     private void reload(CommandSender sender)
     {
-        if (!vind.hasPermissionM(sender, "vindicator.manage.reload"))
+        if (!Utils.hasPermission(sender, "vindicator.manage.reload"))
             return;
 
         vind.reload();

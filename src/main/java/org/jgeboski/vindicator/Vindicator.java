@@ -34,6 +34,7 @@ import org.jgeboski.vindicator.command.*;
 import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.util.Log;
 import org.jgeboski.vindicator.util.Message;
+import org.jgeboski.vindicator.util.Utils;
 
 public class Vindicator extends JavaPlugin
 {
@@ -137,27 +138,12 @@ public class Vindicator extends JavaPlugin
         return false;
     }
 
-    public boolean hasPermissionM(CommandSender sender, String perm)
-    {
-        if (sender.hasPermission(perm))
-            return true;
-        
-        Message.severe(sender, "You don't have permission for that");
-        return false;
-    }
-
     public void broadcast(String perm, String format, Object ... args)
     {
         String msg;
 
         msg = String.format(format, args);
-
-        for (Player p : getServer().getOnlinePlayers()) {
-            if (p.hasPermission(perm))
-                Message.info(p, msg);
-        }
-
-        Log.info(format, args);
+        Utils.broadcast(perm, msg);
 
         if (!config.ircEnabled)
             return;

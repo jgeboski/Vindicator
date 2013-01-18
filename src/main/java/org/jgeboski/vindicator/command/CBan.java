@@ -24,6 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.jgeboski.vindicator.exception.APIException;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
+import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
 public class CBan implements CommandExecutor
@@ -40,7 +41,7 @@ public class CBan implements CommandExecutor
     {
         String reason;
 
-        if (!vind.hasPermissionM(sender, "vindicator.ban"))
+        if (!Utils.hasPermission(sender, "vindicator.ban"))
             return true;
 
         if (args.length < 1) {
