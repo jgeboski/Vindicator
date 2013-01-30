@@ -22,16 +22,6 @@
                 <role>Manager</role>
             </roles>
         </developer>
-        <developer>
-            <id>tritania</id>
-            <name>Erik Wilson</name>
-            <email>erikwilson@magnorum.com</email>
-            <url>https://github.com/tritania/</url>
-            <roles>
-                <role>Author</role>
-                <role>Manager</role>
-            </roles>
-        </developer>
     </developers>
 
     <issueManagement>
