@@ -28,7 +28,7 @@ import org.jgeboski.vindicator.Vindicator;
 
 public class CNoteRem implements CommandExecutor
 {
-    protected Vindicator vind;
+    public Vindicator vind;
 
     public CNoteRem(Vindicator vind)
     {

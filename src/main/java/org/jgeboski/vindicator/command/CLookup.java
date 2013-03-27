@@ -28,7 +28,7 @@ import org.jgeboski.vindicator.Vindicator;
 
 public class CLookup implements CommandExecutor
 {
-    protected Vindicator vind;
+    public Vindicator vind;
 
     public CLookup(Vindicator vind)
     {

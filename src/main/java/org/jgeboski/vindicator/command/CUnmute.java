@@ -28,7 +28,7 @@ import org.jgeboski.vindicator.Vindicator;
 
 public class CUnmute implements CommandExecutor
 {
-    protected Vindicator vind;
+    public Vindicator vind;
 
     public CUnmute(Vindicator vind)
     {

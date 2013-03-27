@@ -29,7 +29,7 @@ import org.jgeboski.vindicator.Vindicator;
 
 public class CBan implements CommandExecutor
 {
-    protected Vindicator vind;
+    public Vindicator vind;
 
     public CBan(Vindicator vind)
     {

@@ -27,7 +27,7 @@ import org.jgeboski.vindicator.VindicatorAPI;
 
 public class RObject extends TargetObject
 {
-    protected VindicatorAPI api;
+    public VindicatorAPI api;
     public CommandSender sender;
 
     public RObject(VindicatorAPI api, CommandSender sender, String target,

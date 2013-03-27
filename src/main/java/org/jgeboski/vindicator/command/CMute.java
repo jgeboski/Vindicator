@@ -29,7 +29,7 @@ import org.jgeboski.vindicator.Vindicator;
 
 public class CMute implements CommandExecutor
 {
-    protected Vindicator vind;
+    public Vindicator vind;
 
     public CMute(Vindicator vind)
     {

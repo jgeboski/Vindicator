@@ -28,7 +28,7 @@ import org.jgeboski.vindicator.Vindicator;
 
 public class CUnban implements CommandExecutor
 {
-    protected Vindicator vind;
+    public Vindicator vind;
 
     public CUnban(Vindicator vind)
     {

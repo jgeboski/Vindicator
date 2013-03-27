@@ -29,7 +29,7 @@ import org.jgeboski.vindicator.Vindicator;
 
 public class CNoteAdd implements CommandExecutor
 {
-    protected Vindicator vind;
+    public Vindicator vind;
 
     public CNoteAdd(Vindicator vind)
     {

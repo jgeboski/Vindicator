@@ -27,7 +27,7 @@ import org.jgeboski.vindicator.Vindicator;
 
 public class CVindicator implements CommandExecutor
 {
-    protected Vindicator vind;
+    public Vindicator vind;
 
     public CVindicator(Vindicator vind)
     {

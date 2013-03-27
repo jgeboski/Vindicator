@@ -29,7 +29,7 @@ import org.jgeboski.vindicator.Vindicator;
 
 public class CKick implements CommandExecutor
 {
-    protected Vindicator vind;
+    public Vindicator vind;
 
     public CKick(Vindicator vind)
     {
