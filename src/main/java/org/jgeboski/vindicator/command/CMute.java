@@ -41,7 +41,6 @@ public class CMute implements CommandExecutor
     {
         String reason;
         long   secs;
-        int    offs;
 
         if (!Utils.hasPermission(sender, "vindicator.mute"))
             return true;
@@ -51,25 +50,12 @@ public class CMute implements CommandExecutor
             return true;
         }
 
-        secs = 0;
-        offs = 1;
+        reason = null;
+        secs   = 0;
 
         if (args.length > 1) {
-            secs = StrUtils.strsecs(args[1]);
-
-            if (secs > 0)
-                offs++;
-        }
-
-        if (args.length < (offs + 1)) {
-            if (vind.config.mustReason) {
-                Message.severe(sender, "A reason must be specified");
-                return true;
-            }
-
-            reason = vind.config.defMuteReason;
-        } else {
-            reason = StrUtils.strjoin(args, " ", offs);
+            secs   = StrUtils.strsecs(args[1]);
+            reason = StrUtils.strjoin(args, " ", ((secs == 0) ? 1 : 2));
         }
 
         try {

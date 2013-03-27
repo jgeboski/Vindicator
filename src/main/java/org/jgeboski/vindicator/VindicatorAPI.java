@@ -69,6 +69,13 @@ public class VindicatorAPI extends ThreadPoolExecutor
         RBan run;
         int  type;
 
+        if (message == null) {
+            if (vind.config.mustReason)
+                throw new APIException("A reason must be provided");
+
+            message = vind.config.defBanReason;
+        }
+
         target = getTarget(target);
         type   = getTypeFlag(sender, target, RObject.PLAYER, RObject.IP);
 
@@ -95,11 +102,18 @@ public class VindicatorAPI extends ThreadPoolExecutor
         ban(sender, target, reason, 0);
     }
 
-    public void kick(CommandSender sender, String target, String reason)
+    public void kick(CommandSender sender, String target, String message)
         throws APIException
     {
+        if (message == null) {
+            if (vind.config.mustReason)
+                throw new APIException("A reason must be provided");
+
+            message = vind.config.defKickReason;
+        }
+
         if (IPUtils.isAddress(target)) {
-            if (kickIP(target, reason))
+            if (kickIP(target, message))
                 return;
 
             throw new APIException("Player(s) for %s not found", target);
@@ -107,12 +121,12 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         target = getTarget(target);
 
-        if (!kick(target, reason))
+        if (!kick(target, message))
             throw new APIException("Player %s not found", target);
 
         vind.broadcast("vindicator.message.kick",
                        "Kick placed for %s by %s: %s",
-                       target, sender.getName(), reason);
+                       target, sender.getName(), message);
     }
 
     public void lookup(CommandSender sender, String target)
@@ -127,6 +141,13 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         RMute run;
+
+        if (message == null) {
+            if (vind.config.mustReason)
+                throw new APIException("A reason must be provided");
+
+            message = vind.config.defMuteReason;
+        }
 
         if (!Utils.isMinecraftName(target))
             throw new APIException("Invalid player: %s", target);

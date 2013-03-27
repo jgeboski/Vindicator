@@ -54,23 +54,8 @@ public class CBan implements CommandExecutor
         secs   = 0;
 
         if (args.length > 1) {
-            secs = StrUtils.strsecs(args[1]);
-
-            if (secs != 0) {
-                if (args.length > 2)
-                    reason = StrUtils.strjoin(args, " ", 2);
-            } else {
-                reason = StrUtils.strjoin(args, " ", 1);
-            }
-        }
-
-        if (reason == null) {
-            if (vind.config.mustReason) {
-                Message.severe(sender, "A reason must be specified");
-                return true;
-            }
-
-            reason = vind.config.defBanReason;
+            secs   = StrUtils.strsecs(args[1]);
+            reason = StrUtils.strjoin(args, " ", ((secs == 0) ? 1 : 2));
         }
 
         try {

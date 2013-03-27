@@ -49,16 +49,7 @@ public class CKick implements CommandExecutor
             return true;
         }
 
-        if (args.length == 1) {
-            if (vind.config.mustReason) {
-                Message.severe(sender, "A reason must be specified");
-                return true;
-            }
-
-            reason = vind.config.defKickReason;
-        } else {
-            reason = StrUtils.strjoin(args, " ", 1);
-        }
+        reason = StrUtils.strjoin(args, " ", 1);
 
         try {
             vind.api.kick(sender, args[0], reason);

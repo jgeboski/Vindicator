@@ -26,8 +26,8 @@ public class StrUtils
         String ret;
         int    i;
 
-        if (start > strs.length)
-            return new String();
+        if (start >= strs.length)
+            return null;
 
         if (end > strs.length)
             end = strs.length;
