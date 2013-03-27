@@ -77,10 +77,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         target = getTarget(target);
-        type   = getTypeFlag(sender, target, RObject.PLAYER, RObject.IP);
-
-        if (type < 0)
-            return;
+        type   = getTypeFlag(target, RObject.PLAYER, RObject.IP);
 
         run = new RBan(this, sender, target, message);
         run.addFlag(type);
@@ -169,10 +166,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         int  type;
 
         target = getTarget(target);
-        type   = getTypeFlag(sender, target, RObject.PLAYER, RObject.IP);
-
-        if (type < 0)
-            return;
+        type   = getTypeFlag(target, RObject.PLAYER, RObject.IP);
 
         run = new RNoteAdd(this, sender, target, message);
         run.addFlag(type);
@@ -244,15 +238,14 @@ public class VindicatorAPI extends ThreadPoolExecutor
         return target;
     }
 
-    private int getTypeFlag(CommandSender sender, String target, int ifname,
-                            int ifaddress)
+    private int getTypeFlag(String target, int ifname, int ifaddr)
         throws APIException
     {
         if (Utils.isMinecraftName(target))
             return ifname;
 
         if (IPUtils.isAddress(target))
-            return ifaddress;
+            return ifaddr;
 
         throw new APIException("Invalid player/IP: %s", target);
     }
