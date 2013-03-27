@@ -28,26 +28,26 @@ public class Configuration extends YamlConfiguration
 {
     private File file;
 
-    public int  poolMinSize;
-    public int  poolMaxSize;
-    public long poolKeepAlive;
-
     public String storeDriver;
     public String storeURL;
     public String storeUser;
     public String storePass;
     public String storePrefix;
 
-    public boolean mustReason;
+    public int  poolMinSize;
+    public int  poolMaxSize;
+    public long poolKeepAlive;
+
     public String  defBanReason;
     public String  defKickReason;
     public String  defMuteReason;
+    public boolean mustReason;
     public boolean unbanNote;
     public boolean autoComplete;
 
+    public String  ircTag;
     public boolean ircEnabled;
     public boolean ircColored;
-    public String  ircTag;
 
     public Configuration(File file)
     {
@@ -64,16 +64,16 @@ public class Configuration extends YamlConfiguration
         this.poolMaxSize   = 10;
         this.poolKeepAlive = 5000;
 
-        this.mustReason    = false;
         this.defBanReason  = "You have been banned";
         this.defKickReason = "You have been kicked";
         this.defMuteReason = "You have been muted";
+        this.mustReason    = false;
         this.unbanNote     = false;
         this.autoComplete  = true;
 
+        this.ircTag        = "vindicator";
         this.ircEnabled    = false;
         this.ircColored    = true;
-        this.ircTag        = "vindicator";
     }
 
     public void load()
@@ -99,17 +99,17 @@ public class Configuration extends YamlConfiguration
         poolKeepAlive = cs.getLong("keep-alive", poolKeepAlive);
 
         cs            = getConfigurationSection("settings");
-        mustReason    = cs.getBoolean("must-reason",   mustReason);
         defBanReason  = cs.getString("default-kick",   defBanReason);
         defKickReason = cs.getString("default-ban",    defKickReason);
         defMuteReason = cs.getString("default-mute",   defMuteReason);
+        mustReason    = cs.getBoolean("must-reason",   mustReason);
         unbanNote     = cs.getBoolean("unban-to-note", unbanNote);
         autoComplete  = cs.getBoolean("auto-complete", autoComplete);
 
         cs            = getConfigurationSection("irc");
+        ircTag        = cs.getString("tag",      ircTag);
         ircEnabled    = cs.getBoolean("enabled", ircEnabled);
         ircColored    = cs.getBoolean("colored", ircEnabled);
-        ircTag        = cs.getString("tag",      ircTag);
 
         if (!file.exists())
             save();
@@ -132,17 +132,17 @@ public class Configuration extends YamlConfiguration
         cs.set("keep-alive", poolKeepAlive);
 
         cs = getConfigurationSection("settings");
-        cs.set("must-reason",   mustReason);
         cs.set("default-kick",  defBanReason);
         cs.set("default-ban",   defKickReason);
         cs.set("default-mute",  defMuteReason);
+        cs.set("must-reason",   mustReason);
         cs.set("unban-to-note", unbanNote);
         cs.set("auto-complete", autoComplete);
 
         cs = getConfigurationSection("irc");
+        cs.set("tag",     ircTag);
         cs.set("enabled", ircEnabled);
         cs.set("colored", ircEnabled);
-        cs.set("tag",     ircTag);
 
         try {
             super.save(file);
