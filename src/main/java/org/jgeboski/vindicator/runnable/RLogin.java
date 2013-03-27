@@ -56,26 +56,22 @@ public class RLogin extends RObject implements Runnable
         checkIP();
 
         if (ban != null) {
-            msg = ban.getMessage();
-
             broadcast("vindicator.message.notify",
                       "Player %s attempted to join with a banned IP: %s",
-                      target, msg);
+                      target, ban.message);
 
-            event.disallow(Result.KICK_OTHER, "Banned: " + msg);
+            event.disallow(Result.KICK_OTHER, "Banned: " + ban.message);
             return;
         }
 
         checkPlayer();
 
         if (ban != null) {
-            msg = ban.getMessage();
-
             broadcast("vindicator.message.notify",
                       "Player %s attempted to join banned: %s",
-                      target, ban.getMessage());
+                      target, ban.message);
 
-            event.disallow(Result.KICK_OTHER, "Banned: " + msg);
+            event.disallow(Result.KICK_OTHER, "Banned: " + ban.message);
             return;
         }
 
@@ -120,7 +116,6 @@ public class RLogin extends RObject implements Runnable
 
         for (TargetObject to : tos) {
             if (to.hasFlag(TargetObject.BAN)) {
-                System.out.println("HAS A BAN");
                 ban = to;
                 return;
             } else if (to.hasFlag(TargetObject.MUTE)) {

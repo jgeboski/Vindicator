@@ -60,6 +60,6 @@ public class RUnmute extends RObject implements Runnable
 
         broadcast("vindicator.message.unmute",
                   "Mute removed for %s by %s: %s",
-                  bt.getTarget(), issuer, bt.getMessage());
+                  bt.target, issuer, bt.message);
     }
 }

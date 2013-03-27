@@ -28,7 +28,7 @@ import org.jgeboski.vindicator.VindicatorAPI;
 public class RObject extends TargetObject
 {
     protected VindicatorAPI api;
-    protected CommandSender sender;
+    public CommandSender sender;
 
     public RObject(VindicatorAPI api, CommandSender sender, String target,
                      String message)
@@ -54,16 +54,6 @@ public class RObject extends TargetObject
         super(target, null, null);
 
         this.api = api;
-    }
-
-    public CommandSender getSender()
-    {
-        return sender;
-    }
-
-    public void setSender(CommandSender sender)
-    {
-        this.sender = sender;
     }
 
     public void broadcast(String perm, String format, Object ... args)

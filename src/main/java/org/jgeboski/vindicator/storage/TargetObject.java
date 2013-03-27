@@ -31,13 +31,13 @@ public class TargetObject
     public static final int MUTE   = 1 << 4;
     public static final int NOTE   = 1 << 5;
 
-    protected int    id;
-    protected String target;
-    protected String issuer;
-    protected String message;
-    protected long   timeout;
-    protected long   time;
-    protected int    flags;
+    public int    id;
+    public String target;
+    public String issuer;
+    public String message;
+    public long   timeout;
+    public long   time;
+    public int    flags;
 
     public TargetObject(String target, String issuer, String message)
     {
@@ -68,75 +68,5 @@ public class TargetObject
     public boolean hasFlag(int flag)
     {
         return ((flags & flag) != 0);
-    }
-
-    public int getId()
-    {
-        return id;
-    }
-
-    public String getTarget()
-    {
-        return target;
-    }
-
-    public String getIssuer()
-    {
-        return issuer;
-    }
-
-    public String getMessage()
-    {
-        return message;
-    }
-
-    public long getTimeout()
-    {
-        return timeout;
-    }
-
-    public long getTime()
-    {
-        return time;
-    }
-
-    public int getFlags()
-    {
-        return flags;
-    }
-
-    public void setId(int id)
-    {
-        this.id = id;
-    }
-
-    public void setTarget(String target)
-    {
-        this.target = target;
-    }
-
-    public void setIssuer(String issuer)
-    {
-        this.issuer = issuer;
-    }
-
-    public void setMessage(String message)
-    {
-        this.message = message;
-    }
-
-    public void setTimeout(long timeout)
-    {
-        this.timeout = timeout;
-    }
-
-    public void setTime(long time)
-    {
-        this.time = time;
-    }
-
-    public void setFlags(int flags)
-    {
-        this.flags = flags;
     }
 }

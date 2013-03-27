@@ -103,8 +103,7 @@ public class StorageSQL implements Storage
             "INSERT INTO", TABLE_TARGETS,
                 "(target, issuer, message, timeout, time, flags)",
                 "VALUES (?, ?, ?, ?, ?, ?)", null,
-            to.getTarget(), to.getIssuer(), to.getMessage(), to.getTimeout(),
-            to.getTime(), to.getFlags());
+            to.target, to.issuer, to.message, to.timeout, to.timeout, to.flags);
 
         try {
             stmt.execute();
@@ -140,7 +139,7 @@ public class StorageSQL implements Storage
     public void remove(TargetObject to)
         throws StorageException
     {
-        remove(to.getId());
+        remove(to.id);
     }
 
     public TargetObject[] getTargets(String target)
@@ -172,13 +171,13 @@ public class StorageSQL implements Storage
             while (rs.next()) {
                 to = new TargetObject();
 
-                to.setId(rs.getInt("id"));
-                to.setTarget(rs.getString("target"));
-                to.setIssuer(rs.getString("issuer"));
-                to.setMessage(rs.getString("message"));
-                to.setTimeout(rs.getLong("timeout"));
-                to.setTime(rs.getLong("time"));
-                to.setFlags(rs.getInt("flags"));
+                to.id      = rs.getInt("id");
+                to.target  = rs.getString("target");
+                to.issuer  = rs.getString("issuer");
+                to.message = rs.getString("message");
+                to.timeout = rs.getLong("timeout");
+                to.time    = rs.getLong("time");
+                to.flags   = rs.getInt("flags");
 
                 ret.add(to);
             }

@@ -79,7 +79,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         run.addFlag(type);
 
         if (timeout > 0)
-            run.setTimeout(Utils.time() + timeout);
+            run.timeout = Utils.time() + timeout;
 
         execrun(run);
 
@@ -135,7 +135,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         run    = new RMute(this, sender, target, message);
 
         if (timeout > 0)
-            run.setTimeout(Utils.time() + timeout);
+            run.timeout = Utils.time() + timeout;
 
         execrun(run);
     }

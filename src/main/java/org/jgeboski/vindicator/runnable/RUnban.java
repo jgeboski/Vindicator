@@ -60,14 +60,13 @@ public class RUnban extends RObject implements Runnable
 
         broadcast("vindicator.message.unban",
                   "Ban removed for %s by %s: %s",
-                  bt.getTarget(), issuer, bt.getMessage());
+                  bt.target, issuer, bt.message);
 
         if (!api.vind.config.unbanNote)
             return;
 
         try {
-            api.noteAdd(sender, bt.getTarget(), "Unbanned: " + bt.getMessage(),
-                        false);
+            api.noteAdd(sender, bt.target, "Unbanned: " + bt.message, false);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }

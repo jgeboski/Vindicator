@@ -29,7 +29,8 @@ public class RNoteRem extends RObject implements Runnable
                     int index)
     {
         super(api, sender, target);
-        setId(index);
+
+        this.id = index;
     }
 
     public void run()
@@ -65,6 +66,6 @@ public class RNoteRem extends RObject implements Runnable
             return;
 
         broadcast(perm, "Note removed for %s by %s: %s",
-                  tos[i].getTarget(), issuer, tos[i].getMessage());
+                  tos[i].target, issuer, tos[i].message);
     }
 }
