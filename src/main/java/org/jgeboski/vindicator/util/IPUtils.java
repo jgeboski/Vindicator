@@ -31,26 +31,12 @@ public class IPUtils
 
     public static boolean isIPv4(String str)
     {
-        InetAddress ia;
-
-        ia = getAddress(str);
-
-        if (ia == null)
-            return false;
-
-        return (ia instanceof Inet4Address);
+        return (getAddress(str) instanceof Inet4Address);
     }
 
     public static boolean isIPv6(String str)
     {
-        InetAddress ia;
-
-        ia = getAddress(str);
-
-        if (ia == null)
-            return false;
-
-        return (ia instanceof Inet6Address);
+        return (getAddress(str) instanceof Inet6Address);
     }
 
     private static InetAddress getAddress(String str)
