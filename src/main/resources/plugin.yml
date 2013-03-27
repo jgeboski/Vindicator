@@ -8,7 +8,7 @@ softdepend: [CraftIRC]
 commands:
   ban:
     description: Ban a player or IP from the server
-    aliases: []
+    aliases: [banip]
     usage: /<command> <player/IP> [reason]
   kick:
     description: Kick a player or IP from the server
@@ -36,7 +36,7 @@ commands:
     usage: /<command> <player/IP> <time> [reason]
   unban:
     description: Unban a player or IP from the server
-    aliases: [pardon]
+    aliases: [pardon, unbanip]
     usage: /<command> <player/IP>
   unmute:
     description: Unmute a player
