@@ -40,6 +40,7 @@ public class CBan implements CommandExecutor
                              String label, String[] args)
     {
         String reason;
+        long   secs;
 
         if (!Utils.hasPermission(sender, "vindicator.ban"))
             return true;
@@ -49,19 +50,31 @@ public class CBan implements CommandExecutor
             return true;
         }
 
-        if (args.length == 1) {
+        reason = null;
+        secs   = 0;
+
+        if (args.length > 1) {
+            secs = StrUtils.strsecs(args[1]);
+
+            if (secs != 0) {
+                if (args.length > 2)
+                    reason = StrUtils.strjoin(args, " ", 2);
+            } else {
+                reason = StrUtils.strjoin(args, " ", 1);
+            }
+        }
+
+        if (reason == null) {
             if (vind.config.mustReason) {
                 Message.severe(sender, "A reason must be specified");
                 return true;
             }
 
             reason = vind.config.defBanReason;
-        } else {
-            reason = StrUtils.strjoin(args, " ", 1);
         }
 
         try {
-            vind.api.ban(sender, args[0], reason);
+            vind.api.ban(sender, args[0], reason, secs);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }

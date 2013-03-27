@@ -93,7 +93,6 @@ public class Vindicator extends JavaPlugin
         getCommand("mute").setExecutor(new CMute(this));
         getCommand("noteadd").setExecutor(new CNoteAdd(this));
         getCommand("noterem").setExecutor(new CNoteRem(this));
-        getCommand("tmpban").setExecutor(new CTmpBan(this));
         getCommand("unban").setExecutor(new CUnban(this));
         getCommand("unmute").setExecutor(new CUnmute(this));
         getCommand("vindicator").setExecutor(new CVindicator(this));
