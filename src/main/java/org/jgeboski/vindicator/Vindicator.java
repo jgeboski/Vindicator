@@ -147,7 +147,12 @@ public class Vindicator extends JavaPlugin
         if (!config.ircEnabled)
             return;
 
-        RelayedMessage rmsg = craftirc.newMsg(vPoint, null, "chat");
+        RelayedMessage rmsg;
+
+        /* This typecasting is needed to prevent a ClassNotFoundException
+         * from being thrown over com.ensifera.animosity.craftirc.EndPoint.
+         */
+        rmsg = craftirc.newMsg((EndPoint) ((Object) vPoint), null, "chat");
 
         if (!config.ircColored)
             msg = ChatColor.stripColor(msg);
