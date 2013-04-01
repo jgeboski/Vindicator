@@ -68,6 +68,7 @@ public class Vindicator extends JavaPlugin
         try {
             api = new VindicatorAPI(this);
         } catch (APIException e) {
+            Log.severe("Failed to enable VindicatorAPI: %s", e.getMessage());
             setEnabled(false);
             return;
         }
@@ -103,7 +104,8 @@ public class Vindicator extends JavaPlugin
         if (config.ircEnabled)
             craftirc.unregisterEndPoint(config.ircTag);
 
-        api.close();
+        if (api != null)
+            api.close();
     }
 
     public void reload()
