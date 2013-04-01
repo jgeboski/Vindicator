@@ -45,8 +45,7 @@ public class Database
             try {
                 Class.forName("org.sqlite.JDBC").newInstance();
             } catch (Exception e) {
-                System.out.println(e.getMessage());
-                return;
+                throw new SQLException(e);
             }
         }
 
