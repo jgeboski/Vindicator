@@ -43,6 +43,7 @@ public class Configuration extends YamlConfiguration
     public String  defMuteReason;
     public boolean mustReason;
     public boolean unbanNote;
+    public boolean unmuteNote;
     public boolean autoComplete;
 
     public String  ircTag;
@@ -69,6 +70,7 @@ public class Configuration extends YamlConfiguration
         this.defMuteReason = "You have been muted";
         this.mustReason    = false;
         this.unbanNote     = false;
+        this.unmuteNote    = false;
         this.autoComplete  = true;
 
         this.ircTag        = "vindicator";
@@ -99,12 +101,13 @@ public class Configuration extends YamlConfiguration
         poolKeepAlive = cs.getLong("keep-alive", poolKeepAlive);
 
         cs            = getConfigurationSection("settings");
-        defBanReason  = cs.getString("default-kick",   defBanReason);
-        defKickReason = cs.getString("default-ban",    defKickReason);
-        defMuteReason = cs.getString("default-mute",   defMuteReason);
-        mustReason    = cs.getBoolean("must-reason",   mustReason);
-        unbanNote     = cs.getBoolean("unban-to-note", unbanNote);
-        autoComplete  = cs.getBoolean("auto-complete", autoComplete);
+        defBanReason  = cs.getString("default-kick",    defBanReason);
+        defKickReason = cs.getString("default-ban",     defKickReason);
+        defMuteReason = cs.getString("default-mute",    defMuteReason);
+        mustReason    = cs.getBoolean("must-reason",    mustReason);
+        unbanNote     = cs.getBoolean("unban-to-note",  unbanNote);
+        unmuteNote    = cs.getBoolean("unmute-to-note", unmuteNote);
+        autoComplete  = cs.getBoolean("auto-complete",  autoComplete);
 
         cs            = getConfigurationSection("irc");
         ircTag        = cs.getString("tag",      ircTag);
@@ -132,12 +135,13 @@ public class Configuration extends YamlConfiguration
         cs.set("keep-alive", poolKeepAlive);
 
         cs = getConfigurationSection("settings");
-        cs.set("default-kick",  defBanReason);
-        cs.set("default-ban",   defKickReason);
-        cs.set("default-mute",  defMuteReason);
-        cs.set("must-reason",   mustReason);
-        cs.set("unban-to-note", unbanNote);
-        cs.set("auto-complete", autoComplete);
+        cs.set("default-kick",   defBanReason);
+        cs.set("default-ban",    defKickReason);
+        cs.set("default-mute",   defMuteReason);
+        cs.set("must-reason",    mustReason);
+        cs.set("unban-to-note",  unbanNote);
+        cs.set("unmute-to-note", unmuteNote);
+        cs.set("auto-complete",  autoComplete);
 
         cs = getConfigurationSection("irc");
         cs.set("tag",     ircTag);

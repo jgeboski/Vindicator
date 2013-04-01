@@ -61,5 +61,14 @@ public class RUnmute extends RObject implements Runnable
         broadcast("vindicator.message.unmute",
                   "Mute removed for %s by %s: %s",
                   bt.target, issuer, bt.message);
+
+        if (!api.vind.config.unmuteNote)
+            return;
+
+        try {
+            api.noteAdd(sender, bt.target, "Unmuted: " + bt.message, false);
+        } catch (APIException e) {
+            Message.severe(sender, e.getMessage());
+        }
     }
 }
