@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import org.jgeboski.vindicator.exception.StorageException;
 import org.jgeboski.vindicator.storage.sql.Database;
 import org.jgeboski.vindicator.storage.sql.SQLStatement;
+import org.jgeboski.vindicator.storage.sql.SQLType;
 
 public class StorageSQL implements Storage
 {
@@ -41,6 +42,7 @@ public class StorageSQL implements Storage
         throws StorageException
     {
         SQLStatement stmt;
+        String       ainc;
 
         this.url      = url;
         this.username = username;
@@ -60,16 +62,17 @@ public class StorageSQL implements Storage
             return;
 
         stmt = database.createStatement();
+        ainc = (database.getType() == SQLType.MYSQL) ? "AUTO_INCREMENT" : "";
 
         stmt.store(
             "CREATE TABLE", TABLE_TARGETS, "(",
-                "id INTEGER PRIMARY KEY,",
+                "id INTEGER PRIMARY KEY ", ainc, ",",
                 "target varchar(16) NOT NULL,",
                 "issuer varchar(16) NOT NULL,",
                 "message varchar(255) NOT NULL,",
-                "timeout INTEGER NOT NULL,",
-                "time INTEGER NOT NULL,",
-                "flags SMALLINT NOT NULL",
+                "timeout INTEGER(11) NOT NULL,",
+                "time INTEGER(11) NOT NULL,",
+                "flags SMALLINT(6) NOT NULL",
             ")");
 
         try {
