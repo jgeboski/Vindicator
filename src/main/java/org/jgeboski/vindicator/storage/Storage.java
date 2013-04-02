@@ -17,7 +17,7 @@
 
 package org.jgeboski.vindicator.storage;
 
-import org.jgeboski.vindicator.exception.StorageException;
+import java.util.List;
 
 public interface Storage
 {
@@ -32,6 +32,9 @@ public interface Storage
     public void remove(TargetObject to)
         throws StorageException;
 
-    public TargetObject[] getTargets(String target)
+    public List<TargetObject> getTargets(String target)
+        throws StorageException;
+
+    public List<TargetObject> getTargets(TargetObject to)
         throws StorageException;
 }

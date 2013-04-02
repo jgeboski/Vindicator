@@ -17,16 +17,22 @@
 
 package org.jgeboski.vindicator.command;
 
+import java.util.List;
+
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.jgeboski.vindicator.exception.APIException;
+import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.api.APIRunnable;
+import org.jgeboski.vindicator.api.APITask;
+import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
-public class CLookup implements CommandExecutor
+public class CLookup extends APIRunnable implements CommandExecutor
 {
     public Vindicator vind;
 
@@ -38,6 +44,8 @@ public class CLookup implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
+        APITask at;
+
         if (!Utils.hasPermission(sender, "vindicator.lookup"))
             return true;
 
@@ -46,12 +54,42 @@ public class CLookup implements CommandExecutor
             return true;
         }
 
+        at = new APITask(this, sender, args[0]);
+
         try {
-            vind.api.lookup(sender, args[0]);
+            vind.api.lookup(at);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
 
         return true;
+    }
+
+    public void run(APITask at, List<TargetObject> tos, APIException expt)
+    {
+        String type;
+
+        if (tos.size() < 1) {
+            Message.info(at.sender, "There are no records for %s", at.target);
+            return;
+        }
+
+        for (TargetObject to : tos) {
+            type = to.hasFlag(TargetObject.IP) ? "IP" : "Player";
+
+            if (to.hasFlag(TargetObject.BAN)) {
+                Message.info(at.sender, "%s[%s] %s Ban (by: %s): %s",
+                             ChatColor.RED, Utils.timestr(to.time), type,
+                             to.issuer, to.message);
+            } else if (to.hasFlag(TargetObject.NOTE)) {
+                Message.info(at.sender, "%s[%s] %s Note #%d (by: %s): %s",
+                             ChatColor.YELLOW, Utils.timestr(to.time),
+                             type, to.id, to.issuer, to.message);
+            } else if (to.hasFlag(TargetObject.MUTE)) {
+                Message.info(at.sender, "%s[%s] Muted (by: %s): %s",
+                             ChatColor.RED, Utils.timestr(to.time),
+                             to.issuer, to.message);
+            }
+        }
     }
 }

@@ -17,6 +17,8 @@
 
 package org.jgeboski.vindicator;
 
+import java.util.List;
+
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,31 +26,89 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.plugin.PluginManager;
 
-import org.jgeboski.vindicator.runnable.RLogin;
+import org.jgeboski.vindicator.api.APIRunnable;
+import org.jgeboski.vindicator.api.APITask;
+import org.jgeboski.vindicator.storage.StorageException;
+import org.jgeboski.vindicator.storage.TargetObject;
 
-public class EventListener implements Listener
+public class EventListener extends APIRunnable implements Listener
 {
-    public Vindicator vdict;
+    public Vindicator vind;
 
-    public EventListener(Vindicator vdict)
+    public EventListener(Vindicator vind)
     {
-        this.vdict = vdict;
+        this.vind = vind;
     }
 
     public void register()
     {
         PluginManager pm;
 
-        pm = vdict.getServer().getPluginManager();
-        pm.registerEvents(this, vdict);
+        pm = vind.getServer().getPluginManager();
+        pm.registerEvents(this, vind);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event)
     {
-        RLogin run;
+        List<TargetObject> tos;
+        TargetObject ban;
+        TargetObject mute;
 
-        run = new RLogin(vdict.api, event);
-        run.run();
+        String target;
+        String str;
+        int    notes;
+
+        target = event.getName();
+        tos    = null;
+        mute   = null;
+        ban    = null;
+        notes  = 0;
+
+        try {
+            tos = vind.api.storage.getTargets(target);
+        } catch (StorageException e) { }
+
+        str = event.getAddress().getHostAddress();
+
+        try {
+            if (tos != null)
+                tos.addAll(vind.api.storage.getTargets(str));
+            else
+                tos = vind.api.storage.getTargets(str);
+        } catch (StorageException e) { }
+
+        for (TargetObject to : tos) {
+            if (to.hasFlag(TargetObject.BAN)) {
+                ban = to;
+                break;
+            } else if (to.hasFlag(TargetObject.MUTE)) {
+                mute = to;
+            } else if (to.hasFlag(TargetObject.NOTE)) {
+                notes++;
+            }
+        }
+
+        if (ban != null) {
+            if (ban.hasFlag(TargetObject.IP))
+                str = "Player %s attempted to join with a banned IP: %s";
+            else
+                str = "Player %s attempted to join banned: %s";
+
+            event.disallow(Result.KICK_OTHER, "Banned: " + ban.message);
+            vind.broadcast("vindicator.message.notify", str,
+                           target, ban.message);
+            return;
+        }
+
+        if ((notes < 1) && (mute == null))
+            return;
+
+        str = String.format("%s has %d note(s)", target, notes);
+
+        if (mute != null)
+            str += ", and is muted";
+
+        vind.broadcast("vindicator.message.notify", str);
     }
 }

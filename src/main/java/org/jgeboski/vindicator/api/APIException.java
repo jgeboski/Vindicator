@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.exception;
+package org.jgeboski.vindicator.api;
 
 public class APIException extends Exception
 {

@@ -21,13 +21,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.jgeboski.vindicator.exception.APIException;
+import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.api.APIRunnable;
+import org.jgeboski.vindicator.api.APITask;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
-public class CMute implements CommandExecutor
+public class CMute extends APIRunnable implements CommandExecutor
 {
     public Vindicator vind;
 
@@ -39,8 +41,7 @@ public class CMute implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        String reason;
-        long   secs;
+        APITask at;
 
         if (!Utils.hasPermission(sender, "vindicator.mute"))
             return true;
@@ -50,20 +51,26 @@ public class CMute implements CommandExecutor
             return true;
         }
 
-        reason = null;
-        secs   = 0;
+        at = new APITask(this, sender, args[0]);
 
         if (args.length > 1) {
-            secs   = StrUtils.strsecs(args[1]);
-            reason = StrUtils.strjoin(args, " ", ((secs == 0) ? 1 : 2));
+            at.timeout = StrUtils.strsecs(args[1]);
+            at.message = StrUtils.strjoin(args, " ",
+                             ((at.timeout == 0) ? 1 : 2));
         }
 
         try {
-            vind.api.mute(sender, args[0], reason, secs);
+            vind.api.mute(at);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
 
         return true;
+    }
+
+    public void run(APITask at, APIException expt)
+    {
+        if (expt != null)
+            Message.severe(at.sender, expt.getMessage());
     }
 }

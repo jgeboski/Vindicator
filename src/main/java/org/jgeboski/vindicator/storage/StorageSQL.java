@@ -20,8 +20,8 @@ package org.jgeboski.vindicator.storage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.jgeboski.vindicator.exception.StorageException;
 import org.jgeboski.vindicator.storage.sql.Database;
 import org.jgeboski.vindicator.storage.sql.SQLStatement;
 import org.jgeboski.vindicator.storage.sql.SQLType;
@@ -145,7 +145,7 @@ public class StorageSQL implements Storage
         remove(to.id);
     }
 
-    public TargetObject[] getTargets(String target)
+    public List<TargetObject> getTargets(String target)
         throws StorageException
     {
         ArrayList<TargetObject> ret;
@@ -154,11 +154,12 @@ public class StorageSQL implements Storage
         ResultSet    rs;
         TargetObject to;
 
+        ret = new ArrayList<TargetObject>();
+
         if (target == null)
-            return new TargetObject[0];
+            return ret;
 
         stmt = database.createStatement();
-        ret  = new ArrayList<TargetObject>();
 
         stmt.store(
             "SELECT * FROM", TABLE_TARGETS,
@@ -169,7 +170,7 @@ public class StorageSQL implements Storage
             rs = stmt.executeQuery();
 
             if (rs == null)
-                return new TargetObject[0];
+                return ret;
 
             while (rs.next()) {
                 to = new TargetObject();
@@ -190,6 +191,12 @@ public class StorageSQL implements Storage
             throw new StorageException(e);
         }
 
-        return ret.toArray(new TargetObject[0]);
+        return ret;
+    }
+
+    public List<TargetObject> getTargets(TargetObject to)
+        throws StorageException
+    {
+        return getTargets(to.target);
     }
 }

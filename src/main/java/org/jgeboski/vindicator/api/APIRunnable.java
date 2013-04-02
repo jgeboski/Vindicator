@@ -15,17 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.exception;
+package org.jgeboski.vindicator.api;
 
-public class StorageException extends APIException
+import java.util.List;
+
+import org.jgeboski.vindicator.storage.TargetObject;
+import org.jgeboski.vindicator.util.Message;
+
+public class APIRunnable
 {
-    public StorageException(String format, Object ... args)
+    public void run(APITask at, APIException expt)
     {
-        super(format, args);
+        if (expt != null)
+            Message.severe(at.sender, expt.getMessage());
     }
 
-    public StorageException(Throwable cause)
+    public void run(APITask at, List<TargetObject> tos, APIException expt)
     {
-        super(cause);
+
     }
 }

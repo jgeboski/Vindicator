@@ -21,13 +21,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.jgeboski.vindicator.exception.APIException;
+import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.api.APIRunnable;
+import org.jgeboski.vindicator.api.APITask;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
-public class CNoteAdd implements CommandExecutor
+public class CNoteAdd extends APIRunnable implements CommandExecutor
 {
     public Vindicator vind;
 
@@ -39,8 +41,7 @@ public class CNoteAdd implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        boolean pub;
-        String  note;
+        APITask at;
 
         if (!Utils.hasPermission(sender, "vindicator.noteadd"))
             return true;
@@ -50,24 +51,11 @@ public class CNoteAdd implements CommandExecutor
             return true;
         }
 
-        pub = false;
-
-        if (args[0].startsWith("-")) {
-            if (!args[0].equals("-p")) {
-                Message.info(sender, command.getUsage());
-                return true;
-            }
-
-            if (!Utils.hasPermission(sender, "vindicator.noteadd.public"))
-                return true;
-
-            pub = true;
-        }
-
-        note = StrUtils.strjoin(args, " ", 1);
+        at = new APITask(this, sender, args[0]);
+        at.message = StrUtils.strjoin(args, " ", 1);
 
         try {
-            vind.api.noteAdd(sender, args[0], note, pub);
+            vind.api.noteAdd(at);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }

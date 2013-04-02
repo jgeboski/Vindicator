@@ -15,34 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.runnable;
+package org.jgeboski.vindicator.storage;
 
-import org.bukkit.command.CommandSender;
+import org.jgeboski.vindicator.api.APIException;
 
-import org.jgeboski.vindicator.util.Message;
-import org.jgeboski.vindicator.VindicatorAPI;
-
-public class RNoteAdd extends RObject implements Runnable
+public class StorageException extends APIException
 {
-    public RNoteAdd(VindicatorAPI api, CommandSender sender, String target,
-                    String message)
+    public StorageException(String format, Object ... args)
     {
-        super(api, sender, target, message);
-        addFlag(RObject.NOTE);
+        super(format, args);
     }
 
-    public void run()
+    public StorageException(Throwable cause)
     {
-        String perm;
-
-        perm = "vindicator.message.noteadd";
-
-        if (hasFlag(RObject.PUBLIC))
-            perm += ".public";
-
-        if (!add(this))
-            return;
-
-        broadcast(perm, "Note added for %s by %s: %s", target, issuer, message);
+        super(cause);
     }
 }
