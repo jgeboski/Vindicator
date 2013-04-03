@@ -161,14 +161,14 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         for (TargetObject to : storage.getTargets(at.target)) {
             if (to.hasFlag(TargetObject.BAN)) {
-                tos.add(m + b, to);
+                tos.add(b, to);
                 b++;
             } else if (to.hasFlag(TargetObject.NOTE)) {
                 to.id = n + 1;
-                tos.add(b + n, to);
+                tos.add(b + m + n, to);
                 n++;
             } else if (to.hasFlag(TargetObject.MUTE)) {
-                tos.add(m, to);
+                tos.add(b + m, to);
                 m++;
             }
         }
