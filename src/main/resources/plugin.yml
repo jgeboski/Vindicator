@@ -24,8 +24,8 @@ commands:
     usage: /<command> <player> [time] [reason]
   noteadd:
     description: Add a player or IP note
-    aliases: [addnote, newnote]
-    usage: /<command> [-p] <player/IP> <note>
+    aliases: [addnote, addpnote, newnote, newpnote, pnoteadd]
+    usage: /<command> <player/IP> <note>
   noterem:
     description: Remove a player or IP note
     aliases: [delnote, notedel, remnote]

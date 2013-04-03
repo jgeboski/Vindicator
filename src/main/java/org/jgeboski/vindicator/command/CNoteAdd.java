@@ -24,6 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.jgeboski.vindicator.api.APIException;
 import org.jgeboski.vindicator.api.APIRunnable;
 import org.jgeboski.vindicator.api.APITask;
+import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
@@ -53,6 +54,9 @@ public class CNoteAdd extends APIRunnable implements CommandExecutor
 
         at = new APITask(this, sender, args[0]);
         at.message = StrUtils.strjoin(args, " ", 1);
+
+        if (label.matches("addpnote|newpnote|pnoteadd"))
+            at.addFlag(TargetObject.PUBLIC);
 
         try {
             vind.api.noteAdd(at);
