@@ -32,6 +32,9 @@ public interface Storage
     public void remove(TargetObject to)
         throws StorageException;
 
+    public void update(TargetObject to)
+        throws StorageException;
+
     public List<TargetObject> getTargets(String target)
         throws StorageException;
 

@@ -101,12 +101,11 @@ public class StorageSQL implements Storage
         SQLStatement stmt;
 
         stmt = database.createStatement();
-
         stmt.store(
             "INSERT INTO", TABLE_TARGETS,
                 "(target, issuer, message, timeout, time, flags)",
-                "VALUES (?, ?, ?, ?, ?, ?)", null,
-            to.target, to.issuer, to.message, to.timeout, to.timeout, to.flags);
+              "VALUES (?, ?, ?, ?, ?, ?)", null,
+            to.target, to.issuer, to.message, to.timeout, to.time, to.flags);
 
         try {
             stmt.execute();
@@ -125,10 +124,9 @@ public class StorageSQL implements Storage
             return;
 
         stmt = database.createStatement();
-
         stmt.store(
             "DELETE FROM", TABLE_TARGETS,
-                "WHERE id = ?", null,
+              "WHERE id = ?", null,
             id);
 
         try {
@@ -143,6 +141,35 @@ public class StorageSQL implements Storage
         throws StorageException
     {
         remove(to.id);
+    }
+
+    public void update(TargetObject to)
+        throws StorageException
+    {
+        SQLStatement stmt;
+
+        if (to.id < 1)
+            return;
+
+        stmt = database.createStatement();
+        stmt.store(
+            "UPDATE", TABLE_TARGETS, "SET",
+                "target = ?,",
+                "issuer = ?,",
+                "message = ?,",
+                "timeout = ?,",
+                "time = ?,",
+                "flags = ?",
+              "WHERE id = ?", null,
+            to.target, to.issuer, to.message, to.timeout, to.time, to.flags,
+            to.id);
+
+        try {
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
     }
 
     public List<TargetObject> getTargets(String target)
@@ -160,10 +187,9 @@ public class StorageSQL implements Storage
             return ret;
 
         stmt = database.createStatement();
-
         stmt.store(
             "SELECT * FROM", TABLE_TARGETS,
-                "WHERE target = ?", null,
+              "WHERE target = ?", null,
             target);
 
         try {
