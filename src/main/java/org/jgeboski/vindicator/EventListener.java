@@ -90,7 +90,7 @@ public class EventListener extends APIRunnable implements Listener
         }
 
         if (ban != null) {
-            if (ban.hasFlag(TargetObject.IP))
+            if (ban.hasFlag(TargetObject.ADDRESS))
                 str = "Player %s attempted to join with a banned IP: %s";
             else
                 str = "Player %s attempted to join banned: %s";

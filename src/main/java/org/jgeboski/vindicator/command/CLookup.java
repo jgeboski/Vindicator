@@ -75,7 +75,7 @@ public class CLookup extends APIRunnable implements CommandExecutor
         }
 
         for (TargetObject to : tos) {
-            type = to.hasFlag(TargetObject.IP) ? "IP" : "Player";
+            type = to.hasFlag(TargetObject.ADDRESS) ? "IP" : "Player";
 
             if (to.hasFlag(TargetObject.BAN)) {
                 Message.info(at.sender, "%s[%s] %s Ban (by: %s): %s",

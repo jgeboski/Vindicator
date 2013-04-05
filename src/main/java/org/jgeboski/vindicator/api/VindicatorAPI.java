@@ -80,7 +80,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (at.timeout > 0)
             at.timeout += Utils.time();
 
-        if (at.hasFlag(TargetObject.IP))
+        if (at.hasFlag(TargetObject.ADDRESS))
             kickIP(at, "Banned: " + at.message);
         else
             kick(at, "Banned: " + at.message);
@@ -437,7 +437,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
             return TargetObject.PLAYER;
 
         if (StrUtils.isAddress(to.target))
-            return TargetObject.IP;
+            return TargetObject.ADDRESS;
 
         throw new APIException("Invalid player/IP: %s", to.target);
     }
