@@ -66,16 +66,16 @@ public class EventListener extends APIRunnable implements Listener
         notes  = 0;
 
         try {
-            tos = vind.api.storage.getTargets(target);
+            tos = vind.api.storage.getRecords(target);
         } catch (StorageException e) { }
 
         str = event.getAddress().getHostAddress();
 
         try {
             if (tos != null)
-                tos.addAll(vind.api.storage.getTargets(str));
+                tos.addAll(vind.api.storage.getRecords(str));
             else
-                tos = vind.api.storage.getTargets(str);
+                tos = vind.api.storage.getRecords(str);
         } catch (StorageException e) { }
 
         for (TargetObject to : tos) {

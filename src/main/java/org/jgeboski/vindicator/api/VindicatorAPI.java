@@ -96,7 +96,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         ban = null;
 
-        for (TargetObject to : storage.getTargets(at)) {
+        for (TargetObject to : storage.getRecords(at)) {
             if (!to.hasFlag(TargetObject.BAN))
                 continue;
 
@@ -176,7 +176,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         tos = new ArrayList<TargetObject>();
         m   = b = n = 0;
 
-        for (TargetObject to : storage.getTargets(at.target)) {
+        for (TargetObject to : storage.getRecords(at.target)) {
             if (to.hasFlag(TargetObject.BAN)) {
                 tos.add(b, to);
                 b++;
@@ -224,7 +224,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         mute = null;
 
-        for (TargetObject to : storage.getTargets(at)) {
+        for (TargetObject to : storage.getRecords(at)) {
             if (!to.hasFlag(TargetObject.MUTE))
                 continue;
 
@@ -299,7 +299,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         note = null;
         i    = 1;
 
-        for (TargetObject to : storage.getTargets(at)) {
+        for (TargetObject to : storage.getRecords(at)) {
             if (!to.hasFlag(TargetObject.NOTE))
                 continue;
 
@@ -339,7 +339,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         bt = null;
 
-        for (TargetObject to : storage.getTargets(at)) {
+        for (TargetObject to : storage.getRecords(at)) {
             if (!to.hasFlag(TargetObject.BAN))
                 continue;
 
@@ -379,7 +379,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         mt = null;
 
-        for (TargetObject to : storage.getTargets(at)) {
+        for (TargetObject to : storage.getRecords(at)) {
             if (!to.hasFlag(TargetObject.MUTE))
                 continue;
 

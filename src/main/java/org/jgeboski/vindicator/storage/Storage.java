@@ -35,9 +35,9 @@ public interface Storage
     public void update(TargetObject to)
         throws StorageException;
 
-    public List<TargetObject> getTargets(String target)
+    public List<TargetObject> getRecords(String target)
         throws StorageException;
 
-    public List<TargetObject> getTargets(TargetObject to)
+    public List<TargetObject> getRecords(TargetObject to)
         throws StorageException;
 }

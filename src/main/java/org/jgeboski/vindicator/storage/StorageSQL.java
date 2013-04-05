@@ -198,7 +198,7 @@ public class StorageSQL implements Storage
         }
     }
 
-    public List<TargetObject> getTargets(String target)
+    public List<TargetObject> getRecords(String target)
         throws StorageException
     {
         ArrayList<TargetObject> ret;
@@ -244,10 +244,10 @@ public class StorageSQL implements Storage
         return ret;
     }
 
-    public List<TargetObject> getTargets(TargetObject to)
+    public List<TargetObject> getRecords(TargetObject to)
         throws StorageException
     {
-        return getTargets(to.target);
+        return getRecords(to.target);
     }
 
     private int getTargetID(String name)
