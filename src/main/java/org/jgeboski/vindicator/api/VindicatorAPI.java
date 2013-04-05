@@ -91,17 +91,34 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void banHandler(APITask at)
         throws APIException
     {
+        TargetObject ban;
+        String       act;
+
+        ban = null;
+
         for (TargetObject to : storage.getTargets(at)) {
             if (!to.hasFlag(TargetObject.BAN))
                 continue;
 
-            throw new APIException("Ban already exists for %s", at.target);
+            ban = to;
+            break;
         }
 
-        storage.add(at);
+        if (ban != null) {
+            if (!vind.config.banUpdate)
+                throw new APIException("Ban already exists for %s", at.target);
+
+            act   = "updated";
+            at.id = ban.id;
+            storage.update(at);
+        } else {
+            act   = "placed";
+            storage.add(at);
+        }
+
         vind.broadcast("vindicator.message.ban",
-                       "Banned placed for %s by %s: %s",
-                       at.target, at.issuer, at.message);
+                       "Ban %s for %s by %s: %s",
+                       act, at.target, at.issuer, at.message);
 
         if (at.timeout < 1)
             return;
@@ -202,17 +219,34 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void muteHandler(APITask at)
         throws APIException
     {
+        TargetObject mute;
+        String       act;
+
+        mute = null;
+
         for (TargetObject to : storage.getTargets(at)) {
             if (!to.hasFlag(TargetObject.MUTE))
                 continue;
 
-            throw new APIException("Mute already exists for %s", at.target);
+            mute = to;
+            break;
         }
 
-        storage.add(at);
+        if (mute != null) {
+            if (!vind.config.muteUpdate)
+                throw new APIException("Mute already exists for %s", at.target);
+
+            act   = "updated";
+            at.id = mute.id;
+            storage.update(at);
+        } else {
+            act   = "placed";
+            storage.add(at);
+        }
+
         vind.broadcast("vindicator.message.mute",
-                       "Mute placed for %s by %s: %s",
-                       at.target, at.issuer, at.message);
+                       "Mute %s for %s by %s: %s",
+                       act, at.target, at.issuer, at.message);
 
         if (at.timeout < 1)
             return;
