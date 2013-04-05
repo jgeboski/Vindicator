@@ -23,19 +23,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class SQLStatement
 {
     private Connection        connection;
     private PreparedStatement pstatement;
+    private int               autogenkeys;
 
     private String sql;
     private Object args[];
 
-    public SQLStatement(Connection connection)
+    public SQLStatement(Connection connection, boolean autogenkeys)
     {
-        this.connection = connection;
-        this.pstatement = null;
+        this.connection  = connection;
+        this.pstatement  = null;
+
+        if (autogenkeys)
+            this.autogenkeys = Statement.RETURN_GENERATED_KEYS;
+        else
+            this.autogenkeys = Statement.NO_GENERATED_KEYS;
     }
 
     private void prepareStatement()
@@ -46,7 +53,7 @@ public class SQLStatement
 
         close();
 
-        pstatement = connection.prepareStatement(sql);
+        pstatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
         for (int i = 0; i < args.length; i++)
             pstatement.setObject(i + 1, args[i]);
@@ -124,5 +131,14 @@ public class SQLStatement
         } catch (SQLException e) { }
 
         pstatement = null;
+    }
+
+    public ResultSet getGeneratedKeys()
+        throws SQLException
+    {
+        if (pstatement == null)
+            return null;
+
+        return pstatement.getGeneratedKeys();
     }
 }

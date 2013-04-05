@@ -89,6 +89,11 @@ public class Database
 
     public SQLStatement createStatement()
     {
-        return new SQLStatement(connection);
+        return new SQLStatement(connection, false);
+    }
+
+    public SQLStatement createStatement(boolean autogenkeys)
+    {
+        return new SQLStatement(connection, autogenkeys);
     }
 }
