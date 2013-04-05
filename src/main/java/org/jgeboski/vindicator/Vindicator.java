@@ -33,6 +33,7 @@ import com.ensifera.animosity.craftirc.RelayedMessage;
 import org.jgeboski.vindicator.api.APIException;
 import org.jgeboski.vindicator.api.VindicatorAPI;
 import org.jgeboski.vindicator.command.*;
+import org.jgeboski.vindicator.listener.PlayerListener;
 import org.jgeboski.vindicator.util.Log;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
@@ -44,8 +45,6 @@ public class Vindicator extends JavaPlugin
     public Configuration config;
     public VindicatorAPI api;
 
-    private EventListener events;
-
     public CraftIRC craftirc;
     public VPoint   vPoint;
 
@@ -53,7 +52,6 @@ public class Vindicator extends JavaPlugin
     {
         config   = new Configuration(new File(getDataFolder(), "config.yml"));
         api      = null;
-        events   = new EventListener(this);
 
         craftirc = null;
         vPoint   = null;
@@ -64,6 +62,7 @@ public class Vindicator extends JavaPlugin
         PluginManager pm;
         Plugin p;
 
+        pm = getServer().getPluginManager();
         config.load();
 
         try {
@@ -75,8 +74,7 @@ public class Vindicator extends JavaPlugin
         }
 
         if (config.ircEnabled) {
-            pm = getServer().getPluginManager();
-            p  = pm.getPlugin("CraftIRC");
+            p = pm.getPlugin("CraftIRC");
 
             if ((p != null) && p.isEnabled()) {
                 craftirc = (CraftIRC) p;
@@ -87,7 +85,7 @@ public class Vindicator extends JavaPlugin
                 config.ircEnabled = false;
         }
 
-        events.register();
+        pm.registerEvents(new PlayerListener(this), this);
 
         getCommand("ban").setExecutor(new CBan(this));
         getCommand("kick").setExecutor(new CKick(this));

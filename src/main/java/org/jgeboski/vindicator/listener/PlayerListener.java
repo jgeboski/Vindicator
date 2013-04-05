@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator;
+package org.jgeboski.vindicator.listener;
 
 import java.util.List;
 
@@ -24,28 +24,20 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
-import org.bukkit.plugin.PluginManager;
 
 import org.jgeboski.vindicator.api.APIRunnable;
 import org.jgeboski.vindicator.api.APITask;
 import org.jgeboski.vindicator.storage.StorageException;
 import org.jgeboski.vindicator.storage.TargetObject;
+import org.jgeboski.vindicator.Vindicator;
 
-public class EventListener extends APIRunnable implements Listener
+public class PlayerListener extends APIRunnable implements Listener
 {
     public Vindicator vind;
 
-    public EventListener(Vindicator vind)
+    public PlayerListener(Vindicator vind)
     {
         this.vind = vind;
-    }
-
-    public void register()
-    {
-        PluginManager pm;
-
-        pm = vind.getServer().getPluginManager();
-        pm.registerEvents(this, vind);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
