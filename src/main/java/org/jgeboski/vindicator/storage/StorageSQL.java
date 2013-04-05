@@ -26,8 +26,7 @@ import java.util.List;
 import org.jgeboski.vindicator.storage.sql.Database;
 import org.jgeboski.vindicator.storage.sql.SQLStatement;
 import org.jgeboski.vindicator.storage.sql.SQLType;
-import org.jgeboski.vindicator.util.IPUtils;
-import org.jgeboski.vindicator.util.Utils;
+import org.jgeboski.vindicator.util.StrUtils;
 
 public class StorageSQL implements Storage
 {
@@ -354,10 +353,10 @@ public class StorageSQL implements Storage
 
     private int getTargetType(String target)
     {
-        if (Utils.isMinecraftName(target))
+        if (StrUtils.isMinecraftName(target))
             return 1;
 
-        if (IPUtils.isAddress(target))
+        if (StrUtils.isAddress(target))
             return 2;
 
         return 0;

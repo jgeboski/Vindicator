@@ -53,7 +53,7 @@ public class CNoteAdd extends APIRunnable implements CommandExecutor
         }
 
         at = new APITask(this, sender, args[0]);
-        at.message = StrUtils.strjoin(args, " ", 1);
+        at.message = StrUtils.join(args, " ", 1);
 
         if (label.matches("addpnote|newpnote|pnoteadd"))
             at.addFlag(TargetObject.PUBLIC);

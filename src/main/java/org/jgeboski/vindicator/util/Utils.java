@@ -59,11 +59,6 @@ public class Utils
         return hasPermission(sender, perm, true);
     }
 
-    public static boolean isMinecraftName(String str)
-    {
-        return str.matches("\\w{2,16}");
-    }
-
     public static long time()
     {
         return System.currentTimeMillis() / 1000;

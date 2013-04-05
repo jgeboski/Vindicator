@@ -52,7 +52,7 @@ public class CKick extends APIRunnable implements CommandExecutor
         }
 
         at = new APITask(this, sender, args[0]);
-        at.message = StrUtils.strjoin(args, " ", 1);
+        at.message = StrUtils.join(args, " ", 1);
 
         try {
             vind.api.kick(at);

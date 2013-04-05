@@ -54,9 +54,8 @@ public class CMute extends APIRunnable implements CommandExecutor
         at = new APITask(this, sender, args[0]);
 
         if (args.length > 1) {
-            at.timeout = StrUtils.strsecs(args[1]);
-            at.message = StrUtils.strjoin(args, " ",
-                             ((at.timeout == 0) ? 1 : 2));
+            at.timeout = StrUtils.toSeconds(args[1]);
+            at.message = StrUtils.join(args, " ", ((at.timeout == 0) ? 1 : 2));
         }
 
         try {

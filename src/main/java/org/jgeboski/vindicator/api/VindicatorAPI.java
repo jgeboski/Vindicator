@@ -31,7 +31,7 @@ import org.bukkit.entity.Player;
 import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageSQL;
 import org.jgeboski.vindicator.storage.TargetObject;
-import org.jgeboski.vindicator.util.IPUtils;
+import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
@@ -138,7 +138,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
             at.message = vind.config.defKickReason;
         }
 
-        if (IPUtils.isAddress(at.target)) {
+        if (StrUtils.isAddress(at.target)) {
             if (kickIP(at, at.message))
                 return;
 
@@ -203,7 +203,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
             at.message = vind.config.defMuteReason;
         }
 
-        if (!Utils.isMinecraftName(at.target))
+        if (!StrUtils.isMinecraftName(at.target))
             throw new APIException("Invalid player: %s", at.target);
 
         at.target = getTarget(at);
@@ -433,10 +433,10 @@ public class VindicatorAPI extends ThreadPoolExecutor
     private int getTypeFlag(TargetObject to)
         throws APIException
     {
-        if (Utils.isMinecraftName(to.target))
+        if (StrUtils.isMinecraftName(to.target))
             return TargetObject.PLAYER;
 
-        if (IPUtils.isAddress(to.target))
+        if (StrUtils.isAddress(to.target))
             return TargetObject.IP;
 
         throw new APIException("Invalid player/IP: %s", to.target);

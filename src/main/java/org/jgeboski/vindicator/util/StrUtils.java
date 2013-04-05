@@ -17,11 +17,35 @@
 
 package org.jgeboski.vindicator.util;
 
+import java.net.InetAddress;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 public class StrUtils
 {
-    public static String strjoin(String[] strs, String glue, int start, int end)
+    public static boolean isAddress(String str)
+    {
+        return (getAddress(str) != null);
+    }
+
+    public static boolean isAddress4(String str)
+    {
+        return (getAddress(str) instanceof Inet4Address);
+    }
+
+    public static boolean isAddress6(String str)
+    {
+        return (getAddress(str) instanceof Inet6Address);
+    }
+
+    public static boolean isMinecraftName(String str)
+    {
+        return str.matches("\\w{2,16}");
+    }
+
+    public static String join(String[] strs, String glue, int start, int end)
     {
         String ret;
         int    i;
@@ -40,12 +64,12 @@ public class StrUtils
         return ret;
     }
 
-    public static String strjoin(String[] strs, String glue, int start)
+    public static String join(String[] strs, String glue, int start)
     {
-        return strjoin(strs, glue, start, strs.length);
+        return join(strs, glue, start, strs.length);
     }
 
-    public static long strsecs(String str)
+    public static long toSeconds(String str)
     {
         String sstr;
         char[] cstr;
@@ -100,5 +124,18 @@ public class StrUtils
         }
 
         return time;
+    }
+
+    private static InetAddress getAddress(String str)
+    {
+        InetAddress ia;
+
+        try {
+            ia = InetAddress.getByName(str);
+        } catch (UnknownHostException e) {
+            return null;
+        }
+
+        return str.equals(ia.getHostAddress()) ? ia : null;
     }
 }
