@@ -24,6 +24,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -40,6 +41,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public Vindicator vind;
     public Storage    storage;
 
+    public HashMap<String, TargetObject> mutes;
+
     public VindicatorAPI(Vindicator vind)
         throws APIException
     {
@@ -48,12 +51,20 @@ public class VindicatorAPI extends ThreadPoolExecutor
               new LinkedBlockingQueue<Runnable>(),
               Executors.defaultThreadFactory());
 
-        this.vind = vind;
+        this.vind  = vind;
+        this.mutes = new HashMap<String, TargetObject>();
 
         /* For now, SQL only */
         storage = new StorageSQL(
             vind.config.storeURL,  vind.config.storeUser,
             vind.config.storePass, vind.config.storePrefix);
+
+        for (Player p : vind.getServer().getOnlinePlayers()) {
+            for (TargetObject to : storage.getRecords(p.getName())) {
+                if (to.hasFlag(TargetObject.MUTE))
+                    mutes.put(p.getName(), to);
+            }
+        }
     }
 
     public void close()
@@ -244,6 +255,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
             storage.add(at);
         }
 
+        mutes.put(at.target, at);
         vind.broadcast("vindicator.message.mute",
                        "Mute %s for %s by %s: %s",
                        act, at.target, at.issuer, at.message);
@@ -376,6 +388,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         TargetObject mt;
+        String       msg;
 
         mt = null;
 
@@ -390,10 +403,17 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (mt == null)
             throw new APIException("Mute for %s not found", at.target);
 
+        if (at.issuer == null) {
+            msg = String.format("Mute removed for %s: %s",
+                                mt.target, at.message);
+        } else {
+            msg = String.format("Mute removed for %s by %s: %s",
+                                mt.target, at.issuer, mt.message);
+        }
+
         storage.remove(mt);
-        vind.broadcast("vindicator.message.unmute",
-                       "Mute removed for %s by %s: %s",
-                       mt.target, at.issuer, mt.message);
+        mutes.remove(at.target);
+        vind.broadcast("vindicator.message.unmute", msg);
 
         if (!vind.config.unmuteNote)
             return;

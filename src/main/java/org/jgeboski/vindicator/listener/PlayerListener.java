@@ -22,13 +22,19 @@ import java.util.List;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
+import org.bukkit.event.player.PlayerQuitEvent;
 
+import org.jgeboski.vindicator.api.APIException;
 import org.jgeboski.vindicator.api.APIRunnable;
 import org.jgeboski.vindicator.api.APITask;
 import org.jgeboski.vindicator.storage.StorageException;
 import org.jgeboski.vindicator.storage.TargetObject;
+import org.jgeboski.vindicator.util.Log;
+import org.jgeboski.vindicator.util.Message;
+import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
 public class PlayerListener extends APIRunnable implements Listener
@@ -38,6 +44,36 @@ public class PlayerListener extends APIRunnable implements Listener
     public PlayerListener(Vindicator vind)
     {
         this.vind = vind;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerChat(AsyncPlayerChatEvent event)
+    {
+        TargetObject mute;
+        APITask      at;
+        String       target;
+
+        target = event.getPlayer().getName();
+        mute   = vind.api.mutes.get(target);
+
+        if (mute == null)
+            return;
+
+        if ((mute.timeout < 1) || (mute.timeout > Utils.time())) {
+            Log.info("%s attempted to speak muted: %s",
+                     target, event.getMessage());
+            event.setCancelled(true);
+            return;
+        }
+
+        at = new APITask(null, mute);
+        at.issuer = null;
+
+        try {
+            vind.api.unmute(at);
+        } catch (APIException e) {
+            Log.severe("Failed to unmute %s: %s", target, e.getMessage());
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -93,6 +129,9 @@ public class PlayerListener extends APIRunnable implements Listener
             return;
         }
 
+        if (mute != null)
+            vind.api.mutes.put(target, mute);
+
         if ((notes < 1) && (mute == null))
             return;
 
@@ -102,5 +141,11 @@ public class PlayerListener extends APIRunnable implements Listener
             str += ", and is muted";
 
         vind.broadcast("vindicator.message.notify", str);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerQuit(PlayerQuitEvent event)
+    {
+        vind.api.mutes.remove(event.getPlayer().getName());
     }
 }

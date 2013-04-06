@@ -52,6 +52,19 @@ public class APITask extends TargetObject implements Runnable
         this(task, null, target);
     }
 
+    public APITask(APIRunnable task, TargetObject to)
+    {
+        this(task, null, null);
+
+        this.id      = to.id;
+        this.target  = to.target;
+        this.issuer  = to.issuer;
+        this.message = to.message;
+        this.timeout = to.timeout;
+        this.time    = to.time;
+        this.flags   = to.flags;
+    }
+
     public void run()
     {
         Object       ret;
@@ -72,6 +85,9 @@ public class APITask extends TargetObject implements Runnable
             if (thab instanceof APIException)
                 expt = (APIException) thab;
         } catch (Exception e) { }
+
+        if (task == null)
+            return;
 
         task.run(this, expt);
 
