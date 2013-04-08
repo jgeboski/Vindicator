@@ -75,8 +75,8 @@ public class StorageSQL implements Storage
             stmt.store(
                 "CREATE TABLE", TABLE_RECORDS, "(",
                     "id INTEGER PRIMARY KEY ", ainc, ",",
-                    "target SMALLINT(6) NOT NULL,",
-                    "issuer SMALLINT(6) NOT NULL,",
+                    "target INTEGER(11) NOT NULL,",
+                    "issuer INTEGER(11) NOT NULL,",
                     "message VARCHAR(255) NOT NULL,",
                     "timeout INTEGER(11) NOT NULL,",
                     "time INTEGER(11) NOT NULL,",
