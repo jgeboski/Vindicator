@@ -95,7 +95,7 @@ public class StorageSQL implements Storage
             stmt.store(
                 "CREATE TABLE", TABLE_TARGETS, "(",
                     "id INTEGER PRIMARY KEY ", ainc, ",",
-                    "name VARCHAR(16) NOT NULL,",
+                    "name VARCHAR(40) NOT NULL,",
                     "type SMALLINT(1) NOT NULL",
                 ")");
 
