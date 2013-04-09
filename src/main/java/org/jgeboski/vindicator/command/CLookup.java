@@ -69,27 +69,23 @@ public class CLookup extends APIRunnable implements CommandExecutor
 
     public void run(APITask at, List<TargetObject> tos, APIException expt)
     {
-        String type;
-
         if (tos.size() < 1) {
-            Message.info(at.sender, "There are no records for %s",
+            Message.info(at.sender, "There are no records for %s.",
                          hl(at.target));
             return;
         }
 
         for (TargetObject to : tos) {
-            type = to.hasFlag(TargetObject.ADDRESS) ? "IP" : "Player";
-
             if (to.hasFlag(TargetObject.BAN)) {
-                Message.severe(at.sender, "[%s] %s Ban (issuer: %s): %s",
+                Message.severe(at.sender, "[%s] Ban by %s: %s",
                                hl(Utils.timestr(Utils.DATEF_SHORT, to.time)),
-                               type, hl(to.issuer), hl(to.message));
+                               hl(to.issuer), hl(to.message));
             } else if (to.hasFlag(TargetObject.NOTE)) {
-                Message.warning(at.sender, "[%s] %s Note #%s (issuer: %s): %s",
+                Message.warning(at.sender, "[%s] Note #%s by %s: %s",
                                 hl(Utils.timestr(Utils.DATEF_SHORT, to.time)),
-                                type, hl(to.id), hl(to.issuer), hl(to.message));
+                                hl(to.id), hl(to.issuer), hl(to.message));
             } else if (to.hasFlag(TargetObject.MUTE)) {
-                Message.severe(at.sender, "[%s] Muted (issuer: %s): %s",
+                Message.severe(at.sender, "[%s] Mute by %s: %s",
                                hl(Utils.timestr(Utils.DATEF_SHORT, to.time)),
                                hl(to.issuer), hl(to.message));
             }
