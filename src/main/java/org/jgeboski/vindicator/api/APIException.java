@@ -17,6 +17,8 @@
 
 package org.jgeboski.vindicator.api;
 
+import org.bukkit.ChatColor;
+
 public class APIException extends Exception
 {
     public APIException(String format, Object ... args)
@@ -27,5 +29,13 @@ public class APIException extends Exception
     public APIException(Throwable cause)
     {
         super(cause);
+    }
+
+    public String getMessage(boolean strip)
+    {
+        if (!strip)
+            return getMessage();
+
+        return ChatColor.stripColor(getMessage());
     }
 }

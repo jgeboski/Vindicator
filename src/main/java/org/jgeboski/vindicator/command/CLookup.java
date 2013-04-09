@@ -32,6 +32,8 @@ import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
+import static org.jgeboski.vindicator.util.Message.hl;
+
 public class CLookup extends APIRunnable implements CommandExecutor
 {
     public Vindicator vind;
@@ -70,7 +72,8 @@ public class CLookup extends APIRunnable implements CommandExecutor
         String type;
 
         if (tos.size() < 1) {
-            Message.info(at.sender, "There are no records for %s", at.target);
+            Message.info(at.sender, "There are no records for %s",
+                         hl(at.target));
             return;
         }
 
@@ -79,15 +82,16 @@ public class CLookup extends APIRunnable implements CommandExecutor
 
             if (to.hasFlag(TargetObject.BAN)) {
                 Message.severe(at.sender, "[%s] %s Ban (issuer: %s): %s",
-                               Utils.timestr(to.time), type, to.issuer,
-                               to.message);
+                               hl(Utils.timestr(to.time)), type, hl(to.issuer),
+                               hl(to.message));
             } else if (to.hasFlag(TargetObject.NOTE)) {
-                Message.warning(at.sender, "[%s] %s Note #%d (issuer: %s): %s",
-                                ChatColor.YELLOW, Utils.timestr(to.time),
-                                type, to.id, to.issuer, to.message);
+                Message.warning(at.sender, "[%s] %s Note #%s (issuer: %s): %s",
+                                hl(Utils.timestr(to.time)), type, hl(to.id),
+                                hl(to.issuer), hl(to.message));
             } else if (to.hasFlag(TargetObject.MUTE)) {
                 Message.severe(at.sender, "[%s] Muted (issuer: %s): %s",
-                               Utils.timestr(to.time), to.issuer, to.message);
+                               hl(Utils.timestr(to.time)), hl(to.issuer),
+                               hl(to.message));
             }
         }
     }

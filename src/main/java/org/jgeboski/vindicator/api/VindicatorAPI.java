@@ -36,6 +36,8 @@ import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
+import static org.jgeboski.vindicator.util.Message.hl;
+
 public class VindicatorAPI extends ThreadPoolExecutor
 {
     public Vindicator vind;
@@ -103,7 +105,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         TargetObject ban;
-        String       act;
+        String       str;
 
         ban = null;
 
@@ -116,27 +118,30 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (ban != null) {
-            if (!vind.config.banUpdate)
-                throw new APIException("Ban already exists on %s.", at.target);
+            if (!vind.config.banUpdate) {
+                throw new APIException("Ban already exists on %s.",
+                                       hl(at.target));
+            }
 
-            act   = "updated";
+            str   = "updated";
             at.id = ban.id;
             storage.update(at);
         } else {
-            act   = "placed";
+            str   = "placed";
             storage.add(at);
         }
 
         vind.broadcast("vindicator.message.ban",
                        "Ban %s on %s by %s: %s",
-                       act, at.target, at.issuer, at.message);
+                       str, hl(at.target), hl(at.issuer), hl(at.message));
 
         if (at.timeout < 1)
             return;
 
+        str = "EEE, MMM d 'at' h:m a z";
         vind.broadcast("vindicator.message.ban",
                        "Temporary ban will be removed: %s",
-                       Utils.timestr("EEE, MMM d 'at' h:m a z", at.timeout));
+                       hl(Utils.timestr(str, at.timeout)));
     }
 
     public void kick(APITask at)
@@ -153,17 +158,18 @@ public class VindicatorAPI extends ThreadPoolExecutor
             if (kickIP(at, at.message))
                 return;
 
-            throw new APIException("Player(s) for %s not found.", at.target);
+            throw new APIException("Player(s) for %s not found.",
+                                   hl(at.target));
         }
 
         at.target = getTarget(at);
 
         if (!kick(at, at.message))
-            throw new APIException("Player %s not found.", at.target);
+            throw new APIException("Player %s not found.", hl(at.target));
 
         vind.broadcast("vindicator.message.kick",
                        "Kick placed on %s by %s: %s",
-                       at.target, at.issuer, at.message);
+                       hl(at.target), hl(at.issuer), hl(at.message));
     }
 
     public void lookup(APITask at)
@@ -214,7 +220,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (!StrUtils.isMinecraftName(at.target))
-            throw new APIException("Invalid player: %s", at.target);
+            throw new APIException("Invalid player: %s", hl(at.target));
 
         at.target = getTarget(at);
         at.addFlag(TargetObject.MUTE);
@@ -230,7 +236,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         TargetObject mute;
-        String       act;
+        String       str;
 
         mute = null;
 
@@ -245,28 +251,29 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (mute != null) {
             if (!vind.config.muteUpdate) {
                 throw new APIException("Mute already exists on %s.",
-                                       at.target);
+                                       hl(at.target));
             }
 
-            act   = "updated";
+            str   = "updated";
             at.id = mute.id;
             storage.update(at);
         } else {
-            act   = "placed";
+            str   = "placed";
             storage.add(at);
         }
 
         mutes.put(at.target, at);
         vind.broadcast("vindicator.message.mute",
                        "Mute %s on %s by %s: %s",
-                       act, at.target, at.issuer, at.message);
+                       str, hl(at.target), hl(at.issuer), hl(at.message));
 
         if (at.timeout < 1)
             return;
 
+        str = "EEE, MMM d 'at' h:m a z";
         vind.broadcast("vindicator.message.mute",
                        "Temporary mute will be removed: %s",
-                       Utils.timestr("EEE, MMM d 'at' h:m a z", at.timeout));
+                       hl(Utils.timestr(str, at.timeout)));
     }
 
     public void noteAdd(APITask at)
@@ -291,7 +298,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         storage.add(at);
         vind.broadcast(perm, "Note added on %s by %s: %s",
-                       at.target, at.issuer, at.message);
+                       hl(at.target), hl(at.issuer), hl(at.message));
     }
 
     public void noteRem(APITask at)
@@ -325,7 +332,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (note == null)
-            throw new APIException("Note index %d not found.", at.id);
+            throw new APIException("Note index %s not found.", hl(at.id));
 
         perm = "vindicator.message.noterem";
 
@@ -334,7 +341,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         storage.remove(note);
         vind.broadcast(perm, "Note removed from %s by %s.",
-                       note.target, at.issuer);
+                       hl(note.target), hl(at.issuer));
     }
 
     public void unban(APITask at)
@@ -361,12 +368,12 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (bt == null)
-            throw new APIException("Ban for %s not found.", at.target);
+            throw new APIException("Ban for %s not found.", hl(at.target));
 
         storage.remove(bt);
         vind.broadcast("vindicator.message.unban",
                        "Ban removed from %s by %s.",
-                       bt.target, at.issuer);
+                       hl(bt.target), hl(at.issuer));
 
         if (!vind.config.unbanNote)
             return;
@@ -402,13 +409,13 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (mt == null)
-            throw new APIException("Mute for %s not found.", at.target);
+            throw new APIException("Mute for %s not found.", hl(at.target));
 
         if (at.issuer == null) {
-            msg = String.format("Mute removed from %s.", mt.target);
+            msg = String.format("Mute removed from %s.", hl(mt.target));
         } else {
             msg = String.format("Mute removed from %s by %s.",
-                                mt.target, at.issuer);
+                                hl(mt.target), hl(at.issuer));
         }
 
         storage.remove(mt);
@@ -459,7 +466,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (StrUtils.isAddress(to.target))
             return TargetObject.ADDRESS;
 
-        throw new APIException("Invalid player/address: %s.", to.target);
+        throw new APIException("Invalid player/address: %s.", hl(to.target));
     }
 
     private boolean kick(TargetObject to, String message)

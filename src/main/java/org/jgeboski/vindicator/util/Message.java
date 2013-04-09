@@ -43,6 +43,16 @@ public class Message
         return str;
     }
 
+    public static String hl(Object obj)
+    {
+        String str;
+
+        str = String.valueOf(obj);
+        str = ChatColor.GRAY + str + ChatColor.RESET;
+
+        return str;
+    }
+
     public static void info(CommandSender sender, String format,
                             Object ... args)
     {
@@ -75,8 +85,8 @@ public class Message
         str = format(format, args);
 
         if (sender instanceof Player) {
-            str = String.format("%s[%s]%s %s", ChatColor.DARK_AQUA,
-                                Vindicator.pluginName, ChatColor.RESET, str);
+            str = String.format("%s%s%s%s %s", hl("["), ChatColor.DARK_AQUA,
+                                Vindicator.pluginName, hl("]"), str);
         } else {
             str = ChatColor.stripColor(str);
             str = String.format("[%s] %s", Vindicator.pluginName, str);

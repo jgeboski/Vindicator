@@ -37,6 +37,8 @@ import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
 
+import static org.jgeboski.vindicator.util.Message.hl;
+
 public class PlayerListener extends APIRunnable implements Listener
 {
     public Vindicator vind;
@@ -61,7 +63,7 @@ public class PlayerListener extends APIRunnable implements Listener
 
         if ((mute.timeout < 1) || (mute.timeout > Utils.time())) {
             Log.info("Player %s attempted to speak muted: %s",
-                     target, event.getMessage());
+                     hl(target), hl(event.getMessage()));
             event.setCancelled(true);
             return;
         }
@@ -125,7 +127,7 @@ public class PlayerListener extends APIRunnable implements Listener
 
             event.disallow(Result.KICK_OTHER, "Banned: " + ban.message);
             vind.broadcast("vindicator.message.notify", str,
-                           target, ban.message);
+                           hl(target), hl(ban.message));
             return;
         }
 
@@ -135,10 +137,10 @@ public class PlayerListener extends APIRunnable implements Listener
         if ((notes < 1) && (mute == null))
             return;
 
-        str = String.format("Player %s has %d note(s)", target, notes);
+        str = String.format("Player %s has %s note(s)", hl(target), hl(notes));
 
         if (mute != null)
-            str += ", and is muted";
+            str += ", and is " + hl("muted");
 
         str += ".";
         vind.broadcast("vindicator.message.notify", str);
