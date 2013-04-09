@@ -26,7 +26,8 @@ import org.bukkit.entity.Player;
 
 public class Utils
 {
-    public static final String dateFormat = "MM-dd-yy kk:mm:ss";
+    public static final String DATEF_LONG  = "EEE, MMM d 'at' h:m a z";
+    public static final String DATEF_SHORT = "MM-dd kk:mm";
 
     public static void broadcast(String perm, String format, Object ... args)
     {
@@ -70,17 +71,6 @@ public class Utils
         Date             date;
 
         sdf  = new SimpleDateFormat(format);
-        date = new Date(secs * 1000);
-
-        return sdf.format(date);
-    }
-
-    public static String timestr(long secs)
-    {
-        SimpleDateFormat sdf;
-        Date             date;
-
-        sdf  = new SimpleDateFormat(dateFormat);
         date = new Date(secs * 1000);
 
         return sdf.format(date);

@@ -82,16 +82,16 @@ public class CLookup extends APIRunnable implements CommandExecutor
 
             if (to.hasFlag(TargetObject.BAN)) {
                 Message.severe(at.sender, "[%s] %s Ban (issuer: %s): %s",
-                               hl(Utils.timestr(to.time)), type, hl(to.issuer),
-                               hl(to.message));
+                               hl(Utils.timestr(Utils.DATEF_SHORT, to.time)),
+                               type, hl(to.issuer), hl(to.message));
             } else if (to.hasFlag(TargetObject.NOTE)) {
                 Message.warning(at.sender, "[%s] %s Note #%s (issuer: %s): %s",
-                                hl(Utils.timestr(to.time)), type, hl(to.id),
-                                hl(to.issuer), hl(to.message));
+                                hl(Utils.timestr(Utils.DATEF_SHORT, to.time)),
+                                type, hl(to.id), hl(to.issuer), hl(to.message));
             } else if (to.hasFlag(TargetObject.MUTE)) {
                 Message.severe(at.sender, "[%s] Muted (issuer: %s): %s",
-                               hl(Utils.timestr(to.time)), hl(to.issuer),
-                               hl(to.message));
+                               hl(Utils.timestr(Utils.DATEF_SHORT, to.time)),
+                               hl(to.issuer), hl(to.message));
             }
         }
     }

@@ -138,10 +138,9 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (at.timeout < 1)
             return;
 
-        str = "EEE, MMM d 'at' h:m a z";
         vind.broadcast("vindicator.message.ban",
                        "Temporary ban will be removed: %s",
-                       hl(Utils.timestr(str, at.timeout)));
+                       hl(Utils.timestr(Utils.DATEF_LONG, at.timeout)));
     }
 
     public void kick(APITask at)
@@ -270,10 +269,9 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (at.timeout < 1)
             return;
 
-        str = "EEE, MMM d 'at' h:m a z";
         vind.broadcast("vindicator.message.mute",
                        "Temporary mute will be removed: %s",
-                       hl(Utils.timestr(str, at.timeout)));
+                       hl(Utils.timestr(Utils.DATEF_LONG, at.timeout)));
     }
 
     public void noteAdd(APITask at)
