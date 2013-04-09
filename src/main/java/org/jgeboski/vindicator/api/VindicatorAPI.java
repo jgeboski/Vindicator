@@ -78,7 +78,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     {
         if (at.message == null) {
             if (vind.config.mustReason)
-                throw new APIException("A reason must be provided");
+                throw new APIException("A reason must be provided.");
 
             at.message = vind.config.defBanReason;
         }
@@ -117,7 +117,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         if (ban != null) {
             if (!vind.config.banUpdate)
-                throw new APIException("Ban already exists for %s", at.target);
+                throw new APIException("Ban already exists on %s.", at.target);
 
             act   = "updated";
             at.id = ban.id;
@@ -128,7 +128,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         vind.broadcast("vindicator.message.ban",
-                       "Ban %s for %s by %s: %s",
+                       "Ban %s on %s by %s: %s",
                        act, at.target, at.issuer, at.message);
 
         if (at.timeout < 1)
@@ -144,7 +144,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     {
         if (at.message == null) {
             if (vind.config.mustReason)
-                throw new APIException("A reason must be provided");
+                throw new APIException("A reason must be provided.");
 
             at.message = vind.config.defKickReason;
         }
@@ -153,16 +153,16 @@ public class VindicatorAPI extends ThreadPoolExecutor
             if (kickIP(at, at.message))
                 return;
 
-            throw new APIException("Player(s) for %s not found", at.target);
+            throw new APIException("Player(s) for %s not found.", at.target);
         }
 
         at.target = getTarget(at);
 
         if (!kick(at, at.message))
-            throw new APIException("Player %s not found", at.target);
+            throw new APIException("Player %s not found.", at.target);
 
         vind.broadcast("vindicator.message.kick",
-                       "Kick placed for %s by %s: %s",
+                       "Kick placed on %s by %s: %s",
                        at.target, at.issuer, at.message);
     }
 
@@ -178,7 +178,6 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         ArrayList<TargetObject> tos;
-        String type;
 
         int m;
         int b;
@@ -209,7 +208,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     {
         if (at.message == null) {
             if (vind.config.mustReason)
-                throw new APIException("A reason must be provided");
+                throw new APIException("A reason must be provided.");
 
             at.message = vind.config.defMuteReason;
         }
@@ -244,8 +243,10 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (mute != null) {
-            if (!vind.config.muteUpdate)
-                throw new APIException("Mute already exists for %s", at.target);
+            if (!vind.config.muteUpdate) {
+                throw new APIException("Mute already exists on %s.",
+                                       at.target);
+            }
 
             act   = "updated";
             at.id = mute.id;
@@ -257,7 +258,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         mutes.put(at.target, at);
         vind.broadcast("vindicator.message.mute",
-                       "Mute %s for %s by %s: %s",
+                       "Mute %s on %s by %s: %s",
                        act, at.target, at.issuer, at.message);
 
         if (at.timeout < 1)
@@ -289,7 +290,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
             perm += ".public";
 
         storage.add(at);
-        vind.broadcast(perm, "Note added for %s by %s: %s",
+        vind.broadcast(perm, "Note added on %s by %s: %s",
                        at.target, at.issuer, at.message);
     }
 
@@ -324,7 +325,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (note == null)
-            throw new APIException("Note index %d not found", at.id);
+            throw new APIException("Note index %d not found.", at.id);
 
         perm = "vindicator.message.noterem";
 
@@ -332,8 +333,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
             perm += ".public";
 
         storage.remove(note);
-        vind.broadcast(perm, "Note removed for %s by %s: %s",
-                       note.target, at.issuer, note.message);
+        vind.broadcast(perm, "Note removed from %s by %s.",
+                       note.target, at.issuer);
     }
 
     public void unban(APITask at)
@@ -360,11 +361,11 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (bt == null)
-            throw new APIException("Ban for %s not found", at.target);
+            throw new APIException("Ban for %s not found.", at.target);
 
         storage.remove(bt);
         vind.broadcast("vindicator.message.unban",
-                       "Ban removed for %s by %s",
+                       "Ban removed from %s by %s.",
                        bt.target, at.issuer);
 
         if (!vind.config.unbanNote)
@@ -401,12 +402,12 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (mt == null)
-            throw new APIException("Mute for %s not found", at.target);
+            throw new APIException("Mute for %s not found.", at.target);
 
         if (at.issuer == null) {
-            msg = String.format("Mute removed for %s", mt.target);
+            msg = String.format("Mute removed from %s.", mt.target);
         } else {
-            msg = String.format("Mute removed for %s by %s",
+            msg = String.format("Mute removed from %s by %s.",
                                 mt.target, at.issuer);
         }
 
@@ -458,7 +459,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (StrUtils.isAddress(to.target))
             return TargetObject.ADDRESS;
 
-        throw new APIException("Invalid player/IP: %s", to.target);
+        throw new APIException("Invalid player/address: %s.", to.target);
     }
 
     private boolean kick(TargetObject to, String message)

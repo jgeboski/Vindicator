@@ -60,7 +60,7 @@ public class PlayerListener extends APIRunnable implements Listener
             return;
 
         if ((mute.timeout < 1) || (mute.timeout > Utils.time())) {
-            Log.info("%s attempted to speak muted: %s",
+            Log.info("Player %s attempted to speak muted: %s",
                      target, event.getMessage());
             event.setCancelled(true);
             return;
@@ -135,11 +135,12 @@ public class PlayerListener extends APIRunnable implements Listener
         if ((notes < 1) && (mute == null))
             return;
 
-        str = String.format("%s has %d note(s)", target, notes);
+        str = String.format("Player %s has %d note(s)", target, notes);
 
         if (mute != null)
             str += ", and is muted";
 
+        str += ".";
         vind.broadcast("vindicator.message.notify", str);
     }
 
