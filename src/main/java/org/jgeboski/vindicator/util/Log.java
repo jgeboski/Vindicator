@@ -26,43 +26,25 @@ public class Log
 {
     protected static final Logger log = Logger.getLogger("Minecraft");
 
-    private static String format(String msg, Object ... args)
-    {
-        msg = ChatColor.stripColor(String.format(msg, args));
-        msg = String.format("[%s] %s", Vindicator.pluginName, msg);
-        return msg;
-    }
-
-    /**
-     * Log an INFO message prefixed with the plugin name
-     *
-     * @param format  A format string
-     * @param args    Arguments corresponding to @param format
-     **/
     public static void info(String format, Object ... args)
     {
         log.info(format(format, args));
     }
 
-    /**
-     * Log a WARNING message prefixed with the plugin name
-     *
-     * @param format  A format string
-     * @param args    Arguments corresponding to @param format
-     **/
     public static void warning(String format, Object ... args)
     {
         log.warning(format(format, args));
     }
 
-    /**
-     * Log a SEVERE message prefixed with the plugin name
-     *
-     * @param format  A format string
-     * @param args    Arguments corresponding to @param format
-     **/
     public static void severe(String format, Object ... args)
     {
         log.severe(format(format, args));
+    }
+
+    private static String format(String msg, Object ... args)
+    {
+        msg = ChatColor.stripColor(String.format(msg, args));
+        msg = String.format("[%s] %s", Vindicator.pluginName, msg);
+        return msg;
     }
 }

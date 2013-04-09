@@ -142,7 +142,7 @@ public class Vindicator extends JavaPlugin
     {
         String msg;
 
-        msg = String.format(format, args);
+        msg = Message.format(format, args);
         Utils.broadcast(perm, msg);
 
         if (!config.ircEnabled)

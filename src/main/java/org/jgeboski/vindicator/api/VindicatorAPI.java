@@ -364,8 +364,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         storage.remove(bt);
         vind.broadcast("vindicator.message.unban",
-                       "Ban removed for %s by %s: %s",
-                       bt.target, at.issuer, bt.message);
+                       "Ban removed for %s by %s",
+                       bt.target, at.issuer);
 
         if (!vind.config.unbanNote)
             return;
@@ -404,11 +404,10 @@ public class VindicatorAPI extends ThreadPoolExecutor
             throw new APIException("Mute for %s not found", at.target);
 
         if (at.issuer == null) {
-            msg = String.format("Mute removed for %s: %s",
-                                mt.target, at.message);
+            msg = String.format("Mute removed for %s", mt.target);
         } else {
-            msg = String.format("Mute removed for %s by %s: %s",
-                                mt.target, at.issuer, mt.message);
+            msg = String.format("Mute removed for %s by %s",
+                                mt.target, at.issuer);
         }
 
         storage.remove(mt);

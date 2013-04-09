@@ -39,6 +39,9 @@ public class TargetObject
     public long   time;
     public int    flags;
 
+    public String dIssuer;
+    public String dTarget;
+
     public TargetObject(String target, String issuer, String message)
     {
         this.id      = 0;
