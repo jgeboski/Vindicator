@@ -367,7 +367,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         bt.issuer  = at.issuer;
         bt.flags   = 0;
-        bt.message = "Unmuted: " + bt.message;
+        bt.message = "Unbanned: " + bt.message;
 
         at.setTargetObject(bt);
         noteAdd(at);
