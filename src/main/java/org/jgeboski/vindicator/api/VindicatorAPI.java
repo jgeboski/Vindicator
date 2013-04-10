@@ -376,6 +376,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (!vind.config.unbanNote)
             return;
 
+        bt.flags = 0;
         at.setTargetObject(bt);
         at.message = "Unbanned: " + at.message;
 
@@ -423,6 +424,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (!vind.config.unmuteNote)
             return;
 
+        mt.flags = 0;
         at.setTargetObject(mt);
         at.message = "Unmuted: " + at.message;
 
