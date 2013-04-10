@@ -19,6 +19,7 @@ package org.jgeboski.vindicator.listener;
 
 import java.util.List;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -53,9 +54,11 @@ public class PlayerListener extends APIRunnable implements Listener
     {
         TargetObject mute;
         APITask      at;
+        Player       player;
         String       target;
 
-        target = event.getPlayer().getName();
+        player = event.getPlayer();
+        target = player.getName();
         mute   = vind.api.mutes.get(target);
 
         if (mute == null)
@@ -64,6 +67,7 @@ public class PlayerListener extends APIRunnable implements Listener
         if ((mute.timeout < 1) || (mute.timeout > Utils.time())) {
             Log.info("Player %s attempted to speak muted: %s",
                      hl(target), hl(event.getMessage()));
+            Message.severe(player, "You cannot speak while being muted!");
             event.setCancelled(true);
             return;
         }
