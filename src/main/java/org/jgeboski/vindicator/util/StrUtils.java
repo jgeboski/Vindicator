@@ -106,6 +106,7 @@ public class StrUtils
                     mod = 60;
                 break;
 
+            case 's': mod = 1;        break;
             case 'h': mod = 3600;     break;
             case 'd': mod = 86400;    break;
             case 'w': mod = 604800;   break;
