@@ -376,10 +376,11 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (!vind.config.unbanNote)
             return;
 
-        bt.flags = 0;
-        at.setTargetObject(bt);
-        at.message = "Unbanned: " + at.message;
+        bt.issuer  = at.issuer;
+        bt.flags   = 0;
+        bt.message = "Unmuted: " + bt.message;
 
+        at.setTargetObject(bt);
         noteAdd(at);
     }
 
@@ -410,24 +411,20 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (mt == null)
             throw new APIException("Mute for %s not found.", hl(at.target));
 
-        if (at.issuer == null) {
-            msg = String.format("Mute removed from %s.", hl(mt.target));
-        } else {
-            msg = String.format("Mute removed from %s by %s.",
-                                hl(mt.target), hl(at.issuer));
-        }
-
         storage.remove(mt);
         mutes.remove(at.target);
-        vind.broadcast("vindicator.message.unmute", msg);
+        vind.broadcast("vindicator.message.unmute",
+                       "Mute removed from %s by %s.",
+                       hl(at.target), hl(at.issuer));
 
         if (!vind.config.unmuteNote)
             return;
 
-        mt.flags = 0;
-        at.setTargetObject(mt);
-        at.message = "Unmuted: " + at.message;
+        mt.issuer  = at.issuer;
+        mt.flags   = 0;
+        mt.message = "Unmuted: " + mt.message;
 
+        at.setTargetObject(mt);
         noteAdd(at);
     }
 
