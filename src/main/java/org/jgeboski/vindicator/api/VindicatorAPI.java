@@ -489,7 +489,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         for (Player p : vind.getServer().getOnlinePlayers()) {
             ip = p.getAddress().getAddress().getHostAddress();
 
-            if (ip.equals(at.target))
+            if (!ip.equals(at.target))
                 continue;
 
             p.kickPlayer(message);
