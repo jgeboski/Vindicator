@@ -86,11 +86,6 @@ permissions:
     children:
       vindicator.message.noterem: true
       vindicator.message.noterem.public: true
-  vindicator.tmpban:
-    description: Temporarily ban a player or IP from the server
-    default: op
-    children:
-      vindicator.message.tmpban: true
   vindicator.unban:
     description: Unban a player or IP from the server
     default: op
