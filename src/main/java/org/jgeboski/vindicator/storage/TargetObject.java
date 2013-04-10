@@ -22,8 +22,6 @@ import org.jgeboski.vindicator.util.Utils;
 
 public class TargetObject
 {
-    public static final int PUBLIC  = 1 << 0;
-
     public static final int ADDRESS = 1 << 1;
     public static final int PLAYER  = 1 << 2;
 

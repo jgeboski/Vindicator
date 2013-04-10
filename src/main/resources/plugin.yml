@@ -24,7 +24,7 @@ commands:
     usage: /<command> <player> [time] [reason]
   noteadd:
     description: Add a player or IP note
-    aliases: [addnote, addpnote, newnote, newpnote, pnoteadd]
+    aliases: [addnote, newnote]
     usage: /<command> <player/IP> <note>
   noterem:
     description: Remove a player or IP note
@@ -75,17 +75,11 @@ permissions:
     default: op
     children:
       vindicator.message.noteadd: true
-  vindicator.noteadd.public:
-    description: Add a public player or IP note
-    default: op
-    children:
-      vindicator.message.noteadd.public: true
   vindicator.noterem:
     description: Remove a player or IP note
     default: op
     children:
       vindicator.message.noterem: true
-      vindicator.message.noterem.public: true
   vindicator.unban:
     description: Unban a player or IP from the server
     default: op
@@ -109,14 +103,8 @@ permissions:
   vindicator.message.noteadd:
     description: Receive a message upon a note addition
     default: op
-  vindicator.message.noteadd.public:
-    description: Receive a message upon a public note addition
-    default: op
   vindicator.message.noterem:
     description: Receive a message upon a note removal
-    default: op
-  vindicator.message.noterem.public:
-    description: Receive a message upon a public note removal
     default: op
   vindicator.message.notify:
     description: Receive a message if there are notes/bans

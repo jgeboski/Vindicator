@@ -287,15 +287,9 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void noteAddHandler(APITask at)
         throws APIException
     {
-        String perm;
-
-        perm = "vindicator.message.noteadd";
-
-        if (at.hasFlag(TargetObject.PUBLIC))
-            perm += ".public";
-
         storage.add(at);
-        vind.broadcast(perm, "Note added on %s by %s: %s",
+        vind.broadcast("vindicator.message.noteadd",
+                       "Note added on %s by %s: %s",
                        hl(at.target), hl(at.issuer), hl(at.message));
     }
 
@@ -311,7 +305,6 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         TargetObject note;
-        String       perm;
         int          i;
 
         note = null;
@@ -332,13 +325,9 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (note == null)
             throw new APIException("Note index %s not found.", hl(at.id));
 
-        perm = "vindicator.message.noterem";
-
-        if (note.hasFlag(TargetObject.PUBLIC))
-            perm += ".public";
-
         storage.remove(note);
-        vind.broadcast(perm, "Note removed from %s by %s.",
+        vind.broadcast("vindicator.message.noterem",
+                       "Note removed from %s by %s.",
                        hl(note.target), hl(at.issuer));
     }
 

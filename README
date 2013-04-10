@@ -17,8 +17,6 @@ Features:
       - Temporary
   - IP/Player kicking
   - IP/Player noting
-    - Public
-    - Private
 
 
 Commands:
@@ -36,7 +34,7 @@ Commands:
     usage: /<command> <player> [time] [reason]
 
   - /noteadd: Add a player or IP note
-    aliases: addnote, addpnote, newnote, newpnote, pnoteadd
+    aliases: addnote, newnote
     usage: /<command> <player/IP> <note>
 
   - /noterem: Remove a player or IP note
@@ -56,28 +54,22 @@ Commands:
 
 
 Permissions:
-  - vindicator.ban:                    Ban a player or IP from the server.
-  - vindicator.kick:                   Kick a player or IP from the server.
-  - vindicator.lookup:                 Lookup a player or IP.
-  - vindicator.manage:                 Access to the vindicator command.
-  - vindicator.manage.reload:          Reload Vindicator.
-  - vindicator.mute:                   Mute a player.
-  - vindicator.noteadd:                Add a player or IP note.
-  - vindicator.noteadd.public:         Add a public player or IP note.
-  - vindicator.noterem:                Remove a player or IP note.
-  - vindicator.unban:                  Unban a player or IP from the server.
-  - vindicator.unmute:                 Unmute a player.
+  - vindicator.ban:              Ban a player or IP from the server.
+  - vindicator.kick:             Kick a player or IP from the server.
+  - vindicator.lookup:           Lookup a player or IP.
+  - vindicator.manage:           Access to the vindicator command.
+  - vindicator.manage.reload:    Reload Vindicator.
+  - vindicator.mute:             Mute a player.
+  - vindicator.noteadd:          Add a player or IP note.
+  - vindicator.noterem:          Remove a player or IP note.
+  - vindicator.unban:            Unban a player or IP from the server.
+  - vindicator.unmute:           Unmute a player.
 
-  - vindicator.message.ban:            Receive a message upon a ban.
-  - vindicator.message.kick:           Receive a message upon a kick.
-  - vindicator.message.mute:           Receive a message upon a mute.
-  - vindicator.message.noteadd:        Receive a message upon a note addition.
-  - vindicator.message.noteadd.public: Receive a message upon a public note
-                                       addition.
-  - vindicator.message.noterem:        Receive a message upon a note removal.
-  - vindicator.message.noterem.public: Receive a message upon a public note
-                                       removal.
-  - vindicator.message.notify:         Receive a message if there are
-                                       notes/bans.
-  - vindicator.message.unban:          Receive a message upon an unban.
-  - vindicator.message.unmute:         Receive a message upon an unmute.
+  - vindicator.message.ban:      Receive a message upon a ban.
+  - vindicator.message.kick:     Receive a message upon a kick.
+  - vindicator.message.mute:     Receive a message upon a mute.
+  - vindicator.message.noteadd:  Receive a message upon a note addition.
+  - vindicator.message.noterem:  Receive a message upon a note removal.
+  - vindicator.message.notify:   Receive a message if there are notes/bans.
+  - vindicator.message.unban:    Receive a message upon an unban.
+  - vindicator.message.unmute:   Receive a message upon an unmute.
