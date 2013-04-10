@@ -84,6 +84,7 @@ public class PlayerListener extends APIRunnable implements Listener
         List<TargetObject> tos;
         TargetObject ban;
         TargetObject mute;
+        APITask      at;
 
         String target;
         String str;
@@ -120,15 +121,25 @@ public class PlayerListener extends APIRunnable implements Listener
         }
 
         if (ban != null) {
-            if (ban.hasFlag(TargetObject.ADDRESS))
-                str = "Player %s attempted to join with a banned IP: %s";
-            else
-                str = "Player %s attempted to join banned: %s";
+            if ((ban.timeout < 1) || (ban.timeout > Utils.time())) {
+                if (ban.hasFlag(TargetObject.ADDRESS))
+                    str = "Player %s attempted to join with a banned IP: %s";
+                else
+                    str = "Player %s attempted to join banned: %s";
 
-            event.disallow(Result.KICK_OTHER, "Banned: " + ban.message);
-            vind.broadcast("vindicator.message.notify", str,
-                           hl(target), hl(ban.message));
-            return;
+                event.disallow(Result.KICK_OTHER, "Banned: " + ban.message);
+                vind.broadcast("vindicator.message.notify", str,
+                               hl(target), hl(ban.message));
+                return;
+            }
+
+            at = new APITask(null, ban);
+
+            try {
+                vind.api.unban(at);
+            } catch (APIException e) {
+                Log.severe("Failed to unban %s: %s", target, e.getMessage());
+            }
         }
 
         if (mute != null)
