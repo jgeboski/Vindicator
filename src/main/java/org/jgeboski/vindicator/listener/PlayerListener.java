@@ -147,8 +147,24 @@ public class PlayerListener extends APIRunnable implements Listener
             }
         }
 
-        if (mute != null)
-            vind.api.mutes.put(target, mute);
+        if (mute != null) {
+            if ((mute.timeout > 0) && (mute.timeout < Utils.time())) {
+                at = new APITask(null, mute);
+                at.issuer = vind.getDescription().getName();
+
+                try {
+                    vind.api.unmute(at);
+                } catch (APIException e) {
+                    Log.severe("Failed to unmute %s: %s", target,
+                               e.getMessage());
+                }
+
+                mute = null;
+                vind.api.mutes.remove(target);
+            } else {
+                vind.api.mutes.put(target, mute);
+            }
+        }
 
         if ((notes < 1) && (mute == null))
             return;
