@@ -21,10 +21,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import org.jgeboski.vindicator.Vindicator;
-
 public class Message
 {
+    public static String plugin;
+
+    public static void init(String plugin)
+    {
+        Message.plugin = plugin;
+    }
+
     public static String format(String format, Object ... args)
     {
         String str;
@@ -86,10 +91,10 @@ public class Message
 
         if (sender instanceof Player) {
             str = String.format("%s%s%s%s %s", hl("["), ChatColor.DARK_AQUA,
-                                Vindicator.pluginName, hl("]"), str);
+                                plugin, hl("]"), str);
         } else {
             str = ChatColor.stripColor(str);
-            str = String.format("[%s] %s", Vindicator.pluginName, str);
+            str = String.format("[%s] %s", plugin, str);
         }
 
         sender.sendMessage(str);

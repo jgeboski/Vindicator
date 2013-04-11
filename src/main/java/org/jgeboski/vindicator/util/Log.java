@@ -20,31 +20,32 @@ package org.jgeboski.vindicator.util;
 import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 
-import org.jgeboski.vindicator.Vindicator;
-
 public class Log
 {
-    protected static final Logger log = Logger.getLogger("Minecraft");
+    public static Logger logger;
+
+    public static void init(Logger logger)
+    {
+        Log.logger = logger;
+    }
 
     public static void info(String format, Object ... args)
     {
-        log.info(format(format, args));
+        logger.info(format(format, args));
     }
 
     public static void warning(String format, Object ... args)
     {
-        log.warning(format(format, args));
+        logger.warning(format(format, args));
     }
 
     public static void severe(String format, Object ... args)
     {
-        log.severe(format(format, args));
+        logger.severe(format(format, args));
     }
 
     private static String format(String msg, Object ... args)
     {
-        msg = ChatColor.stripColor(String.format(msg, args));
-        msg = String.format("[%s] %s", Vindicator.pluginName, msg);
-        return msg;
+        return ChatColor.stripColor(String.format(msg, args));
     }
 }

@@ -73,7 +73,7 @@ public class PlayerListener extends APIRunnable implements Listener
         }
 
         at = new APITask(null, mute);
-        at.issuer = Vindicator.pluginName;
+        at.issuer = vind.getDescription().getName();
 
         try {
             vind.api.unmute(at);
@@ -138,7 +138,7 @@ public class PlayerListener extends APIRunnable implements Listener
             }
 
             at = new APITask(null, ban);
-            at.issuer = Vindicator.pluginName;
+            at.issuer = vind.getDescription().getName();
 
             try {
                 vind.api.unban(at);
