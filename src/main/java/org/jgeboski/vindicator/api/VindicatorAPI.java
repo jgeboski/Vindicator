@@ -191,7 +191,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         tos = new ArrayList<TargetObject>();
         m   = b = n = 0;
 
-        for (TargetObject to : storage.getRecords(at.target)) {
+        for (TargetObject to : getAllRecords(at.target)) {
             if (to.hasFlag(TargetObject.BAN)) {
                 tos.add(b, to);
                 b++;
@@ -310,7 +310,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         note = null;
         i    = 1;
 
-        for (TargetObject to : storage.getRecords(at)) {
+        for (TargetObject to : getAllRecords(at.target)) {
             if (!to.hasFlag(TargetObject.NOTE))
                 continue;
 
@@ -415,6 +415,30 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         at.setTargetObject(mt);
         noteAdd(at);
+    }
+
+    public List<TargetObject> getAllRecords(String target)
+        throws APIException
+    {
+        List<TargetObject> tos;
+
+        Player p;
+        String str;
+
+        tos = storage.getRecords(target);
+
+        if (!StrUtils.isMinecraftName(target))
+            return tos;
+
+        p = vind.getServer().getPlayerExact(target);
+
+        if (p == null)
+            return tos;
+
+        str = p.getAddress().getAddress().getHostAddress();
+        tos.addAll(storage.getRecords(str));
+
+        return tos;
     }
 
     private void execrun(APITask at)

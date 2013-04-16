@@ -101,17 +101,8 @@ public class PlayerListener extends APIRunnable implements Listener
         notes  = 0;
 
         try {
-            tos = vind.api.storage.getRecords(target);
-        } catch (StorageException e) { }
-
-        str = event.getAddress().getHostAddress();
-
-        try {
-            if (tos != null)
-                tos.addAll(vind.api.storage.getRecords(str));
-            else
-                tos = vind.api.storage.getRecords(str);
-        } catch (StorageException e) { }
+            tos = vind.api.getAllRecords(target);
+        } catch (APIException e) { }
 
         for (TargetObject to : tos) {
             if (to.hasFlag(TargetObject.BAN)) {
