@@ -1,7 +1,7 @@
 name: Vindicator
 version: ${project.version}
 description: A user management plugin
-authors: [jgeboski, tritania]
+author: jgeboski
 main: org.jgeboski.vindicator.Vindicator
 softdepend: [CraftIRC]
 
