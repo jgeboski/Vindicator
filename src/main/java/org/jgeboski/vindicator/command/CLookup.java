@@ -70,6 +70,7 @@ public class CLookup extends APIRunnable implements CommandExecutor
     public void run(APITask at, List<TargetObject> tos, APIException expt)
     {
         String type;
+        String time;
 
         if (tos.size() < 1) {
             Message.info(at.sender, "There are no records for %s.",
@@ -79,19 +80,30 @@ public class CLookup extends APIRunnable implements CommandExecutor
 
         for (TargetObject to : tos) {
             type = to.hasFlag(TargetObject.ADDRESS) ? "Address" : "Player";
+            time = Utils.timestr(Utils.DATEF_SHORT, to.time);
 
             if (to.hasFlag(TargetObject.BAN)) {
                 Message.severe(at.sender, "[%s] %s ban by %s: %s",
-                               hl(Utils.timestr(Utils.DATEF_SHORT, to.time)),
-                               type, hl(to.issuer), hl(to.message));
-            } else if (to.hasFlag(TargetObject.NOTE)) {
-                Message.warning(at.sender, "[%s] %s note #%s by %s: %s",
-                                hl(Utils.timestr(Utils.DATEF_SHORT, to.time)),
-                                type, hl(to.id), hl(to.issuer), hl(to.message));
+                               hl(time), type, hl(to.issuer), hl(to.message));
+
+                if (to.timeout < 1)
+                    continue;
+
+                Message.severe(at.sender, "Ban will be removed: %s",
+                               hl(Utils.timestr(Utils.DATEF_LONG, to.timeout)));
             } else if (to.hasFlag(TargetObject.MUTE)) {
                 Message.severe(at.sender, "[%s] Mute by %s: %s",
-                               hl(Utils.timestr(Utils.DATEF_SHORT, to.time)),
-                               hl(to.issuer), hl(to.message));
+                               hl(time), hl(to.issuer), hl(to.message));
+
+                if (to.timeout < 1)
+                    continue;
+
+                Message.severe(at.sender, "Mute will be removed: %s",
+                               hl(Utils.timestr(Utils.DATEF_LONG, to.timeout)));
+            } else if (to.hasFlag(TargetObject.NOTE)) {
+                Message.warning(at.sender, "[%s] %s note #%s by %s: %s",
+                                hl(time), type, hl(to.id), hl(to.issuer),
+                                hl(to.message));
             }
         }
     }
