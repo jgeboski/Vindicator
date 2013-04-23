@@ -86,6 +86,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         at.target = getTarget(at);
+        at.flags  = 0;
+
         at.addFlag(TargetObject.BAN);
         at.addFlag(getTypeFlag(at));
         at.setHandler(this, "banHandler");
@@ -222,6 +224,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
             throw new APIException("Invalid player: %s", hl(at.target));
 
         at.target = getTarget(at);
+        at.flags  = 0;
+
         at.addFlag(TargetObject.MUTE);
         at.setHandler(this, "muteHandler");
 
@@ -279,6 +283,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     {
         at.target  = getTarget(at);
         at.timeout = 0;
+        at.flags   = 0;
 
         at.addFlag(TargetObject.NOTE);
         at.addFlag(getTypeFlag(at));
@@ -368,7 +373,6 @@ public class VindicatorAPI extends ThreadPoolExecutor
             return;
 
         bt.issuer  = at.issuer;
-        bt.flags   = 0;
         bt.message = "Unbanned: " + bt.message;
 
         at.setTargetObject(bt);
@@ -412,7 +416,6 @@ public class VindicatorAPI extends ThreadPoolExecutor
             return;
 
         mt.issuer  = at.issuer;
-        mt.flags   = 0;
         mt.message = "Unmuted: " + mt.message;
 
         at.setTargetObject(mt);
