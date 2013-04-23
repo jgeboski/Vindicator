@@ -277,7 +277,9 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void noteAdd(APITask at)
         throws APIException
     {
-        at.target = getTarget(at);
+        at.target  = getTarget(at);
+        at.timeout = 0;
+
         at.addFlag(TargetObject.NOTE);
         at.addFlag(getTypeFlag(at));
         at.setHandler(this, "noteAddHandler");
