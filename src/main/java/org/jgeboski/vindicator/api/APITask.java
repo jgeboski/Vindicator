@@ -26,24 +26,24 @@ import org.bukkit.command.CommandSender;
 public class APITask<T> implements Runnable
 {
     public Class<T>      type;
-    public APIRunnable   task;
+    public APIRunnable   arun;
     public CommandSender sender;
 
-    public Object hObject;
-    public Method hMethod;
+    public Object tObject;
+    public Method tMethod;
 
-    public APITask(Class<T> type, APIRunnable task, CommandSender sender)
+    public APITask(Class<T> type, APIRunnable arun, CommandSender sender)
     {
         this.type    = type;
-        this.task    = task;
+        this.arun    = arun;
         this.sender  = sender;
-        this.hObject = null;
-        this.hMethod = null;
+        this.tObject = null;
+        this.tMethod = null;
     }
 
-    public APITask(Class<T> type, APIRunnable task)
+    public APITask(Class<T> type, APIRunnable arun)
     {
-        this(type, task, null);
+        this(type, arun, null);
     }
 
     public void run()
@@ -56,14 +56,14 @@ public class APITask<T> implements Runnable
         Class  r;
         Method m;
 
-        if ((hObject == null) || (hMethod == null))
+        if ((tObject == null) || (tMethod == null))
             return;
 
         ret  = null;
         expt = null;
 
         try {
-            ret = hMethod.invoke(hObject, this);
+            ret = tMethod.invoke(tObject, this);
         } catch (InvocationTargetException e) {
             thab = e.getCause();
 
@@ -71,15 +71,15 @@ public class APITask<T> implements Runnable
                 expt = (APIException) thab;
         } catch (Exception e) { }
 
-        if (task == null)
+        if (arun == null)
             return;
 
-        c = task.getClass();
+        c = arun.getClass();
 
         if (ret == null) {
             try {
                 m = c.getMethod("run", type, APIException.class);
-                m.invoke(task, this, expt);
+                m.invoke(arun, this, expt);
             } catch (Exception e) { }
             return;
         }
@@ -87,25 +87,28 @@ public class APITask<T> implements Runnable
         for (r = ret.getClass(); r != null; r = r.getSuperclass()) {
             try {
                 m = c.getMethod("run", type, r, APIException.class);
-                m.invoke(task, this, ret, expt);
+                m.invoke(arun, this, ret, expt);
                 return;
             } catch (Exception e) { }
 
             for (Class i : r.getInterfaces()) {
                 try {
                     m = c.getMethod("run", type, i, APIException.class);
-                    m.invoke(task, this, ret, expt);
+                    m.invoke(arun, this, ret, expt);
                     return;
                 } catch (Exception e) { }
             }
         }
     }
 
-    public void setHandler(Object obj, String method)
+    public void setTask(Object obj, String method)
     {
         try {
-            hMethod = obj.getClass().getMethod(method, type);
-            hObject = obj;
+            tMethod = obj.getClass().getDeclaredMethod(method, type);
+            tObject = obj;
+
+            if (!tMethod.isAccessible())
+                tMethod.setAccessible(true);
         } catch (Exception e) { }
     }
 }

@@ -89,7 +89,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         ar.addFlag(APIRecord.BAN);
         ar.addFlag(getTypeFlag(ar));
-        ar.setHandler(this, "banHandler");
+        ar.setTask(this, "banTask");
 
         if (ar.timeout > 0)
             ar.timeout += Utils.time();
@@ -102,7 +102,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         execrun(ar);
     }
 
-    public void banHandler(APIRecord ar)
+    private void banTask(APIRecord ar)
         throws APIException
     {
         APIRecord br;
@@ -176,11 +176,11 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         ar.target = getTarget(ar);
-        ar.setHandler(this, "lookupHandler");
+        ar.setTask(this, "lookupTask");
         execrun(ar);
     }
 
-    public List<APIRecord> lookupHandler(APIRecord ar)
+    private List<APIRecord> lookupTask(APIRecord ar)
         throws APIException
     {
         ArrayList<APIRecord> ars;
@@ -226,7 +226,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         ar.flags  = 0;
 
         ar.addFlag(APIRecord.MUTE);
-        ar.setHandler(this, "muteHandler");
+        ar.setTask(this, "muteTask");
 
         if (ar.timeout > 0)
             ar.timeout += Utils.time();
@@ -234,7 +234,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         execrun(ar);
     }
 
-    public void muteHandler(APIRecord ar)
+    private void muteTask(APIRecord ar)
         throws APIException
     {
         APIRecord mr;
@@ -286,11 +286,11 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         ar.addFlag(APIRecord.NOTE);
         ar.addFlag(getTypeFlag(ar));
-        ar.setHandler(this, "noteAddHandler");
+        ar.setTask(this, "noteAddTask");
         execrun(ar);
     }
 
-    public void noteAddHandler(APIRecord ar)
+    private void noteAddTask(APIRecord ar)
         throws APIException
     {
         storage.add(ar);
@@ -303,11 +303,11 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         ar.target = getTarget(ar);
-        ar.setHandler(this, "noteRemHandler");
+        ar.setTask(this, "noteRemTask");
         execrun(ar);
     }
 
-    public void noteRemHandler(APIRecord ar)
+    private void noteRemTask(APIRecord ar)
         throws APIException
     {
         APIRecord nr;
@@ -341,11 +341,11 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         ar.target = getTarget(ar);
-        ar.setHandler(this, "unbanHandler");
+        ar.setTask(this, "unbanTask");
         execrun(ar);
     }
 
-    public void unbanHandler(APIRecord ar)
+    private void unbanTask(APIRecord ar)
         throws APIException
     {
         APIRecord br;
@@ -382,11 +382,11 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         ar.target = getTarget(ar);
-        ar.setHandler(this, "unmuteHandler");
+        ar.setTask(this, "unmuteTask");
         execrun(ar);
     }
 
-    public void unmuteHandler(APIRecord ar)
+    private void unmuteTask(APIRecord ar)
         throws APIException
     {
         APIRecord mr;

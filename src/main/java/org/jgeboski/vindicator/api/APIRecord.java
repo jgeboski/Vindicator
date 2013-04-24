@@ -38,15 +38,15 @@ public class APIRecord extends APITask<APIRecord>
     public long   time;
     public int    flags;
 
-    public APIRecord(APIRunnable task, String target, String issuer)
+    public APIRecord(APIRunnable arun, String target, String issuer)
     {
-        super(APIRecord.class, task);
+        super(APIRecord.class, arun);
         init(target, issuer);
     }
 
-    public APIRecord(APIRunnable task, CommandSender sender, String target)
+    public APIRecord(APIRunnable arun, CommandSender sender, String target)
     {
-        super(APIRecord.class, task, sender);
+        super(APIRecord.class, arun, sender);
         init(target, sender.getName());
     }
 
