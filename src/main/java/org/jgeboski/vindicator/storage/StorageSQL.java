@@ -81,6 +81,7 @@ public class StorageSQL implements Storage
             stmt.executeUpdate();
             stmt.close();
         } catch (SQLException e) {
+            stmt.close();
             throw new StorageException(e);
         }
     }
@@ -113,6 +114,7 @@ public class StorageSQL implements Storage
             stmt.execute();
             stmt.close();
         } catch (SQLException e) {
+            stmt.close();
             throw new StorageException(e);
         }
     }
@@ -135,6 +137,7 @@ public class StorageSQL implements Storage
             stmt.executeUpdate();
             stmt.close();
         } catch (SQLException e) {
+            stmt.close();
             throw new StorageException(e);
         }
     }
@@ -170,6 +173,7 @@ public class StorageSQL implements Storage
             stmt.execute();
             stmt.close();
         } catch (SQLException e) {
+            stmt.close();
             throw new StorageException(e);
         }
     }
@@ -213,6 +217,7 @@ public class StorageSQL implements Storage
 
             stmt.close();
         } catch (SQLException e) {
+            stmt.close();
             throw new StorageException(e);
         }
 
