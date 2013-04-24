@@ -22,9 +22,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.api.APIRecord;
 import org.jgeboski.vindicator.api.APIRunnable;
-import org.jgeboski.vindicator.api.APITask;
-import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
@@ -42,7 +41,7 @@ public class CNoteAdd extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APITask at;
+        APIRecord ar;
 
         if (!Utils.hasPermission(sender, "vindicator.noteadd"))
             return true;
@@ -52,11 +51,11 @@ public class CNoteAdd extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        at = new APITask(this, sender, args[0]);
-        at.message = StrUtils.join(args, " ", 1);
+        ar = new APIRecord(this, sender, args[0]);
+        ar.message = StrUtils.join(args, " ", 1);
 
         try {
-            vind.api.noteAdd(at);
+            vind.api.noteAdd(ar);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }

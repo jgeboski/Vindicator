@@ -22,8 +22,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.api.APIRecord;
 import org.jgeboski.vindicator.api.APIRunnable;
-import org.jgeboski.vindicator.api.APITask;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
@@ -41,7 +41,7 @@ public class CBan extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APITask at;
+        APIRecord ar;
 
         if (!Utils.hasPermission(sender, "vindicator.ban"))
             return true;
@@ -51,15 +51,15 @@ public class CBan extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        at = new APITask(this, sender, args[0]);
+        ar = new APIRecord(this, sender, args[0]);
 
         if (args.length > 1) {
-            at.timeout = StrUtils.toSeconds(args[1]);
-            at.message = StrUtils.join(args, " ", ((at.timeout == 0) ? 1 : 2));
+            ar.timeout = StrUtils.toSeconds(args[1]);
+            ar.message = StrUtils.join(args, " ", ((ar.timeout == 0) ? 1 : 2));
         }
 
         try {
-            vind.api.ban(at);
+            vind.api.ban(ar);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }

@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jgeboski.vindicator.api.APIRecord;
 import org.jgeboski.vindicator.storage.sql.Database;
 import org.jgeboski.vindicator.storage.sql.SQLStatement;
 import org.jgeboski.vindicator.storage.sql.SQLType;
@@ -96,7 +97,7 @@ public class StorageSQL implements Storage
             database.close();
     }
 
-    public void add(TargetObject to)
+    public void add(APIRecord ar)
         throws StorageException
     {
         SQLStatement stmt;
@@ -106,7 +107,7 @@ public class StorageSQL implements Storage
             "INSERT INTO", TABLE_RECORDS,
                 "(target, issuer, message, timeout, time, flags)",
               "VALUES (?, ?, ?, ?, ?, ?)", null,
-            to.target, to.issuer, to.message, to.timeout, to.time, to.flags);
+            ar.target, ar.issuer, ar.message, ar.timeout, ar.time, ar.flags);
 
         try {
             stmt.execute();
@@ -138,18 +139,18 @@ public class StorageSQL implements Storage
         }
     }
 
-    public void remove(TargetObject to)
+    public void remove(APIRecord ar)
         throws StorageException
     {
-        remove(to.id);
+        remove(ar.id);
     }
 
-    public void update(TargetObject to)
+    public void update(APIRecord ar)
         throws StorageException
     {
         SQLStatement stmt;
 
-        if (to.id < 1)
+        if (ar.id < 1)
             return;
 
         stmt = database.createStatement();
@@ -162,8 +163,8 @@ public class StorageSQL implements Storage
                 "time = ?,",
                 "flags = ?",
               "WHERE id = ?", null,
-            to.target, to.issuer, to.message, to.timeout, to.time, to.flags,
-            to.id);
+            ar.target, ar.issuer, ar.message, ar.timeout, ar.time, ar.flags,
+            ar.id);
 
         try {
             stmt.execute();
@@ -173,19 +174,19 @@ public class StorageSQL implements Storage
         }
     }
 
-    public List<TargetObject> getRecords(String target)
+    public List<APIRecord> getRecords(String target)
         throws StorageException
     {
-        ArrayList<TargetObject> ret;
+        ArrayList<APIRecord> ars;
 
         SQLStatement stmt;
         ResultSet    rs;
-        TargetObject to;
+        APIRecord    ar;
 
-        ret = new ArrayList<TargetObject>();
+        ars = new ArrayList<APIRecord>();
 
         if (target == null)
-            return ret;
+            return ars;
 
         stmt = database.createStatement();
         stmt.store(
@@ -197,17 +198,17 @@ public class StorageSQL implements Storage
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                to = new TargetObject();
+                ar = new APIRecord();
 
-                to.id      = rs.getInt("id");
-                to.target  = rs.getString("target");
-                to.issuer  = rs.getString("issuer");
-                to.message = rs.getString("message");
-                to.timeout = rs.getLong("timeout");
-                to.time    = rs.getLong("time");
-                to.flags   = rs.getInt("flags");
+                ar.id      = rs.getInt("id");
+                ar.target  = rs.getString("target");
+                ar.issuer  = rs.getString("issuer");
+                ar.message = rs.getString("message");
+                ar.timeout = rs.getLong("timeout");
+                ar.time    = rs.getLong("time");
+                ar.flags   = rs.getInt("flags");
 
-                ret.add(to);
+                ars.add(ar);
             }
 
             stmt.close();
@@ -215,12 +216,12 @@ public class StorageSQL implements Storage
             throw new StorageException(e);
         }
 
-        return ret;
+        return ars;
     }
 
-    public List<TargetObject> getRecords(TargetObject to)
+    public List<APIRecord> getRecords(APIRecord ar)
         throws StorageException
     {
-        return getRecords(to.target);
+        return getRecords(ar.target);
     }
 }

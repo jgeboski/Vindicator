@@ -25,9 +25,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.api.APIRecord;
 import org.jgeboski.vindicator.api.APIRunnable;
-import org.jgeboski.vindicator.api.APITask;
-import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
@@ -46,7 +45,7 @@ public class CLookup extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APITask at;
+        APIRecord ar;
 
         if (!Utils.hasPermission(sender, "vindicator.lookup"))
             return true;
@@ -56,10 +55,10 @@ public class CLookup extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        at = new APITask(this, sender, args[0]);
+        ar = new APIRecord(this, sender, args[0]);
 
         try {
-            vind.api.lookup(at);
+            vind.api.lookup(ar);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }
@@ -67,43 +66,43 @@ public class CLookup extends APIRunnable implements CommandExecutor
         return true;
     }
 
-    public void run(APITask at, List<TargetObject> tos, APIException expt)
+    public void run(APIRecord ar, List<APIRecord> ars, APIException expt)
     {
         String type;
         String time;
 
-        if (tos.size() < 1) {
-            Message.info(at.sender, "There are no records for %s.",
-                         hl(at.target));
+        if (ars.size() < 1) {
+            Message.info(ar.sender, "There are no records for %s.",
+                         hl(ar.target));
             return;
         }
 
-        for (TargetObject to : tos) {
-            type = to.hasFlag(TargetObject.ADDRESS) ? "Address" : "Player";
-            time = Utils.timestr(Utils.DATEF_SHORT, to.time);
+        for (APIRecord r : ars) {
+            type = r.hasFlag(APIRecord.ADDRESS) ? "Address" : "Player";
+            time = Utils.timestr(Utils.DATEF_SHORT, r.time);
 
-            if (to.hasFlag(TargetObject.BAN)) {
-                Message.severe(at.sender, "[%s] %s ban by %s: %s",
-                               hl(time), type, hl(to.issuer), hl(to.message));
+            if (r.hasFlag(APIRecord.BAN)) {
+                Message.severe(ar.sender, "[%s] %s ban by %s: %s",
+                               hl(time), type, hl(r.issuer), hl(r.message));
 
-                if (to.timeout < 1)
+                if (r.timeout < 1)
                     continue;
 
-                Message.severe(at.sender, "Ban will be removed: %s",
-                               hl(Utils.timestr(Utils.DATEF_LONG, to.timeout)));
-            } else if (to.hasFlag(TargetObject.MUTE)) {
-                Message.severe(at.sender, "[%s] Mute by %s: %s",
-                               hl(time), hl(to.issuer), hl(to.message));
+                Message.severe(ar.sender, "Ban will be removed: %s",
+                               hl(Utils.timestr(Utils.DATEF_LONG, r.timeout)));
+            } else if (r.hasFlag(APIRecord.MUTE)) {
+                Message.severe(ar.sender, "[%s] Mute by %s: %s",
+                               hl(time), hl(r.issuer), hl(r.message));
 
-                if (to.timeout < 1)
+                if (r.timeout < 1)
                     continue;
 
-                Message.severe(at.sender, "Mute will be removed: %s",
-                               hl(Utils.timestr(Utils.DATEF_LONG, to.timeout)));
-            } else if (to.hasFlag(TargetObject.NOTE)) {
-                Message.warning(at.sender, "[%s] %s note #%s by %s: %s",
-                                hl(time), type, hl(to.id), hl(to.issuer),
-                                hl(to.message));
+                Message.severe(ar.sender, "Mute will be removed: %s",
+                               hl(Utils.timestr(Utils.DATEF_LONG, r.timeout)));
+            } else if (r.hasFlag(APIRecord.NOTE)) {
+                Message.warning(ar.sender, "[%s] %s note #%s by %s: %s",
+                                hl(time), type, hl(r.id), hl(r.issuer),
+                                hl(r.message));
             }
         }
     }

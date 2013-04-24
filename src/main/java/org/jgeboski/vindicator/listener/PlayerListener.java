@@ -29,10 +29,9 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.api.APIRecord;
 import org.jgeboski.vindicator.api.APIRunnable;
-import org.jgeboski.vindicator.api.APITask;
 import org.jgeboski.vindicator.storage.StorageException;
-import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.Log;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
@@ -52,19 +51,18 @@ public class PlayerListener extends APIRunnable implements Listener
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event)
     {
-        TargetObject mute;
-        APITask      at;
-        Player       player;
-        String       target;
+        APIRecord mr;
+        Player    player;
+        String    target;
 
         player = event.getPlayer();
         target = player.getName();
-        mute   = vind.api.mutes.get(target);
+        mr     = vind.api.mutes.get(target);
 
-        if (mute == null)
+        if (mr == null)
             return;
 
-        if ((mute.timeout < 1) || (mute.timeout > Utils.time())) {
+        if ((mr.timeout < 1) || (mr.timeout > Utils.time())) {
             Log.info("Player %s attempted to speak muted: %s",
                      hl(target), hl(event.getMessage()));
             Message.severe(player, "You cannot speak while being muted!");
@@ -72,11 +70,10 @@ public class PlayerListener extends APIRunnable implements Listener
             return;
         }
 
-        at = new APITask(null, mute);
-        at.issuer = vind.getDescription().getName();
+        mr.issuer = vind.getDescription().getName();
 
         try {
-            vind.api.unmute(at);
+            vind.api.unmute(mr);
         } catch (APIException e) {
             Log.severe("Failed to unmute %s: %s", target, e.getMessage());
         }
@@ -85,84 +82,81 @@ public class PlayerListener extends APIRunnable implements Listener
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event)
     {
-        List<TargetObject> tos;
-        TargetObject ban;
-        TargetObject mute;
-        APITask      at;
-
-        String target;
-        String str;
-        int    notes;
+        List<APIRecord> ars;
+        APIRecord br;
+        APIRecord mr;
+        String    target;
+        String    str;
+        int       nc;
 
         target = event.getName();
-        tos    = null;
-        mute   = null;
-        ban    = null;
-        notes  = 0;
+        br     = null;
+        mr     = null;
+        nc     = 0;
 
         try {
-            tos = vind.api.getAllRecords(target);
-        } catch (APIException e) { }
+            ars = vind.api.getAllRecords(target);
+        } catch (APIException e) {
+            Log.severe(e.getMessage());
+            return;
+        }
 
-        for (TargetObject to : tos) {
-            if (to.hasFlag(TargetObject.BAN)) {
-                ban = to;
+        for (APIRecord r : ars) {
+            if (r.hasFlag(APIRecord.BAN)) {
+                br = r;
                 break;
-            } else if (to.hasFlag(TargetObject.MUTE)) {
-                mute = to;
-            } else if (to.hasFlag(TargetObject.NOTE)) {
-                notes++;
+            } else if (r.hasFlag(APIRecord.MUTE)) {
+                mr = r;
+            } else if (r.hasFlag(APIRecord.NOTE)) {
+                nc++;
             }
         }
 
-        if (ban != null) {
-            if ((ban.timeout < 1) || (ban.timeout > Utils.time())) {
-                if (ban.hasFlag(TargetObject.ADDRESS))
+        if (br != null) {
+            if ((br.timeout < 1) || (br.timeout > Utils.time())) {
+                if (br.hasFlag(APIRecord.ADDRESS))
                     str = "Player %s attempted to join with a banned IP: %s";
                 else
                     str = "Player %s attempted to join banned: %s";
 
-                event.disallow(Result.KICK_OTHER, "Banned: " + ban.message);
+                event.disallow(Result.KICK_OTHER, "Banned: " + br.message);
                 vind.broadcast("vindicator.message.notify", str,
-                               hl(target), hl(ban.message));
+                               hl(target), hl(br.message));
                 return;
             }
 
-            at = new APITask(null, ban);
-            at.issuer = vind.getDescription().getName();
+            br.issuer = vind.getDescription().getName();
 
             try {
-                vind.api.unban(at);
+                vind.api.unban(br);
             } catch (APIException e) {
-                Log.severe("Failed to unban %s: %s", target, e.getMessage());
+                Log.severe(e.getMessage());
             }
         }
 
-        if (mute != null) {
-            if ((mute.timeout > 0) && (mute.timeout < Utils.time())) {
-                at = new APITask(null, mute);
-                at.issuer = vind.getDescription().getName();
+        if (mr != null) {
+            if ((mr.timeout > 0) && (mr.timeout < Utils.time())) {
+                mr.issuer = vind.getDescription().getName();
 
                 try {
-                    vind.api.unmute(at);
+                    vind.api.unmute(mr);
                 } catch (APIException e) {
-                    Log.severe("Failed to unmute %s: %s", target,
-                               e.getMessage());
+                    Log.severe(e.getMessage());
                 }
 
-                mute = null;
+                mr = null;
                 vind.api.mutes.remove(target);
             } else {
-                vind.api.mutes.put(target, mute);
+                vind.api.mutes.put(target, mr);
             }
         }
 
-        if ((notes < 1) && (mute == null))
+        if ((nc < 1) && (mr == null))
             return;
 
-        str = String.format("Player %s has %s note(s)", hl(target), hl(notes));
+        str = String.format("Player %s has %s note(s)", hl(target), hl(nc));
 
-        if (mute != null)
+        if (mr != null)
             str += ", and is " + hl("muted");
 
         str += ".";

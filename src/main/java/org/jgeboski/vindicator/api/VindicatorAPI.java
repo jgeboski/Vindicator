@@ -31,7 +31,6 @@ import org.bukkit.entity.Player;
 
 import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageSQL;
-import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
@@ -43,7 +42,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public Vindicator vind;
     public Storage    storage;
 
-    public HashMap<String, TargetObject> mutes;
+    public HashMap<String, APIRecord> mutes;
 
     public VindicatorAPI(Vindicator vind)
         throws APIException
@@ -54,7 +53,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
               Executors.defaultThreadFactory());
 
         this.vind  = vind;
-        this.mutes = new HashMap<String, TargetObject>();
+        this.mutes = new HashMap<String, APIRecord>();
 
         /* For now, SQL only */
         storage = new StorageSQL(
@@ -62,9 +61,9 @@ public class VindicatorAPI extends ThreadPoolExecutor
             vind.config.storePass, vind.config.storePrefix);
 
         for (Player p : vind.getServer().getOnlinePlayers()) {
-            for (TargetObject to : storage.getRecords(p.getName())) {
-                if (to.hasFlag(TargetObject.MUTE))
-                    mutes.put(p.getName(), to);
+            for (APIRecord r : storage.getRecords(p.getName())) {
+                if (r.hasFlag(APIRecord.MUTE))
+                    mutes.put(p.getName(), r);
             }
         }
     }
@@ -75,375 +74,375 @@ public class VindicatorAPI extends ThreadPoolExecutor
         storage.close();
     }
 
-    public void ban(APITask at)
+    public void ban(APIRecord ar)
         throws APIException
     {
-        if (at.message == null) {
+        if (ar.message == null) {
             if (vind.config.mustReason)
                 throw new APIException("A reason must be provided.");
 
-            at.message = vind.config.defBanReason;
+            ar.message = vind.config.defBanReason;
         }
 
-        at.target = getTarget(at);
-        at.flags  = 0;
+        ar.target = getTarget(ar);
+        ar.flags  = 0;
 
-        at.addFlag(TargetObject.BAN);
-        at.addFlag(getTypeFlag(at));
-        at.setHandler(this, "banHandler");
+        ar.addFlag(APIRecord.BAN);
+        ar.addFlag(getTypeFlag(ar));
+        ar.setHandler(this, "banHandler");
 
-        if (at.timeout > 0)
-            at.timeout += Utils.time();
+        if (ar.timeout > 0)
+            ar.timeout += Utils.time();
 
-        if (at.hasFlag(TargetObject.ADDRESS))
-            kickIP(at, "Banned: " + at.message);
+        if (ar.hasFlag(APIRecord.ADDRESS))
+            kickIP(ar, "Banned: " + ar.message);
         else
-            kick(at, "Banned: " + at.message);
+            kick(ar, "Banned: " + ar.message);
 
-        execrun(at);
+        execrun(ar);
     }
 
-    public void banHandler(APITask at)
+    public void banHandler(APIRecord ar)
         throws APIException
     {
-        TargetObject ban;
-        String       str;
+        APIRecord br;
+        String    str;
 
-        ban = null;
+        br = null;
 
-        for (TargetObject to : storage.getRecords(at)) {
-            if (!to.hasFlag(TargetObject.BAN))
+        for (APIRecord r : storage.getRecords(ar)) {
+            if (!r.hasFlag(APIRecord.BAN))
                 continue;
 
-            ban = to;
+            br = r;
             break;
         }
 
-        if (ban != null) {
+        if (br != null) {
             if (!vind.config.banUpdate) {
                 throw new APIException("Ban already exists on %s.",
-                                       hl(at.target));
+                                       hl(ar.target));
             }
 
             str   = "updated";
-            at.id = ban.id;
-            storage.update(at);
+            ar.id = br.id;
+            storage.update(ar);
         } else {
             str   = "placed";
-            storage.add(at);
+            storage.add(ar);
         }
 
         vind.broadcast("vindicator.message.ban",
                        "Ban %s on %s by %s: %s",
-                       str, hl(at.target), hl(at.issuer), hl(at.message));
+                       str, hl(ar.target), hl(ar.issuer), hl(ar.message));
 
-        if (at.timeout < 1)
+        if (ar.timeout < 1)
             return;
 
         vind.broadcast("vindicator.message.ban",
                        "Temporary ban will be removed: %s",
-                       hl(Utils.timestr(Utils.DATEF_LONG, at.timeout)));
+                       hl(Utils.timestr(Utils.DATEF_LONG, ar.timeout)));
     }
 
-    public void kick(APITask at)
+    public void kick(APIRecord ar)
         throws APIException
     {
-        if (at.message == null) {
+        if (ar.message == null) {
             if (vind.config.mustReason)
                 throw new APIException("A reason must be provided.");
 
-            at.message = vind.config.defKickReason;
+            ar.message = vind.config.defKickReason;
         }
 
-        if (StrUtils.isAddress(at.target)) {
-            if (kickIP(at, at.message))
+        if (StrUtils.isAddress(ar.target)) {
+            if (kickIP(ar, ar.message))
                 return;
 
             throw new APIException("Player(s) for %s not found.",
-                                   hl(at.target));
+                                   hl(ar.target));
         }
 
-        at.target = getTarget(at);
+        ar.target = getTarget(ar);
 
-        if (!kick(at, at.message))
-            throw new APIException("Player %s not found.", hl(at.target));
+        if (!kick(ar, ar.message))
+            throw new APIException("Player %s not found.", hl(ar.target));
 
         vind.broadcast("vindicator.message.kick",
                        "Kick placed on %s by %s: %s",
-                       hl(at.target), hl(at.issuer), hl(at.message));
+                       hl(ar.target), hl(ar.issuer), hl(ar.message));
     }
 
-    public void lookup(APITask at)
+    public void lookup(APIRecord ar)
         throws APIException
     {
-        at.target = getTarget(at);
-        at.setHandler(this, "lookupHandler");
-        execrun(at);
+        ar.target = getTarget(ar);
+        ar.setHandler(this, "lookupHandler");
+        execrun(ar);
     }
 
-    public List<TargetObject> lookupHandler(APITask at)
+    public List<APIRecord> lookupHandler(APIRecord ar)
         throws APIException
     {
-        ArrayList<TargetObject> tos;
+        ArrayList<APIRecord> ars;
 
         int m;
         int b;
         int n;
 
-        tos = new ArrayList<TargetObject>();
+        ars = new ArrayList<APIRecord>();
         m   = b = n = 0;
 
-        for (TargetObject to : getAllRecords(at.target)) {
-            if (to.hasFlag(TargetObject.BAN)) {
-                tos.add(b, to);
+        for (APIRecord r : getAllRecords(ar.target)) {
+            if (r.hasFlag(APIRecord.BAN)) {
+                ars.add(b, r);
                 b++;
-            } else if (to.hasFlag(TargetObject.NOTE)) {
-                to.id = n + 1;
-                tos.add(b + m + n, to);
+            } else if (r.hasFlag(APIRecord.NOTE)) {
+                r.id = n + 1;
+                ars.add(b + m + n, r);
                 n++;
-            } else if (to.hasFlag(TargetObject.MUTE)) {
-                tos.add(b + m, to);
+            } else if (r.hasFlag(APIRecord.MUTE)) {
+                ars.add(b + m, r);
                 m++;
             }
         }
 
-        return tos;
+        return ars;
     }
 
-    public void mute(APITask at)
+    public void mute(APIRecord ar)
         throws APIException
     {
-        if (at.message == null) {
+        if (ar.message == null) {
             if (vind.config.mustReason)
                 throw new APIException("A reason must be provided.");
 
-            at.message = vind.config.defMuteReason;
+            ar.message = vind.config.defMuteReason;
         }
 
-        if (!StrUtils.isMinecraftName(at.target))
-            throw new APIException("Invalid player: %s", hl(at.target));
+        if (!StrUtils.isMinecraftName(ar.target))
+            throw new APIException("Invalid player: %s", hl(ar.target));
 
-        at.target = getTarget(at);
-        at.flags  = 0;
+        ar.target = getTarget(ar);
+        ar.flags  = 0;
 
-        at.addFlag(TargetObject.MUTE);
-        at.setHandler(this, "muteHandler");
+        ar.addFlag(APIRecord.MUTE);
+        ar.setHandler(this, "muteHandler");
 
-        if (at.timeout > 0)
-            at.timeout += Utils.time();
+        if (ar.timeout > 0)
+            ar.timeout += Utils.time();
 
-        execrun(at);
+        execrun(ar);
     }
 
-    public void muteHandler(APITask at)
+    public void muteHandler(APIRecord ar)
         throws APIException
     {
-        TargetObject mute;
-        String       str;
+        APIRecord mr;
+        String    str;
 
-        mute = null;
+        mr = null;
 
-        for (TargetObject to : storage.getRecords(at)) {
-            if (!to.hasFlag(TargetObject.MUTE))
+        for (APIRecord r : storage.getRecords(ar)) {
+            if (!r.hasFlag(APIRecord.MUTE))
                 continue;
 
-            mute = to;
+            mr = r;
             break;
         }
 
-        if (mute != null) {
+        if (mr != null) {
             if (!vind.config.muteUpdate) {
                 throw new APIException("Mute already exists on %s.",
-                                       hl(at.target));
+                                       hl(ar.target));
             }
 
             str   = "updated";
-            at.id = mute.id;
-            storage.update(at);
+            ar.id = mr.id;
+            storage.update(ar);
         } else {
             str   = "placed";
-            storage.add(at);
+            storage.add(ar);
         }
 
-        mutes.put(at.target, at);
+        mutes.put(ar.target, ar);
         vind.broadcast("vindicator.message.mute",
                        "Mute %s on %s by %s: %s",
-                       str, hl(at.target), hl(at.issuer), hl(at.message));
+                       str, hl(ar.target), hl(ar.issuer), hl(ar.message));
 
-        if (at.timeout < 1)
+        if (ar.timeout < 1)
             return;
 
         vind.broadcast("vindicator.message.mute",
                        "Temporary mute will be removed: %s",
-                       hl(Utils.timestr(Utils.DATEF_LONG, at.timeout)));
+                       hl(Utils.timestr(Utils.DATEF_LONG, ar.timeout)));
     }
 
-    public void noteAdd(APITask at)
+    public void noteAdd(APIRecord ar)
         throws APIException
     {
-        at.target  = getTarget(at);
-        at.timeout = 0;
-        at.flags   = 0;
+        ar.target  = getTarget(ar);
+        ar.timeout = 0;
+        ar.flags   = 0;
 
-        at.addFlag(TargetObject.NOTE);
-        at.addFlag(getTypeFlag(at));
-        at.setHandler(this, "noteAddHandler");
-        execrun(at);
+        ar.addFlag(APIRecord.NOTE);
+        ar.addFlag(getTypeFlag(ar));
+        ar.setHandler(this, "noteAddHandler");
+        execrun(ar);
     }
 
-    public void noteAddHandler(APITask at)
+    public void noteAddHandler(APIRecord ar)
         throws APIException
     {
-        storage.add(at);
+        storage.add(ar);
         vind.broadcast("vindicator.message.noteadd",
                        "Note added on %s by %s: %s",
-                       hl(at.target), hl(at.issuer), hl(at.message));
+                       hl(ar.target), hl(ar.issuer), hl(ar.message));
     }
 
-    public void noteRem(APITask at)
+    public void noteRem(APIRecord ar)
         throws APIException
     {
-        at.target = getTarget(at);
-        at.setHandler(this, "noteRemHandler");
-        execrun(at);
+        ar.target = getTarget(ar);
+        ar.setHandler(this, "noteRemHandler");
+        execrun(ar);
     }
 
-    public void noteRemHandler(APITask at)
+    public void noteRemHandler(APIRecord ar)
         throws APIException
     {
-        TargetObject note;
-        int          i;
+        APIRecord nr;
+        int       i;
 
-        note = null;
-        i    = 1;
+        nr = null;
+        i  = 1;
 
-        for (TargetObject to : getAllRecords(at.target)) {
-            if (!to.hasFlag(TargetObject.NOTE))
+        for (APIRecord r : getAllRecords(ar.target)) {
+            if (!r.hasFlag(APIRecord.NOTE))
                 continue;
 
-            if (i == at.id) {
-                note = to;
+            if (i == ar.id) {
+                nr = r;
                 break;
             }
 
             i++;
         }
 
-        if (note == null)
-            throw new APIException("Note index %s not found.", hl(at.id));
+        if (nr == null)
+            throw new APIException("Note index %s not found.", hl(ar.id));
 
-        storage.remove(note);
+        storage.remove(nr);
         vind.broadcast("vindicator.message.noterem",
                        "Note removed from %s by %s.",
-                       hl(note.target), hl(at.issuer));
+                       hl(nr.target), hl(ar.issuer));
     }
 
-    public void unban(APITask at)
+    public void unban(APIRecord ar)
         throws APIException
     {
-        at.target = getTarget(at);
-        at.setHandler(this, "unbanHandler");
-        execrun(at);
+        ar.target = getTarget(ar);
+        ar.setHandler(this, "unbanHandler");
+        execrun(ar);
     }
 
-    public void unbanHandler(APITask at)
+    public void unbanHandler(APIRecord ar)
         throws APIException
     {
-        TargetObject bt;
+        APIRecord br;
 
-        bt = null;
+        br = null;
 
-        for (TargetObject to : storage.getRecords(at)) {
-            if (!to.hasFlag(TargetObject.BAN))
+        for (APIRecord r : storage.getRecords(ar)) {
+            if (!r.hasFlag(APIRecord.BAN))
                 continue;
 
-            bt = to;
+            br = r;
             break;
         }
 
-        if (bt == null)
-            throw new APIException("Ban for %s not found.", hl(at.target));
+        if (br == null)
+            throw new APIException("Ban for %s not found.", hl(ar.target));
 
-        storage.remove(bt);
+        storage.remove(br);
         vind.broadcast("vindicator.message.unban",
                        "Ban removed from %s by %s.",
-                       hl(bt.target), hl(at.issuer));
+                       hl(br.target), hl(ar.issuer));
 
         if (!vind.config.unbanNote)
             return;
 
-        bt.issuer  = at.issuer;
-        bt.message = "Unbanned: " + bt.message;
+        br.issuer  = ar.issuer;
+        br.message = "Unbanned: " + br.message;
 
-        at.setTargetObject(bt);
-        noteAdd(at);
+        ar.setObject(br);
+        noteAdd(ar);
     }
 
-    public void unmute(APITask at)
+    public void unmute(APIRecord ar)
         throws APIException
     {
-        at.target = getTarget(at);
-        at.setHandler(this, "unmuteHandler");
-        execrun(at);
+        ar.target = getTarget(ar);
+        ar.setHandler(this, "unmuteHandler");
+        execrun(ar);
     }
 
-    public void unmuteHandler(APITask at)
+    public void unmuteHandler(APIRecord ar)
         throws APIException
     {
-        TargetObject mt;
-        String       msg;
+        APIRecord mr;
+        String    msg;
 
-        mt = null;
+        mr = null;
 
-        for (TargetObject to : storage.getRecords(at)) {
-            if (!to.hasFlag(TargetObject.MUTE))
+        for (APIRecord r : storage.getRecords(ar)) {
+            if (!r.hasFlag(APIRecord.MUTE))
                 continue;
 
-            mt = to;
+            mr = r;
             break;
         }
 
-        if (mt == null)
-            throw new APIException("Mute for %s not found.", hl(at.target));
+        if (mr == null)
+            throw new APIException("Mute for %s not found.", hl(ar.target));
 
-        storage.remove(mt);
-        mutes.remove(at.target);
+        storage.remove(mr);
+        mutes.remove(ar.target);
         vind.broadcast("vindicator.message.unmute",
                        "Mute removed from %s by %s.",
-                       hl(at.target), hl(at.issuer));
+                       hl(ar.target), hl(ar.issuer));
 
         if (!vind.config.unmuteNote)
             return;
 
-        mt.issuer  = at.issuer;
-        mt.message = "Unmuted: " + mt.message;
+        mr.issuer  = ar.issuer;
+        mr.message = "Unmuted: " + mr.message;
 
-        at.setTargetObject(mt);
-        noteAdd(at);
+        ar.setObject(mr);
+        noteAdd(ar);
     }
 
-    public List<TargetObject> getAllRecords(String target)
+    public List<APIRecord> getAllRecords(String target)
         throws APIException
     {
-        List<TargetObject> tos;
+        List<APIRecord> ars;
 
         Player p;
         String str;
 
-        tos = storage.getRecords(target);
+        ars = storage.getRecords(target);
 
         if (!StrUtils.isMinecraftName(target))
-            return tos;
+            return ars;
 
         p = vind.getServer().getPlayerExact(target);
 
         if (p == null)
-            return tos;
+            return ars;
 
         str = p.getAddress().getAddress().getHostAddress();
-        tos.addAll(storage.getRecords(str));
+        ars.addAll(storage.getRecords(str));
 
-        return tos;
+        return ars;
     }
 
     private void execrun(APITask at)
@@ -457,38 +456,38 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
     }
 
-    private String getTarget(TargetObject to)
+    private String getTarget(APIRecord ar)
     {
         Player p;
 
         if (!vind.config.autoComplete)
-            return to.target;
+            return ar.target;
 
-        p = vind.getServer().getPlayer(to.target);
+        p = vind.getServer().getPlayer(ar.target);
 
         if (p != null)
             return p.getName();
 
-        return to.target;
+        return ar.target;
     }
 
-    private int getTypeFlag(TargetObject to)
+    private int getTypeFlag(APIRecord ar)
         throws APIException
     {
-        if (StrUtils.isMinecraftName(to.target))
-            return TargetObject.PLAYER;
+        if (StrUtils.isMinecraftName(ar.target))
+            return APIRecord.PLAYER;
 
-        if (StrUtils.isAddress(to.target))
-            return TargetObject.ADDRESS;
+        if (StrUtils.isAddress(ar.target))
+            return APIRecord.ADDRESS;
 
-        throw new APIException("Invalid player/address: %s.", hl(to.target));
+        throw new APIException("Invalid player/address: %s.", hl(ar.target));
     }
 
-    private boolean kick(TargetObject to, String message)
+    private boolean kick(APIRecord ar, String message)
     {
         Player p;
 
-        p = vind.getServer().getPlayerExact(to.target);
+        p = vind.getServer().getPlayerExact(ar.target);
 
         if (p == null)
             return false;
@@ -497,7 +496,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         return true;
     }
 
-    private boolean kickIP(TargetObject at, String message)
+    private boolean kickIP(APIRecord ar, String message)
     {
         String ip;
         int    i;
@@ -507,7 +506,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         for (Player p : vind.getServer().getOnlinePlayers()) {
             ip = p.getAddress().getAddress().getHostAddress();
 
-            if (!ip.equals(at.target))
+            if (!ip.equals(ar.target))
                 continue;
 
             p.kickPlayer(message);

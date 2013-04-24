@@ -17,52 +17,33 @@
 
 package org.jgeboski.vindicator.api;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
-import org.jgeboski.vindicator.storage.TargetObject;
 
-public class APITask extends TargetObject implements Runnable
+public class APITask<T> implements Runnable
 {
+    public Class<T>      type;
     public APIRunnable   task;
     public CommandSender sender;
 
     public Object hObject;
     public Method hMethod;
 
-    public APITask(APIRunnable task, CommandSender sender, String target)
+    public APITask(Class<T> type, APIRunnable task, CommandSender sender)
     {
-        super();
-
+        this.type    = type;
         this.task    = task;
         this.sender  = sender;
-        this.target  = target;
         this.hObject = null;
         this.hMethod = null;
-
-        if (sender != null)
-            this.issuer = sender.getName();
     }
 
-    public APITask(APIRunnable task, String target)
+    public APITask(Class<T> type, APIRunnable task)
     {
-        this(task, null, target);
-    }
-
-    public APITask(APIRunnable task, TargetObject to)
-    {
-        this(task, null, null);
-
-        this.id      = to.id;
-        this.target  = to.target;
-        this.issuer  = to.issuer;
-        this.message = to.message;
-        this.timeout = to.timeout;
-        this.time    = to.time;
-        this.flags   = to.flags;
+        this(type, task, null);
     }
 
     public void run()
@@ -70,6 +51,10 @@ public class APITask extends TargetObject implements Runnable
         Object       ret;
         APIException expt;
         Throwable    thab;
+
+        Class  c;
+        Class  r;
+        Method m;
 
         if ((hObject == null) || (hMethod == null))
             return;
@@ -89,29 +74,38 @@ public class APITask extends TargetObject implements Runnable
         if (task == null)
             return;
 
-        task.run(this, expt);
+        c = task.getClass();
 
-        if (ret instanceof List)
-            task.run(this, (List<TargetObject>) ret, expt);
+        if (ret == null) {
+            try {
+                m = c.getMethod("run", type, APIException.class);
+                m.invoke(task, this, expt);
+            } catch (Exception e) { }
+            return;
+        }
+
+        for (r = ret.getClass(); r != null; r = r.getSuperclass()) {
+            try {
+                m = c.getMethod("run", type, r, APIException.class);
+                m.invoke(task, this, ret, expt);
+                return;
+            } catch (Exception e) { }
+
+            for (Class i : r.getInterfaces()) {
+                try {
+                    m = c.getMethod("run", type, i, APIException.class);
+                    m.invoke(task, this, ret, expt);
+                    return;
+                } catch (Exception e) { }
+            }
+        }
     }
 
     public void setHandler(Object obj, String method)
     {
         try {
-            hMethod = obj.getClass().getMethod(method, APITask.class);
+            hMethod = obj.getClass().getMethod(method, type);
             hObject = obj;
         } catch (Exception e) { }
-    }
-
-    public void setTargetObject(TargetObject to)
-    {
-        Object v;
-
-        for (Field f : to.getClass().getDeclaredFields()) {
-            try {
-                v = f.get(to);
-                f.set(this, v);
-            } catch (Exception e) { }
-        }
     }
 }

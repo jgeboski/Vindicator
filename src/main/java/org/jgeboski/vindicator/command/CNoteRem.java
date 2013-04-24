@@ -22,8 +22,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.api.APIRecord;
 import org.jgeboski.vindicator.api.APIRunnable;
-import org.jgeboski.vindicator.api.APITask;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
@@ -40,7 +40,7 @@ public class CNoteRem extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APITask at;
+        APIRecord ar;
 
         if (!Utils.hasPermission(sender, "vindicator.noterem"))
             return true;
@@ -50,17 +50,17 @@ public class CNoteRem extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        at = new APITask(this, sender, args[0]);
+        ar = new APIRecord(this, sender, args[0]);
 
         try {
-            at.id = Integer.parseInt(args[1]);
+            ar.id = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
             Message.severe(sender, "Invalid note index: %s", args[1]);
             return true;
         }
 
         try {
-            vind.api.noteRem(at);
+            vind.api.noteRem(ar);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }

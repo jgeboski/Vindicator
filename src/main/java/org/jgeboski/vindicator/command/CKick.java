@@ -22,8 +22,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.api.APIRecord;
 import org.jgeboski.vindicator.api.APIRunnable;
-import org.jgeboski.vindicator.api.APITask;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
@@ -41,7 +41,7 @@ public class CKick extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APITask at;
+        APIRecord ar;
 
         if (!Utils.hasPermission(sender, "vindicator.kick"))
             return true;
@@ -51,11 +51,11 @@ public class CKick extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        at = new APITask(this, sender, args[0]);
-        at.message = StrUtils.join(args, " ", 1);
+        ar = new APIRecord(this, sender, args[0]);
+        ar.message = StrUtils.join(args, " ", 1);
 
         try {
-            vind.api.kick(at);
+            vind.api.kick(ar);
         } catch (APIException e) {
             Message.severe(sender, e.getMessage());
         }

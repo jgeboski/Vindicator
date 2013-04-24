@@ -18,19 +18,17 @@
 package org.jgeboski.vindicator.api;
 
 import java.util.List;
-
-import org.jgeboski.vindicator.storage.TargetObject;
 import org.jgeboski.vindicator.util.Message;
 
 public class APIRunnable
 {
-    public void run(APITask at, APIException expt)
+    public void run(APIRecord ar, APIException expt)
     {
         if (expt != null)
-            Message.severe(at.sender, expt.getMessage());
+            Message.severe(ar.sender, expt.getMessage());
     }
 
-    public void run(APITask at, List<TargetObject> tos, APIException expt)
+    public void run(APIRecord ar, List<APIRecord> ars, APIException expt)
     {
 
     }

@@ -15,12 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.storage;
+package org.jgeboski.vindicator.api;
 
+import java.lang.reflect.Field;
 import org.bukkit.command.CommandSender;
 import org.jgeboski.vindicator.util.Utils;
 
-public class TargetObject
+public class APIRecord extends APITask<APIRecord>
 {
     public static final int ADDRESS = 1 << 1;
     public static final int PLAYER  = 1 << 2;
@@ -37,28 +38,33 @@ public class TargetObject
     public long   time;
     public int    flags;
 
-    public String dIssuer;
-    public String dTarget;
+    public APIRecord(APIRunnable task, String target, String issuer)
+    {
+        super(APIRecord.class, task);
+        init(target, issuer);
+    }
 
-    public TargetObject(String target, String issuer, String message)
+    public APIRecord(APIRunnable task, CommandSender sender, String target)
+    {
+        super(APIRecord.class, task, sender);
+        init(target, sender.getName());
+    }
+
+    public APIRecord()
+    {
+        super(APIRecord.class, null);
+        init(null, null);
+    }
+
+    private void init(String target, String issuer)
     {
         this.id      = 0;
         this.target  = target;
         this.issuer  = issuer;
-        this.message = message;
+        this.message = null;
         this.timeout = 0;
         this.time    = Utils.time();
         this.flags   = 0;
-    }
-
-    public TargetObject(CommandSender sender, String target, String message)
-    {
-        this(sender.getName(), null, null);
-    }
-
-    public TargetObject()
-    {
-        this((String) null, null, null);
     }
 
     public void addFlag(int flag)
@@ -69,5 +75,17 @@ public class TargetObject
     public boolean hasFlag(int flag)
     {
         return ((flags & flag) != 0);
+    }
+
+    public void setObject(APIRecord ar)
+    {
+        Object v;
+
+        for (Field f : ar.getClass().getDeclaredFields()) {
+            try {
+                v = f.get(ar);
+                f.set(this, v);
+            } catch (Exception e) { }
+        }
     }
 }

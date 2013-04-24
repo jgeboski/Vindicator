@@ -18,26 +18,27 @@
 package org.jgeboski.vindicator.storage;
 
 import java.util.List;
+import org.jgeboski.vindicator.api.APIRecord;
 
 public interface Storage
 {
     public void close();
 
-    public void add(TargetObject to)
+    public void add(APIRecord ar)
         throws StorageException;
 
     public void remove(int id)
         throws StorageException;
 
-    public void remove(TargetObject to)
+    public void remove(APIRecord ar)
         throws StorageException;
 
-    public void update(TargetObject to)
+    public void update(APIRecord ar)
         throws StorageException;
 
-    public List<TargetObject> getRecords(String target)
+    public List<APIRecord> getRecords(String target)
         throws StorageException;
 
-    public List<TargetObject> getRecords(TargetObject to)
+    public List<APIRecord> getRecords(APIRecord ar)
         throws StorageException;
 }
