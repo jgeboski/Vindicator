@@ -51,6 +51,7 @@ public class CNoteRem extends APIRunnable implements CommandExecutor
         }
 
         ar = new APIRecord(this, sender, args[0]);
+        args[1] = args[1].replaceAll("#", "");
 
         try {
             ar.id = Integer.parseInt(args[1]);
