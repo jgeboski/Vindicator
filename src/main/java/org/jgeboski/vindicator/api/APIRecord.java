@@ -30,6 +30,8 @@ public class APIRecord extends APITask<APIRecord>
     public static final int MUTE    = 1 << 4;
     public static final int NOTE    = 1 << 5;
 
+    public CommandSender sender;
+
     public int    id;
     public String target;
     public String issuer;
@@ -41,23 +43,25 @@ public class APIRecord extends APITask<APIRecord>
     public APIRecord(APIRunnable arun, String target, String issuer)
     {
         super(APIRecord.class, arun);
-        init(target, issuer);
+        init(null, target, issuer);
     }
 
     public APIRecord(APIRunnable arun, CommandSender sender, String target)
     {
-        super(APIRecord.class, arun, sender);
-        init(target, sender.getName());
+        super(APIRecord.class, arun);
+        init(sender, target, sender.getName());
     }
 
     public APIRecord()
     {
         super(APIRecord.class, null);
-        init(null, null);
+        init(null, null, null);
     }
 
-    private void init(String target, String issuer)
+    private void init(CommandSender sender, String target, String issuer)
     {
+        this.sender  = sender;
+
         this.id      = 0;
         this.target  = target;
         this.issuer  = issuer;

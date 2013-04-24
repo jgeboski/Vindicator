@@ -21,29 +21,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.bukkit.command.CommandSender;
-
 public class APITask<T> implements Runnable
 {
-    public Class<T>      type;
-    public APIRunnable   arun;
-    public CommandSender sender;
+    public Class<T>    type;
+    public APIRunnable arun;
 
     public Object tObject;
     public Method tMethod;
 
-    public APITask(Class<T> type, APIRunnable arun, CommandSender sender)
+    public APITask(Class<T> type, APIRunnable arun)
     {
         this.type    = type;
         this.arun    = arun;
-        this.sender  = sender;
         this.tObject = null;
         this.tMethod = null;
-    }
-
-    public APITask(Class<T> type, APIRunnable arun)
-    {
-        this(type, arun, null);
     }
 
     public void run()
