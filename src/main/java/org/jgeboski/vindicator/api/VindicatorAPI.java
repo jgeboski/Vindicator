@@ -31,6 +31,7 @@ import org.bukkit.entity.Player;
 
 import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageSQL;
+import org.jgeboski.vindicator.util.Log;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
@@ -72,6 +73,87 @@ public class VindicatorAPI extends ThreadPoolExecutor
     {
         shutdown();
         storage.close();
+    }
+
+    public void checkLogin(String player)
+        throws APIException
+    {
+        APIRecord br;
+        APIRecord mr;
+        String    str;
+        int       nc;
+
+        br = null;
+        mr = null;
+        nc = 0;
+
+        for (APIRecord r : getAllRecords(player)) {
+            if (r.hasFlag(APIRecord.BAN)) {
+                br = r;
+                break;
+            } else if (r.hasFlag(APIRecord.MUTE)) {
+                mr = r;
+            } else if (r.hasFlag(APIRecord.NOTE)) {
+                nc++;
+            }
+        }
+
+        if (br != null) {
+            if ((br.timeout < 1) || (br.timeout > Utils.time())) {
+                if (br.hasFlag(APIRecord.ADDRESS))
+                    str = "Player %s attempted to join with a banned IP: %s";
+                else
+                    str = "Player %s attempted to join banned: %s";
+
+                vind.broadcast("vindicator.message.notify", str,
+                               hl(player), hl(br.message));
+                throw new APIException("Banned: %s", br.message);
+            }
+
+            br.issuer = vind.getDescription().getName();
+            unban(br);
+        }
+
+        if (mr != null) {
+            if ((mr.timeout > 0) && (mr.timeout < Utils.time())) {
+                mr.issuer = vind.getDescription().getName();
+                unmute(mr);
+                mutes.remove(player);
+                mr = null;
+            } else {
+                mutes.put(player, mr);
+            }
+        }
+
+        if ((nc < 1) && (mr == null))
+            return;
+
+        str = String.format("Player %s has %s note(s)", hl(player), hl(nc));
+
+        if (mr != null)
+            str += ", and is " + hl("muted");
+
+        str += ".";
+        vind.broadcast("vindicator.message.notify", str);
+    }
+
+    public void checkChat(String player, String message)
+        throws APIException
+    {
+        APIRecord mr;
+
+        mr = mutes.get(player);
+
+        if (mr == null)
+            return;
+
+        if ((mr.timeout < 1) || (mr.timeout > Utils.time())) {
+            Log.info("Player %s attempted to speak muted: %s", player, message);
+            throw new APIException("You cannot speak while being muted!");
+        }
+
+        mr.issuer = vind.getDescription().getName();
+        unmute(mr);
     }
 
     public void ban(APIRecord ar)
