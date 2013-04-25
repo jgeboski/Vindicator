@@ -134,14 +134,10 @@ public class StrUtils
 
     private static InetAddress getAddress(String str)
     {
-        InetAddress ia;
-
         try {
-            ia = InetAddress.getByName(str);
+            return InetAddress.getByName(str);
         } catch (UnknownHostException e) {
             return null;
         }
-
-        return str.equals(ia.getHostAddress()) ? ia : null;
     }
 }
