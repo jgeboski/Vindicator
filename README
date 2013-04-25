@@ -30,6 +30,10 @@ Commands:
   - /lookup: Lookup a player or IP
     usage: /<command> <player/IP>
 
+  - /lookupa: Lookup the address history of a player or IP
+    aliases: alookup
+    usage: /<command> <player/IP>
+
   - /mute: Mute a player
     usage: /<command> <player> [time] [reason]
 
@@ -57,6 +61,7 @@ Permissions:
   - vindicator.ban:              Ban a player or IP from the server.
   - vindicator.kick:             Kick a player or IP from the server.
   - vindicator.lookup:           Lookup a player or IP.
+  - vindicator.lookupa:          Lookup the address history of a player or IP.
   - vindicator.manage:           Access to the vindicator command.
   - vindicator.manage.reload:    Reload Vindicator.
   - vindicator.mute:             Mute a player.

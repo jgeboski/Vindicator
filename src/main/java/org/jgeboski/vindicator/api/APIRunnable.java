@@ -22,6 +22,11 @@ import org.jgeboski.vindicator.util.Message;
 
 public class APIRunnable
 {
+    public void run(APIAddress aa, List<APIAddress> aas, APIException expt)
+    {
+
+    }
+
     public void run(APIRecord ar, APIException expt)
     {
         if (expt != null)

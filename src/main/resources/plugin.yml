@@ -18,6 +18,10 @@ commands:
     description: Lookup a player or IP
     aliases: []
     usage: /<command> <player/IP>
+  lookupa:
+    description: Lookup the address history of a player or IP
+    aliases: [alookup]
+    usage: /<command> <player/IP>
   mute:
     description: Mute a player
     aliases: []
@@ -56,6 +60,9 @@ permissions:
       vindicator.message.kick: true
   vindicator.lookup:
     description: Lookup a player or IP
+    default: op
+  vindicator.lookupa:
+    description: Lookup the address history of a player or IP
     default: op
   vindicator.manage:
     description: Access to the vindicator command

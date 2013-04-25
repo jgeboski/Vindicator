@@ -200,7 +200,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
             ar.message = vind.config.defBanReason;
         }
 
-        ar.target = getTarget(ar);
+        ar.target = getTarget(ar.target);
         ar.flags  = 0;
 
         ar.addFlag(APIRecord.BAN);
@@ -278,7 +278,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
                                    hl(ar.target));
         }
 
-        ar.target = getTarget(ar);
+        ar.target = getTarget(ar.target);
 
         if (!kick(ar, ar.message))
             throw new APIException("Player %s not found.", hl(ar.target));
@@ -291,7 +291,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void lookup(APIRecord ar)
         throws APIException
     {
-        ar.target = getTarget(ar);
+        ar.target = getTarget(ar.target);
         ar.setTask(this, "lookupTask");
         execrun(ar);
     }
@@ -325,6 +325,28 @@ public class VindicatorAPI extends ThreadPoolExecutor
         return ars;
     }
 
+    public void lookupa(APIAddress aa)
+        throws APIException
+    {
+        if (aa.player != null)
+            aa.player = getTarget(aa.player);
+
+        aa.setTask(this, "lookupaTask");
+        execrun(aa);
+    }
+
+    private List<APIAddress> lookupaTask(APIAddress aa)
+        throws APIException
+    {
+        if (aa.player != null)
+            return storage.getAddresses(aa.player);
+
+        if (aa.address != null)
+            return storage.getAddressPlayers(aa.address);
+
+        return new ArrayList<APIAddress>();
+    }
+
     public void mute(APIRecord ar)
         throws APIException
     {
@@ -338,7 +360,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (!StrUtils.isMinecraftName(ar.target))
             throw new APIException("Invalid player: %s", hl(ar.target));
 
-        ar.target = getTarget(ar);
+        ar.target = getTarget(ar.target);
         ar.flags  = 0;
 
         ar.addFlag(APIRecord.MUTE);
@@ -396,7 +418,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void noteAdd(APIRecord ar)
         throws APIException
     {
-        ar.target  = getTarget(ar);
+        ar.target  = getTarget(ar.target);
         ar.timeout = 0;
         ar.flags   = 0;
 
@@ -418,7 +440,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void noteRem(APIRecord ar)
         throws APIException
     {
-        ar.target = getTarget(ar);
+        ar.target = getTarget(ar.target);
         ar.setTask(this, "noteRemTask");
         execrun(ar);
     }
@@ -456,7 +478,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void unban(APIRecord ar)
         throws APIException
     {
-        ar.target = getTarget(ar);
+        ar.target = getTarget(ar.target);
         ar.setTask(this, "unbanTask");
         execrun(ar);
     }
@@ -497,7 +519,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void unmute(APIRecord ar)
         throws APIException
     {
-        ar.target = getTarget(ar);
+        ar.target = getTarget(ar.target);
         ar.setTask(this, "unmuteTask");
         execrun(ar);
     }
@@ -572,19 +594,19 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
     }
 
-    private String getTarget(APIRecord ar)
+    private String getTarget(String target)
     {
         Player p;
 
         if (!vind.config.autoComplete)
-            return ar.target;
+            return target;
 
-        p = vind.getServer().getPlayer(ar.target);
+        p = vind.getServer().getPlayer(target);
 
         if (p != null)
             return p.getName();
 
-        return ar.target;
+        return target;
     }
 
     private int getTypeFlag(APIRecord ar)

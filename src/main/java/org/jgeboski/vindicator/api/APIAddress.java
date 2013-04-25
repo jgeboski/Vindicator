@@ -29,6 +29,13 @@ public class APIAddress extends APITask<APIAddress>
     public int    logins;
     public long   time;
 
+    public APIAddress(APIRunnable arun, CommandSender sender, String player,
+                      String address)
+    {
+        super(APIAddress.class, arun, sender);
+        init(player, address);
+    }
+
     public APIAddress(APIRunnable arun, String player, String address)
     {
         super(APIAddress.class, arun);
