@@ -25,19 +25,28 @@ import java.util.Arrays;
 
 public class StrUtils
 {
+    public static String getAddress(String str)
+    {
+        try {
+            return InetAddress.getByName(str).getHostAddress();
+        } catch (UnknownHostException e) {
+            return null;
+        }
+    }
+
     public static boolean isAddress(String str)
     {
-        return (getAddress(str) != null);
+        return (getInetAddress(str) != null);
     }
 
     public static boolean isAddress4(String str)
     {
-        return (getAddress(str) instanceof Inet4Address);
+        return (getInetAddress(str) instanceof Inet4Address);
     }
 
     public static boolean isAddress6(String str)
     {
-        return (getAddress(str) instanceof Inet6Address);
+        return (getInetAddress(str) instanceof Inet6Address);
     }
 
     public static boolean isMinecraftName(String str)
@@ -132,7 +141,7 @@ public class StrUtils
         return time;
     }
 
-    private static InetAddress getAddress(String str)
+    private static InetAddress getInetAddress(String str)
     {
         try {
             return InetAddress.getByName(str);

@@ -83,8 +83,9 @@ public class VindicatorAPI extends ThreadPoolExecutor
         HashSet<String> pl;
         APIAddress aa;
 
-        aa = storage.getAddress(player, address);
-        pl = new HashSet<String>();
+        address = getAddress(address);
+        aa      = storage.getAddress(player, address);
+        pl      = new HashSet<String>();
 
         if (aa != null) {
             aa.time = Utils.time();
@@ -331,6 +332,9 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (aa.player != null)
             aa.player = getTarget(aa.player);
 
+        if (aa.address != null)
+            aa.address = getAddress(aa.address);
+
         aa.setTask(this, "lookupaTask");
         execrun(aa);
     }
@@ -568,6 +572,9 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         ars = new ArrayList<APIRecord>();
 
+        for (int i = 0; i < targets.length; i++)
+            targets[i] = getAddress(targets[i]);
+
         for (String t : targets) {
             if (!StrUtils.isMinecraftName(t)) {
                 ars.addAll(storage.getRecords(t));
@@ -599,9 +606,23 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
     }
 
+    private String getAddress(String address)
+    {
+        String addr;
+
+        addr = StrUtils.getAddress(address);
+        return (addr != null) ? addr : address;
+    }
+
     private String getTarget(String target)
     {
+        String addr;
         Player p;
+
+        addr = StrUtils.getAddress(target);
+
+        if (addr != null)
+            return addr;
 
         if (!vind.config.autoComplete)
             return target;
