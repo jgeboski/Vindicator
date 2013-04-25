@@ -23,8 +23,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -75,7 +77,39 @@ public class VindicatorAPI extends ThreadPoolExecutor
         storage.close();
     }
 
-    public void checkLogin(String player)
+    public void checkAddresses(String player, String address)
+        throws APIException
+    {
+        HashSet<String> pl;
+        APIAddress aa;
+
+        aa = storage.getAddress(player, address);
+        pl = new HashSet<String>();
+
+        if (aa != null) {
+            aa.time = Utils.time();
+            aa.logins++;
+            storage.update(aa);
+        } else {
+            aa = new APIAddress(null, player, address);
+            storage.add(aa);
+        }
+
+        for (APIAddress a : storage.getAddressPlayers(address)) {
+            if (!player.equals(a.player))
+                pl.add(hl(a.player));
+        }
+
+        if (pl.size() < 1)
+            return;
+
+        vind.broadcast("vindicator.message.notify",
+                       "Player %s has %s alternates(s): %s",
+                       hl(player), hl(pl.size()),
+                       StrUtils.join(pl.toArray(new String[0]), ", "));
+    }
+
+    public void checkRecords(String player)
         throws APIException
     {
         APIRecord br;

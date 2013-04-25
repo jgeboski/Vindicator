@@ -18,27 +18,64 @@
 package org.jgeboski.vindicator.storage;
 
 import java.util.List;
+import org.jgeboski.vindicator.api.APIAddress;
 import org.jgeboski.vindicator.api.APIRecord;
 
-public interface Storage
+public abstract class Storage
 {
-    public void close();
+    public abstract void close();
 
-    public void add(APIRecord ar)
+    public abstract void add(APIAddress aa)
         throws StorageException;
 
-    public void remove(int id)
+    public abstract void add(APIRecord ar)
         throws StorageException;
 
-    public void remove(APIRecord ar)
+    public abstract void remove(APIAddress aa)
         throws StorageException;
 
-    public void update(APIRecord ar)
+    public abstract void remove(APIRecord ar)
         throws StorageException;
 
-    public List<APIRecord> getRecords(String target)
+    public abstract void update(APIAddress aa)
         throws StorageException;
+
+    public abstract void update(APIRecord ar)
+        throws StorageException;
+
+    public abstract APIAddress getAddress(String player, String address)
+        throws StorageException;
+
+    public abstract List<APIAddress> getAddresses(String player)
+        throws StorageException;
+
+    public abstract List<APIAddress> getAddressPlayers(String address)
+        throws StorageException;
+
+    public abstract List<APIRecord> getRecords(String target)
+        throws StorageException;
+
+    public APIAddress getAddress(APIAddress aa)
+        throws StorageException
+    {
+        return getAddress(aa.player, aa.address);
+    }
+
+    public List<APIAddress> getAddresses(APIAddress aa)
+        throws StorageException
+    {
+        return getAddresses(aa.player);
+    }
+
+    public List<APIAddress> getAddressPlayers(APIAddress aa)
+        throws StorageException
+    {
+        return getAddressPlayers(aa.address);
+    }
 
     public List<APIRecord> getRecords(APIRecord ar)
-        throws StorageException;
+        throws StorageException
+    {
+        return getRecords(ar.target);
+    }
 }

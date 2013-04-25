@@ -76,8 +76,11 @@ public class PlayerListener extends APIRunnable implements Listener
     {
         String str;
 
+        str = event.getName();
+
         try {
-            vind.api.checkLogin(event.getName());
+            vind.api.checkRecords(str);
+            vind.api.checkAddresses(str, event.getAddress().getHostAddress());
         } catch (APIException e) {
             if (e instanceof StorageException) {
                 str = "Failed username check. Notify the administrator.";

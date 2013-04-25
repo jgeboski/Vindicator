@@ -69,6 +69,11 @@ public class StrUtils
         return join(strs, glue, start, strs.length);
     }
 
+    public static String join(String[] strs, String glue)
+    {
+        return join(strs, glue, 0, strs.length);
+    }
+
     public static long toSeconds(String str)
     {
         String sstr;

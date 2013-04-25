@@ -22,15 +22,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jgeboski.vindicator.api.APIAddress;
 import org.jgeboski.vindicator.api.APIRecord;
 import org.jgeboski.vindicator.storage.sql.Database;
 import org.jgeboski.vindicator.storage.sql.SQLStatement;
 import org.jgeboski.vindicator.storage.sql.SQLType;
 import org.jgeboski.vindicator.util.StrUtils;
 
-public class StorageSQL implements Storage
+public class StorageSQL extends Storage
 {
-    private String TABLE_RECORDS = "records";
+    private String TABLE_ADDRESSES = "addresses";
+    private String TABLE_RECORDS   = "records";
 
     private String url;
     private String username;
@@ -51,8 +53,10 @@ public class StorageSQL implements Storage
         this.password = password;
         this.prefix   = prefix;
 
-        if (prefix != null)
-            TABLE_RECORDS = prefix + TABLE_RECORDS;
+        if (prefix != null) {
+            TABLE_ADDRESSES = prefix + TABLE_ADDRESSES;
+            TABLE_RECORDS   = prefix + TABLE_RECORDS;
+        }
 
         try {
             database = new Database(url, username, password, prefix);
@@ -63,26 +67,44 @@ public class StorageSQL implements Storage
         stmt = database.createStatement();
         ainc = (database.getType() == SQLType.MYSQL) ? "AUTO_INCREMENT" : "";
 
-        if (database.hasTable(TABLE_RECORDS))
-            return;
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            stmt.store(
+                "CREATE TABLE", TABLE_ADDRESSES, "(",
+                    "id INTEGER PRIMARY KEY ", ainc, ",",
+                    "player VARCHAR(16) NOT NULL,",
+                    "address VARCHAR(45) NOT NULL,",
+                    "logins SMALLINT(6) NOT NULL,",
+                    "time INTEGER(11) NOT NULL",
+                ")");
 
-        stmt.store(
-            "CREATE TABLE", TABLE_RECORDS, "(",
-                "id INTEGER PRIMARY KEY ", ainc, ",",
-                "target VARCHAR(45) NOT NULL,",
-                "issuer VARCHAR(16) NOT NULL,",
-                "message VARCHAR(255) NOT NULL,",
-                "timeout INTEGER(11) NOT NULL,",
-                "time INTEGER(11) NOT NULL,",
-                "flags SMALLINT(6) NOT NULL",
-            ")");
+            try {
+                stmt.executeUpdate();
+                stmt.close();
+            } catch (SQLException e) {
+                stmt.close();
+                throw new StorageException(e);
+            }
+        }
 
-        try {
-            stmt.executeUpdate();
-            stmt.close();
-        } catch (SQLException e) {
-            stmt.close();
-            throw new StorageException(e);
+        if (!database.hasTable(TABLE_RECORDS)) {
+            stmt.store(
+                "CREATE TABLE", TABLE_RECORDS, "(",
+                    "id INTEGER PRIMARY KEY ", ainc, ",",
+                    "target VARCHAR(45) NOT NULL,",
+                    "issuer VARCHAR(16) NOT NULL,",
+                    "message VARCHAR(255) NOT NULL,",
+                    "timeout INTEGER(11) NOT NULL,",
+                    "time INTEGER(11) NOT NULL,",
+                    "flags SMALLINT(6) NOT NULL",
+                ")");
+
+            try {
+                stmt.executeUpdate();
+                stmt.close();
+            } catch (SQLException e) {
+                stmt.close();
+                throw new StorageException(e);
+            }
         }
     }
 
@@ -96,6 +118,27 @@ public class StorageSQL implements Storage
     {
         if (database != null)
             database.close();
+    }
+
+    public void add(APIAddress aa)
+        throws StorageException
+    {
+        SQLStatement stmt;
+
+        stmt = database.createStatement();
+        stmt.store(
+            "INSERT INTO", TABLE_ADDRESSES,
+                "(player, address, logins, time)",
+              "VALUES (?, ?, ?, ?)", null,
+            aa.player, aa.address, aa.logins, aa.time);
+
+        try {
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException e) {
+            stmt.close();
+            throw new StorageException(e);
+        }
     }
 
     public void add(APIRecord ar)
@@ -119,19 +162,19 @@ public class StorageSQL implements Storage
         }
     }
 
-    public void remove(int id)
+    public void remove(APIAddress aa)
         throws StorageException
     {
         SQLStatement stmt;
 
-        if (id < 1)
+        if (aa.id < 1)
             return;
 
         stmt = database.createStatement();
         stmt.store(
-            "DELETE FROM", TABLE_RECORDS,
+            "DELETE FROM", TABLE_ADDRESSES,
               "WHERE id = ?", null,
-            id);
+            aa.id);
 
         try {
             stmt.executeUpdate();
@@ -145,7 +188,51 @@ public class StorageSQL implements Storage
     public void remove(APIRecord ar)
         throws StorageException
     {
-        remove(ar.id);
+        SQLStatement stmt;
+
+        if (ar.id < 1)
+            return;
+
+        stmt = database.createStatement();
+        stmt.store(
+            "DELETE FROM", TABLE_RECORDS,
+              "WHERE id = ?", null,
+            ar.id);
+
+        try {
+            stmt.executeUpdate();
+            stmt.close();
+        } catch (SQLException e) {
+            stmt.close();
+            throw new StorageException(e);
+        }
+    }
+
+    public void update(APIAddress aa)
+        throws StorageException
+    {
+        SQLStatement stmt;
+
+        if (aa.id < 1)
+            return;
+
+        stmt = database.createStatement();
+        stmt.store(
+            "UPDATE", TABLE_ADDRESSES, "SET",
+                "player = ?,",
+                "address = ?,",
+                "logins = ?,",
+                "time = ?",
+              "WHERE id = ?", null,
+            aa.player, aa.address, aa.logins, aa.time, aa.id);
+
+        try {
+            stmt.execute();
+            stmt.close();
+        } catch (SQLException e) {
+            stmt.close();
+            throw new StorageException(e);
+        }
     }
 
     public void update(APIRecord ar)
@@ -178,6 +265,84 @@ public class StorageSQL implements Storage
         }
     }
 
+    public APIAddress getAddress(String player, String address)
+        throws StorageException
+    {
+        List<APIAddress> aas;
+        SQLStatement stmt;
+
+        stmt = database.createStatement();
+        stmt.store(
+            "SELECT * FROM", TABLE_ADDRESSES,
+              "WHERE player = ? AND address = ?",
+              "LIMIT 1", null,
+            player, address);
+
+        aas = getAddressList(stmt);
+        return (aas.size() > 0) ? aas.get(0) : null;
+    }
+
+    public List<APIAddress> getAddresses(String player)
+        throws StorageException
+    {
+        SQLStatement stmt;
+
+        stmt = database.createStatement();
+        stmt.store(
+            "SELECT * FROM", TABLE_ADDRESSES,
+              "WHERE player = ?", null,
+            player);
+
+        return getAddressList(stmt);
+    }
+
+    public List<APIAddress> getAddressPlayers(String address)
+        throws StorageException
+    {
+        SQLStatement stmt;
+
+        stmt = database.createStatement();
+        stmt.store(
+            "SELECT * FROM", TABLE_ADDRESSES,
+              "WHERE address = ?", null,
+            address);
+
+        return getAddressList(stmt);
+    }
+
+    private List<APIAddress> getAddressList(SQLStatement stmt)
+        throws StorageException
+    {
+        ArrayList<APIAddress> aas;
+        APIAddress aa;
+        ResultSet  rs;
+
+        aas = new ArrayList<APIAddress>();
+
+        try {
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                aa = new APIAddress();
+
+                aa.id      = rs.getInt("id");
+                aa.player  = rs.getString("player");
+                aa.address = rs.getString("address");
+                aa.logins  = rs.getInt("logins");
+                aa.time    = rs.getLong("time");
+
+                aas.add(aa);
+            }
+
+            stmt.close();
+        } catch (SQLException e) {
+            stmt.close();
+            throw new StorageException(e);
+        }
+
+        return aas;
+    }
+
     public List<APIRecord> getRecords(String target)
         throws StorageException
     {
@@ -187,12 +352,9 @@ public class StorageSQL implements Storage
         ResultSet    rs;
         APIRecord    ar;
 
-        ars = new ArrayList<APIRecord>();
-
-        if (target == null)
-            return ars;
-
+        ars  = new ArrayList<APIRecord>();
         stmt = database.createStatement();
+
         stmt.store(
             "SELECT * FROM", TABLE_RECORDS,
               "WHERE target = ?", null,
@@ -222,11 +384,5 @@ public class StorageSQL implements Storage
         }
 
         return ars;
-    }
-
-    public List<APIRecord> getRecords(APIRecord ar)
-        throws StorageException
-    {
-        return getRecords(ar.target);
     }
 }
