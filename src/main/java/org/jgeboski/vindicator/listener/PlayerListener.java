@@ -74,13 +74,16 @@ public class PlayerListener extends APIRunnable implements Listener
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event)
     {
+        String player;
+        String address;
         String str;
 
-        str = event.getName();
+        player  = event.getName();
+        address = event.getAddress().getHostAddress();
 
         try {
-            vind.api.checkRecords(str);
-            vind.api.checkAddresses(str, event.getAddress().getHostAddress());
+            vind.api.checkRecords(player, address);
+            vind.api.checkAddresses(player, address);
         } catch (APIException e) {
             if (e instanceof StorageException) {
                 str = "Failed username check. Notify the administrator.";

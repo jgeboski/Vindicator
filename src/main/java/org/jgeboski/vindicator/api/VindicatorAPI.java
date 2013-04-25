@@ -109,7 +109,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
                        StrUtils.join(pl.toArray(new String[0]), ", "));
     }
 
-    public void checkRecords(String player)
+    public void checkRecords(String player, String address)
         throws APIException
     {
         APIRecord br;
@@ -121,7 +121,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         mr = null;
         nc = 0;
 
-        for (APIRecord r : getAllRecords(player)) {
+        for (APIRecord r : getAllRecords(player, address)) {
             if (r.hasFlag(APIRecord.BAN)) {
                 br = r;
                 break;
@@ -559,26 +559,31 @@ public class VindicatorAPI extends ThreadPoolExecutor
         noteAdd(ar);
     }
 
-    public List<APIRecord> getAllRecords(String target)
+    public List<APIRecord> getAllRecords(String ... targets)
         throws APIException
     {
-        List<APIRecord> ars;
-
+        ArrayList<APIRecord> ars;
         Player p;
-        String str;
+        String addr;
 
-        ars = storage.getRecords(target);
+        ars = new ArrayList<APIRecord>();
 
-        if (!StrUtils.isMinecraftName(target))
-            return ars;
+        for (String t : targets) {
+            if (!StrUtils.isMinecraftName(t)) {
+                ars.addAll(storage.getRecords(t));
+                continue;
+            }
 
-        p = vind.getServer().getPlayerExact(target);
+            p = vind.getServer().getPlayerExact(t);
+            ars.addAll(storage.getRecords(t));
 
-        if (p == null)
-            return ars;
+            if (p != null) {
+                addr = p.getAddress().getAddress().getHostAddress();
 
-        str = p.getAddress().getAddress().getHostAddress();
-        ars.addAll(storage.getRecords(str));
+                if (Arrays.binarySearch(targets, addr) < 0)
+                    ars.addAll(storage.getRecords(addr));
+            }
+        }
 
         return ars;
     }
