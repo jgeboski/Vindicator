@@ -87,13 +87,11 @@ public class StrUtils
     {
         String sstr;
         char[] cstr;
-
-        long time;
-        long mod;
-
-        int i;
-        int s;
-        int e;
+        long   time;
+        long   mod;
+        int    i;
+        int    s;
+        int    e;
 
         cstr = str.toLowerCase().toCharArray();
         time = 0;
@@ -125,16 +123,18 @@ public class StrUtils
             case 'd': mod = 86400;    break;
             case 'w': mod = 604800;   break;
             case 'y': mod = 31536000; break;
-            default:  mod = 1;
+
+            default:
+                return 0;
             }
 
-            sstr  = new String(Arrays.copyOfRange(cstr, s, e));
-            s = e = 0;
+            sstr = new String(Arrays.copyOfRange(cstr, s, e));
+            s    = e = 0;
 
             try {
                 time += Integer.parseInt(sstr) * mod;
             } catch (NumberFormatException ex) {
-                continue;
+                return 0;
             }
         }
 
