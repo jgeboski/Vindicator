@@ -17,6 +17,7 @@
 
 package org.jgeboski.vindicator.util;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -27,11 +28,10 @@ public class StrUtils
 {
     public static String getAddress(String str)
     {
-        try {
-            return InetAddress.getByName(str).getHostAddress();
-        } catch (UnknownHostException e) {
-            return null;
-        }
+        InetAddress ia;
+
+        ia = getInetAddress(str);
+        return (ia != null) ? ia.getHostAddress() : null;
     }
 
     public static boolean isAddress(String str)
@@ -143,10 +143,119 @@ public class StrUtils
 
     private static InetAddress getInetAddress(String str)
     {
+        byte addr[];
+
+        addr = getNumericAddress4(str);
+
+        if (addr == null)
+            addr = getNumericAddress6(str);
+
+        if (addr == null)
+            return null;
+
         try {
-            return InetAddress.getByName(str);
+            return InetAddress.getByAddress(new String(), addr);
         } catch (UnknownHostException e) {
             return null;
         }
+    }
+
+    private static byte[] getNumericAddress4(String str)
+    {
+        String ss[];
+        byte   bs[];
+        int    i;
+        int    v;
+
+        ss = str.split("\\.");
+
+        if (ss.length != 4)
+            return null;
+
+        bs = new byte[4];
+
+        try {
+            for (i = 0; i < bs.length; i++) {
+                v = Integer.parseInt(ss[i]);
+
+                if ((v < 0) || (v > 255))
+                    return null;
+
+                bs[i] = (byte) v;
+            }
+        } catch (NumberFormatException e) {
+            return null;
+        }
+
+        return bs;
+    }
+
+    private static byte[] getNumericAddress6(String str)
+    {
+        char cs[];
+        byte bs[];
+        int  i;
+        int  c;
+        int  o;
+        int  val;
+        int  vch;
+
+        boolean cold;
+
+        cs   = str.toCharArray();
+        bs   = new byte[16];
+        cold = false;
+        val  = i = c = 0;
+
+        if ((cs[0] == ':') && (cs[1] != ':'))
+            return null;
+
+        while ((i < cs.length) && (c < bs.length)) {
+            if (cs[i] == ':') {
+                cold = true;
+
+                if (++i >= cs.length)
+                    return null;
+
+                if (cs[i] != ':')
+                    continue;
+
+                if (++i >= cs.length)
+                    return bs;
+
+                o  = i - 1;
+                c += bs.length - (c + 2);
+
+                while ((o = Arrays.binarySearch(cs, ++o, cs.length, ':')) >= 0)
+                    c += 2;
+
+                if (c >= bs.length)
+                    return null;
+            }
+
+            while (i < cs.length) {
+                vch = Character.digit(cs[i], 16);
+
+                if (vch < 0) {
+                    if (cs[i] == ':')
+                        break;
+
+                    return null;
+                }
+
+                val <<= 4;
+                val  |= (byte) vch;
+                i++;
+            }
+
+            if (val > 0xFFFF)
+                return null;
+
+            bs[c++] = (byte) ((val >> 8) & 0xFF);
+            bs[c++] = (byte) (val & 0xFF);
+            val = 0;
+        }
+
+        return cold ? bs : null;
     }
 }
