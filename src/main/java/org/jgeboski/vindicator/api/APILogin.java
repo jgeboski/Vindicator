@@ -17,29 +17,20 @@
 
 package org.jgeboski.vindicator.api;
 
-import java.util.List;
-import org.jgeboski.vindicator.util.Message;
+import org.bukkit.entity.Player;
 
-public class APIRunnable
+public class APILogin extends APITask<APILogin>
 {
-    public void run(APIAddress aa, List<APIAddress> aas, APIException expt)
+    public Player player;
+    public String pname;
+    public String address;
+
+    public APILogin(APIRunnable arun, Player player)
     {
+        super(APILogin.class, arun, player);
 
-    }
-
-    public void run(APILogin al, APIException expt)
-    {
-
-    }
-
-    public void run(APIRecord ar, APIException expt)
-    {
-        if (expt != null)
-            Message.severe(ar.sender, expt.getMessage());
-    }
-
-    public void run(APIRecord ar, List<APIRecord> ars, APIException expt)
-    {
-
+        this.player  = player;
+        this.pname   = player.getName();
+        this.address = player.getAddress().getAddress().getHostAddress();
     }
 }

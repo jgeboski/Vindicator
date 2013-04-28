@@ -32,6 +32,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import org.jgeboski.vindicator.storage.Storage;
+import org.jgeboski.vindicator.storage.StorageException;
 import org.jgeboski.vindicator.storage.StorageSQL;
 import org.jgeboski.vindicator.util.Log;
 import org.jgeboski.vindicator.util.StrUtils;
@@ -189,6 +190,29 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         mr.issuer = vind.getDescription().getName();
         unmute(mr);
+    }
+
+    public void login(APILogin al)
+        throws APIException
+    {
+        al.address = getAddress(al.address);
+        al.setTask(this, "loginTask");
+        execrun(al);
+    }
+
+    private void loginTask(APILogin al)
+        throws APIException
+    {
+        try {
+            checkRecords(al.pname, al.address);
+            checkAddresses(al.pname, al.address);
+        } catch (APIException e) {
+            if (!(e instanceof StorageException))
+                throw e;
+
+            Log.severe(e.getMessage());
+            throw new APIException("Failed username check. Notify the admin.");
+        }
     }
 
     public void ban(APIRecord ar)
