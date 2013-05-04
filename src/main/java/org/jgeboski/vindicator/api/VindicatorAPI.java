@@ -220,8 +220,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
         throws APIException
     {
         try {
-            checkRecords(al.pname, al.address);
             checkAddresses(al.pname, al.address);
+            checkRecords(al.pname, al.address);
         } catch (APIException e) {
             if (!(e instanceof StorageException))
                 throw e;

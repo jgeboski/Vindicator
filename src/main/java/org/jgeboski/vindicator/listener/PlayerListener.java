@@ -141,8 +141,8 @@ public class PlayerListener extends APIRunnable implements Listener
         address = event.getAddress().getHostAddress();
 
         try {
-            vind.api.checkRecords(pname, address);
             vind.api.checkAddresses(pname, address);
+            vind.api.checkRecords(pname, address);
         } catch (APIException e) {
             if (e instanceof StorageException) {
                 str = "Failed username check. Notify the administrator.";
