@@ -47,6 +47,8 @@ public class Configuration extends YamlConfiguration
     public boolean muteUpdate;
     public boolean unbanNote;
     public boolean unmuteNote;
+    public int     altInfoLogins;
+    public long    altInfoTime;
 
     public String  ircTag;
     public boolean ircEnabled;
@@ -76,6 +78,8 @@ public class Configuration extends YamlConfiguration
         this.muteUpdate    = true;
         this.unbanNote     = false;
         this.unmuteNote    = false;
+        this.altInfoLogins = -1;
+        this.altInfoTime   = -1;
 
         this.ircTag        = "vindicator";
         this.ircEnabled    = false;
@@ -114,6 +118,8 @@ public class Configuration extends YamlConfiguration
         muteUpdate    = cs.getBoolean("mute-update",    muteUpdate);
         unbanNote     = cs.getBoolean("unban-to-note",  unbanNote);
         unmuteNote    = cs.getBoolean("unmute-to-note", unmuteNote);
+        altInfoLogins = cs.getInt("alt-info-logins",    altInfoLogins);
+        altInfoTime   = cs.getLong("alt-info-time",     altInfoTime);
 
         cs            = getConfigurationSection("irc");
         ircTag        = cs.getString("tag",      ircTag);
@@ -141,15 +147,17 @@ public class Configuration extends YamlConfiguration
         cs.set("keep-alive", poolKeepAlive);
 
         cs = getConfigurationSection("settings");
-        cs.set("default-kick",   defBanReason);
-        cs.set("default-ban",    defKickReason);
-        cs.set("default-mute",   defMuteReason);
-        cs.set("auto-complete",  autoComplete);
-        cs.set("must-reason",    mustReason);
-        cs.set("ban-update",     banUpdate);
-        cs.set("mute-update",    muteUpdate);
-        cs.set("unban-to-note",  unbanNote);
-        cs.set("unmute-to-note", unmuteNote);
+        cs.set("default-kick",    defBanReason);
+        cs.set("default-ban",     defKickReason);
+        cs.set("default-mute",    defMuteReason);
+        cs.set("auto-complete",   autoComplete);
+        cs.set("must-reason",     mustReason);
+        cs.set("ban-update",      banUpdate);
+        cs.set("mute-update",     muteUpdate);
+        cs.set("unban-to-note",   unbanNote);
+        cs.set("unmute-to-note",  unmuteNote);
+        cs.set("alt-info-logins", altInfoLogins);
+        cs.set("alt-info-time",   altInfoTime);
 
         cs = getConfigurationSection("irc");
         cs.set("tag",     ircTag);

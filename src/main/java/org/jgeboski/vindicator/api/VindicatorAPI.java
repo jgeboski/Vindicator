@@ -83,6 +83,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
     {
         HashSet<String> pl;
         APIAddress aa;
+        long val;
 
         address = getAddress(address);
         aa      = storage.getAddress(player, address);
@@ -97,9 +98,24 @@ public class VindicatorAPI extends ThreadPoolExecutor
             storage.add(aa);
         }
 
+        if ((vind.config.altInfoLogins == 0) || (vind.config.altInfoTime == 0))
+            return;
+
         for (APIAddress a : storage.getAddressPlayers(address)) {
-            if (!player.equals(a.player))
-                pl.add(hl(a.player));
+            if (player.equals(a.player))
+                continue;
+
+            val = vind.config.altInfoLogins;
+
+            if ((vind.config.altInfoLogins >= 0) && (a.logins > val))
+                continue;
+
+            val = vind.config.altInfoTime + a.time;
+
+            if ((vind.config.altInfoTime >= 0) && (Utils.time() > val))
+                continue;
+
+            pl.add(hl(a.player));
         }
 
         if (pl.size() < 1)
