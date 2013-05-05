@@ -35,6 +35,7 @@ import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageException;
 import org.jgeboski.vindicator.storage.StorageSQL;
 import org.jgeboski.vindicator.util.Log;
+import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
@@ -159,7 +160,15 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
                 vind.broadcast("vindicator.message.notify", str,
                                hl(player), hl(br.message));
-                throw new APIException("Banned: %s", br.message);
+
+                str = new String();
+
+                if (br.timeout > 0) {
+                    str += " until ";
+                    str += Utils.timestr(Utils.DATEF_LONG, br.timeout);
+                }
+
+                throw new APIException("Banned%s: %s", str, br.message);
             }
 
             br.issuer = vind.getDescription().getName();
@@ -234,6 +243,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
     public void ban(APIRecord ar)
         throws APIException
     {
+        String str;
+
         if (ar.message == null) {
             if (vind.config.mustReason)
                 throw new APIException("A reason must be provided.");
@@ -248,13 +259,20 @@ public class VindicatorAPI extends ThreadPoolExecutor
         ar.addFlag(getTypeFlag(ar));
         ar.setTask(this, "banTask");
 
-        if (ar.timeout > 0)
+        str = new String();
+
+        if (ar.timeout > 0) {
             ar.timeout += Utils.time();
+            str        += " until ";
+            str        += Utils.timestr(Utils.DATEF_LONG, ar.timeout);
+        }
+
+        str = String.format("Banned%s: %s", str, ar.message);
 
         if (ar.hasFlag(APIRecord.ADDRESS))
-            kickIP(ar, "Banned: " + ar.message);
+            kickIP(ar, str);
         else
-            kick(ar, "Banned: " + ar.message);
+            kick(ar, str);
 
         execrun(ar);
     }
