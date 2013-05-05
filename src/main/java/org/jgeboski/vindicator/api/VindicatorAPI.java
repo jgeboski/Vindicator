@@ -34,6 +34,7 @@ import org.bukkit.entity.Player;
 import org.jgeboski.vindicator.storage.Storage;
 import org.jgeboski.vindicator.storage.StorageException;
 import org.jgeboski.vindicator.storage.StorageSQL;
+import org.jgeboski.vindicator.util.Kick;
 import org.jgeboski.vindicator.util.Log;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
@@ -267,13 +268,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
             str        += hl(Utils.timestr(Utils.DATEF_LONG, ar.timeout));
         }
 
-        str = String.format("Banned%s: %s", str, hl(ar.message));
-
-        if (ar.hasFlag(APIRecord.ADDRESS))
-            kickIP(ar, str);
-        else
-            kick(ar, str);
-
+        kickTarget(ar, "Banned%s: %s", str, hl(ar.message));
         execrun(ar);
     }
 
@@ -329,18 +324,12 @@ public class VindicatorAPI extends ThreadPoolExecutor
             ar.message = vind.config.defKickReason;
         }
 
-        if (StrUtils.isAddress(ar.target)) {
-            if (kickIP(ar, hl(ar.message)))
-                return;
-
-            throw new APIException("Player(s) for %s not found.",
-                                   hl(ar.target));
-        }
-
         ar.target = getTarget(ar.target);
+        ar.flags  = 0;
+        ar.addFlag(getTypeFlag(ar));
 
-        if (!kick(ar, hl(ar.message)))
-            throw new APIException("Player %s not found.", hl(ar.target));
+        if (!kickTarget(ar, hl(ar.message)))
+            throw new APIException("No player(s) found for %s.", hl(ar.target));
 
         vind.broadcast("vindicator.message.kick",
                        "Kick placed on %s by %s: %s",
@@ -664,6 +653,18 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
     }
 
+    private boolean kickTarget(APIRecord ar, String format, String ... args)
+    {
+        String str;
+
+        str = Message.format(format, args);
+
+        if (!ar.hasFlag(APIRecord.ADDRESS))
+            return Kick.player(vind, ar.target, str);
+
+        return Kick.address(vind, ar.target, str);
+    }
+
     private String getAddress(String address)
     {
         String addr;
@@ -703,40 +704,5 @@ public class VindicatorAPI extends ThreadPoolExecutor
             return APIRecord.ADDRESS;
 
         throw new APIException("Invalid player/address: %s.", hl(ar.target));
-    }
-
-    private boolean kick(APIRecord ar, String message)
-    {
-        Player p;
-
-        p = vind.getServer().getPlayerExact(ar.target);
-
-        if (p == null)
-            return false;
-
-        message = Message.format(message);
-        p.kickPlayer(message);
-        return true;
-    }
-
-    private boolean kickIP(APIRecord ar, String message)
-    {
-        String ip;
-        int    i;
-
-        message = Message.format(message);
-        i       = 0;
-
-        for (Player p : vind.getServer().getOnlinePlayers()) {
-            ip = p.getAddress().getAddress().getHostAddress();
-
-            if (!ip.equals(ar.target))
-                continue;
-
-            p.kickPlayer(message);
-            i++;
-        }
-
-        return (i > 0);
     }
 }

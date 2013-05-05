@@ -45,6 +45,7 @@ import org.jgeboski.vindicator.api.APILogin;
 import org.jgeboski.vindicator.api.APIRecord;
 import org.jgeboski.vindicator.api.APIRunnable;
 import org.jgeboski.vindicator.storage.StorageException;
+import org.jgeboski.vindicator.util.Kick;
 import org.jgeboski.vindicator.util.Log;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
@@ -118,23 +119,12 @@ public class PlayerListener extends APIRunnable implements Listener
 
     public void run(final APILogin al, final APIException expt)
     {
-        final String str;
-
         if (expt == null) {
             checking.remove(al.pname);
             return;
         }
 
-        str = expt.getMessage();
-
-        /* Hackery for asynchronous kicking */
-        vind.getServer().getScheduler().scheduleSyncDelayedTask(vind,
-            new Runnable() {
-                public void run() {
-                    al.player.kickPlayer(Message.format(str));
-                }
-            }
-        );
+        Kick.player(vind, al.player, Message.format(expt.getMessage()));
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
