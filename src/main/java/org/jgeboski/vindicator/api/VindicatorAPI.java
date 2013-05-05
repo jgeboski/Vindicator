@@ -165,10 +165,10 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
                 if (br.timeout > 0) {
                     str += " until ";
-                    str += Utils.timestr(Utils.DATEF_LONG, br.timeout);
+                    str += hl(Utils.timestr(Utils.DATEF_LONG, br.timeout));
                 }
 
-                throw new APIException("Banned%s: %s", str, br.message);
+                throw new APIException("Banned%s: %s", str, hl(br.message));
             }
 
             br.issuer = vind.getDescription().getName();
@@ -264,10 +264,10 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (ar.timeout > 0) {
             ar.timeout += Utils.time();
             str        += " until ";
-            str        += Utils.timestr(Utils.DATEF_LONG, ar.timeout);
+            str        += hl(Utils.timestr(Utils.DATEF_LONG, ar.timeout));
         }
 
-        str = String.format("Banned%s: %s", str, ar.message);
+        str = String.format("Banned%s: %s", str, hl(ar.message));
 
         if (ar.hasFlag(APIRecord.ADDRESS))
             kickIP(ar, str);
@@ -330,7 +330,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         }
 
         if (StrUtils.isAddress(ar.target)) {
-            if (kickIP(ar, ar.message))
+            if (kickIP(ar, hl(ar.message)))
                 return;
 
             throw new APIException("Player(s) for %s not found.",
@@ -339,7 +339,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
 
         ar.target = getTarget(ar.target);
 
-        if (!kick(ar, ar.message))
+        if (!kick(ar, hl(ar.message)))
             throw new APIException("Player %s not found.", hl(ar.target));
 
         vind.broadcast("vindicator.message.kick",
@@ -714,6 +714,7 @@ public class VindicatorAPI extends ThreadPoolExecutor
         if (p == null)
             return false;
 
+        message = Message.format(message);
         p.kickPlayer(message);
         return true;
     }
@@ -723,7 +724,8 @@ public class VindicatorAPI extends ThreadPoolExecutor
         String ip;
         int    i;
 
-        i = 0;
+        message = Message.format(message);
+        i       = 0;
 
         for (Player p : vind.getServer().getOnlinePlayers()) {
             ip = p.getAddress().getAddress().getHostAddress();

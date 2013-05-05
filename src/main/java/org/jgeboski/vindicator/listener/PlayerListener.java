@@ -97,6 +97,7 @@ public class PlayerListener extends APIRunnable implements Listener
     public void onPlayerJoin(PlayerJoinEvent event)
     {
         APILogin al;
+        String   str;
 
         if (vind.getServer().getOnlineMode())
             return;
@@ -108,23 +109,29 @@ public class PlayerListener extends APIRunnable implements Listener
             checking.add(al.pname);
             event.setJoinMessage(null);
         } catch (APIException e) {
+            str = "Failed mute check. Notify the admin.";
+
             Log.severe(e.getMessage());
-            al.player.kickPlayer("Failed mute check. Notify the admin.");
+            al.player.kickPlayer(Message.format(str));
         }
     }
 
     public void run(final APILogin al, final APIException expt)
     {
+        final String str;
+
         if (expt == null) {
             checking.remove(al.pname);
             return;
         }
 
+        str = expt.getMessage();
+
         /* Hackery for asynchronous kicking */
         vind.getServer().getScheduler().scheduleSyncDelayedTask(vind,
             new Runnable() {
                 public void run() {
-                    al.player.kickPlayer(expt.getMessage());
+                    al.player.kickPlayer(Message.format(str));
                 }
             }
         );
@@ -151,7 +158,7 @@ public class PlayerListener extends APIRunnable implements Listener
                 str = e.getMessage();
             }
 
-            event.disallow(Result.KICK_OTHER, str);
+            event.disallow(Result.KICK_OTHER, Message.format(str));
         }
     }
 
