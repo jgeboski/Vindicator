@@ -59,6 +59,7 @@ Commands:
 
 Permissions:
   - vindicator.ban:              Ban a player or IP from the server.
+  - vindicator.exempt:           Exempt from Vindicator actions
   - vindicator.kick:             Kick a player or IP from the server.
   - vindicator.lookup:           Lookup a player or IP.
   - vindicator.lookupa:          Lookup the address history of a player or IP.

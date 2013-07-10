@@ -53,6 +53,9 @@ permissions:
     default: op
     children:
       vindicator.message.ban: true
+  vindicator.exempt:
+    description: Exempt from Vindicator actions
+    default: op
   vindicator.kick:
     description: Kick a player or IP from the server
     default: op

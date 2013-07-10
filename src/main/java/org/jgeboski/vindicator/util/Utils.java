@@ -23,6 +23,11 @@ import java.util.Date;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.permissions.PermissibleBase;
+import org.bukkit.plugin.PluginManager;
+
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class Utils
 {
@@ -58,6 +63,25 @@ public class Utils
     public static boolean hasPermission(CommandSender sender, String perm)
     {
         return hasPermission(sender, perm, true);
+    }
+
+    public static boolean hasPrePermission(String player, String perm)
+    {
+        OfflinePlayer   op;
+        PermissibleBase pb;
+        PluginManager   pm;
+        PermissionsEx   pex;
+
+        pm  = Bukkit.getPluginManager();
+        pex = (PermissionsEx) pm.getPlugin("PermissionsEx");
+
+        if (pex != null)
+            return pex.getPermissionManager().has(player, perm, null);
+
+        op = Bukkit.getOfflinePlayer(player);
+        pb = new PermissibleBase(op);
+
+        return pb.hasPermission(perm);
     }
 
     public static long time()

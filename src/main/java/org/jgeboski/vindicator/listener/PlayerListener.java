@@ -74,6 +74,9 @@ public class PlayerListener extends APIRunnable implements Listener
         player = event.getPlayer();
         pname  = player.getName();
 
+        if (player.hasPermission("vindicator.exempt"))
+            return;
+
         if (isEntityChecking(player)) {
             event.setCancelled(true);
             return;
@@ -97,13 +100,19 @@ public class PlayerListener extends APIRunnable implements Listener
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event)
     {
+        Player   player;
         APILogin al;
         String   str;
 
         if (vind.getServer().getOnlineMode())
             return;
 
-        al = new APILogin(this, event.getPlayer());
+        player = event.getPlayer();
+
+        if (player.hasPermission("vindicator.exempt"))
+            return;
+
+        al = new APILogin(this, player);
 
         try {
             vind.api.login(al);
@@ -136,6 +145,9 @@ public class PlayerListener extends APIRunnable implements Listener
 
         pname   = event.getName();
         address = event.getAddress().getHostAddress();
+
+        if (Utils.hasPrePermission(pname, "vindicator.exempt"))
+            return;
 
         try {
             vind.api.checkAddresses(pname, address);
