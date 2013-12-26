@@ -31,8 +31,8 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class Utils
 {
-    public static final String DATEF_LONG  = "EEE, MMM d 'at' h:m a z";
-    public static final String DATEF_SHORT = "MM-dd kk:mm";
+    public static final String DATEF_LONG  = "EEE, MMM d 'at' h:mm a z";
+    public static final String DATEF_SHORT = "MM-dd HH:mm";
 
     public static void broadcast(String perm, String format, Object ... args)
     {
