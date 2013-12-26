@@ -40,22 +40,19 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import org.jgeboski.vindicator.api.APIException;
-import org.jgeboski.vindicator.api.APILogin;
-import org.jgeboski.vindicator.api.APIRecord;
-import org.jgeboski.vindicator.api.APIRunnable;
-import org.jgeboski.vindicator.storage.StorageException;
-import org.jgeboski.vindicator.util.Kick;
-import org.jgeboski.vindicator.util.Log;
+import org.jgeboski.vindicator.event.VindicatorChatEvent;
+import org.jgeboski.vindicator.event.VindicatorLoginEvent;
+import org.jgeboski.vindicator.storage.StorageAddress;
+import org.jgeboski.vindicator.storage.StorageLogin;
+import org.jgeboski.vindicator.storage.StoragePlayer;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
+import org.jgeboski.vindicator.VindicatorException;
 
-import static org.jgeboski.vindicator.util.Message.hl;
-
-public class PlayerListener extends APIRunnable implements Listener
+public class PlayerListener implements Listener
 {
-    public Vindicator vind;
+    public Vindicator      vind;
     public HashSet<String> checking;
 
     public PlayerListener(Vindicator vind)
@@ -67,12 +64,12 @@ public class PlayerListener extends APIRunnable implements Listener
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event)
     {
-        Player player;
-        String pname;
-        String str;
+        StoragePlayer plyr;
+        Player        player;
+        String        name;
 
         player = event.getPlayer();
-        pname  = player.getName();
+        name   = player.getName();
 
         if (player.hasPermission("vindicator.exempt"))
             return;
@@ -83,98 +80,78 @@ public class PlayerListener extends APIRunnable implements Listener
         }
 
         try {
-            vind.api.checkChat(pname, event.getMessage());
-        } catch (APIException e) {
-            if (e instanceof StorageException) {
-                str = "Failed mute check. Notify the admin.";
-                Log.severe(e.getMessage());
-            } else {
-                str = e.getMessage();
-            }
-
+            plyr = new StoragePlayer(name);
+            vind.execute(new VindicatorChatEvent(plyr, event.getMessage()));
+        } catch (VindicatorException e) {
             event.setCancelled(true);
-            Message.severe(player, str);
+            Message.severe(player, e.getMessage());
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event)
     {
-        Player   player;
-        APILogin al;
-        String   str;
+        VindicatorLoginEvent levnt;
+        StorageLogin         login;
+        Player               player;
+        String               name;
+        String               addr;
 
         if (vind.getServer().getOnlineMode())
             return;
 
         player = event.getPlayer();
+        name   = player.getName();
+        addr   = player.getAddress().getAddress().getHostAddress();
 
         if (player.hasPermission("vindicator.exempt"))
             return;
 
-        al = new APILogin(this, player);
+        login = new StorageLogin(name, addr);
+        levnt = new VindicatorLoginEvent(login);
 
         try {
-            vind.api.login(al);
-            checking.add(al.pname);
+            vind.queue(levnt);
+            checking.add(name);
             event.setJoinMessage(null);
-        } catch (APIException e) {
-            str = "Failed mute check. Notify the admin.";
-
-            Log.severe(e.getMessage());
-            al.player.kickPlayer(Message.format(str));
+        } catch (VindicatorException e) {
+            levnt.kick(login.player, Message.format(e.getMessage()));
         }
-    }
-
-    public void run(final APILogin al, final APIException expt)
-    {
-        if (expt == null) {
-            checking.remove(al.pname);
-            return;
-        }
-
-        Kick.player(vind, al.player, Message.format(expt.getMessage()));
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event)
     {
-        String pname;
-        String address;
-        String str;
+        StorageLogin login;
+        String       name;
+        String       addr;
 
-        pname   = event.getName();
-        address = event.getAddress().getHostAddress();
+        name = event.getName();
+        addr = event.getAddress().getHostAddress();
 
-        if (Utils.hasPrePermission(pname, "vindicator.exempt"))
+        if (Utils.hasPrePermission(name, "vindicator.exempt"))
             return;
 
-        try {
-            vind.api.checkAddresses(pname, address);
-            vind.api.checkRecords(pname, address);
-        } catch (APIException e) {
-            if (e instanceof StorageException) {
-                str = "Failed username check. Notify the administrator.";
-                Log.severe(e.getMessage());
-            } else {
-                str = e.getMessage();
-            }
+        login = new StorageLogin(name, addr);
 
-            event.disallow(Result.KICK_OTHER, Message.format(str));
+        try {
+            vind.execute(new VindicatorLoginEvent(login));
+        } catch (VindicatorException e) {
+            event.disallow(Result.KICK_OTHER, Message.format(e.getMessage()));
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent event)
     {
-        String pname;
+        String name;
 
-        pname = event.getPlayer().getName();
+        name = event.getPlayer().getName();
 
-        if (checking.remove(pname))
+        if (checking.remove(name))
             event.setQuitMessage(null);
 
-        vind.api.mutes.remove(pname);
+        vind.mutes.remove(name);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

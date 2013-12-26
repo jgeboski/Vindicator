@@ -17,9 +17,9 @@
 
 package org.jgeboski.vindicator.storage;
 
-import org.jgeboski.vindicator.api.APIException;
+import org.jgeboski.vindicator.VindicatorException;
 
-public class StorageException extends APIException
+public class StorageException extends VindicatorException
 {
     public StorageException(String format, Object ... args)
     {

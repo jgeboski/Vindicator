@@ -17,65 +17,105 @@
 
 package org.jgeboski.vindicator.storage;
 
+import java.util.ArrayList;
 import java.util.List;
-import org.jgeboski.vindicator.api.APIAddress;
-import org.jgeboski.vindicator.api.APIRecord;
 
 public abstract class Storage
 {
     public abstract void close();
 
-    public abstract void add(APIAddress aa)
+    public abstract void add(StorageLogin login)
         throws StorageException;
 
-    public abstract void add(APIRecord ar)
+    public abstract void add(StorageRecord recd)
         throws StorageException;
 
-    public abstract void remove(APIAddress aa)
+    public abstract void remove(StorageLogin login)
         throws StorageException;
 
-    public abstract void remove(APIRecord ar)
+    public abstract void remove(StorageRecord recd)
         throws StorageException;
 
-    public abstract void update(APIAddress aa)
+    public abstract void update(StorageLogin login)
         throws StorageException;
 
-    public abstract void update(APIRecord ar)
+    public abstract void update(StorageRecord recd)
         throws StorageException;
 
-    public abstract APIAddress getAddress(String player, String address)
+    public abstract StorageLogin getLogin(StorageLogin login)
         throws StorageException;
 
-    public abstract List<APIAddress> getAddresses(String player)
+    public abstract List<StorageLogin> getLogins(StorageAddress addr)
         throws StorageException;
 
-    public abstract List<APIAddress> getAddressPlayers(String address)
+    public abstract List<StorageLogin> getLogins(StoragePlayer plyr)
         throws StorageException;
 
-    public abstract List<APIRecord> getRecords(String target)
+    public abstract List<StorageRecord> getRecords(StorageAddress addr)
         throws StorageException;
 
-    public APIAddress getAddress(APIAddress aa)
+    public abstract List<StorageRecord> getRecords(StoragePlayer plyr)
+        throws StorageException;
+
+    public List<StorageLogin> getLogins(StorageEntity entity)
         throws StorageException
     {
-        return getAddress(aa.player, aa.address);
+        if (entity instanceof StorageAddress)
+            return getLogins((StorageAddress) entity);
+
+        if (entity instanceof StoragePlayer)
+            return getLogins((StoragePlayer) entity);
+
+        entity.invalid();
+        return new ArrayList<StorageLogin>();
     }
 
-    public List<APIAddress> getAddresses(APIAddress aa)
+    public List<StorageLogin> getLogins(StorageLogin login)
         throws StorageException
     {
-        return getAddresses(aa.player);
+        List<StorageLogin> logins;
+
+        logins = new ArrayList<StorageLogin>();
+        logins.addAll(getLogins(login.player));
+        logins.addAll(getLogins(login.address));
+
+        return logins;
     }
 
-    public List<APIAddress> getAddressPlayers(APIAddress aa)
+    public List<StorageRecord> getRecords(StorageEntity entity)
         throws StorageException
     {
-        return getAddressPlayers(aa.address);
+        if (entity instanceof StorageAddress)
+            return getRecords((StorageAddress) entity);
+
+        if (entity instanceof StoragePlayer)
+            return getRecords((StoragePlayer) entity);
+
+        entity.invalid();
+        return new ArrayList<StorageRecord>();
     }
 
-    public List<APIRecord> getRecords(APIRecord ar)
+    public List<StorageRecord> getRecords(StorageLogin login)
         throws StorageException
     {
-        return getRecords(ar.target);
+        List<StorageRecord> recds;
+
+        recds = new ArrayList<StorageRecord>();
+        recds.addAll(getRecords(login.player));
+        recds.addAll(getRecords(login.address));
+
+        return recds;
+    }
+
+    public List<StorageRecord> getRecords(StorageRecord recd)
+        throws StorageException
+    {
+        List<StorageRecord> recds;
+
+        recds = new ArrayList<StorageRecord>();
+        recds.addAll(getRecords(recd.target));
+        recds.addAll(getRecords(recd.issuer));
+
+        return recds;
     }
 }

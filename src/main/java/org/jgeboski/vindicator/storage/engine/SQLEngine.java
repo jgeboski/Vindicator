@@ -15,21 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.storage;
+package org.jgeboski.vindicator.storage.engine;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jgeboski.vindicator.api.APIAddress;
-import org.jgeboski.vindicator.api.APIRecord;
-import org.jgeboski.vindicator.storage.sql.Database;
-import org.jgeboski.vindicator.storage.sql.SQLStatement;
-import org.jgeboski.vindicator.storage.sql.SQLType;
+import org.jgeboski.vindicator.storage.Storage;
+import org.jgeboski.vindicator.storage.StorageAddress;
+import org.jgeboski.vindicator.storage.StorageException;
+import org.jgeboski.vindicator.storage.StorageLogin;
+import org.jgeboski.vindicator.storage.StoragePlayer;
+import org.jgeboski.vindicator.storage.StorageRecord;
+import org.jgeboski.vindicator.util.sql.Database;
+import org.jgeboski.vindicator.util.sql.SQLStatement;
+import org.jgeboski.vindicator.util.sql.SQLType;
 import org.jgeboski.vindicator.util.StrUtils;
 
-public class StorageSQL extends Storage
+public class SQLEngine extends Storage
 {
     private String TABLE_ADDRESSES = "addresses";
     private String TABLE_RECORDS   = "records";
@@ -41,8 +45,8 @@ public class StorageSQL extends Storage
 
     private Database database;
 
-    public StorageSQL(String url, String username, String password,
-                      String prefix)
+    public SQLEngine(String url, String username, String password,
+                     String prefix)
         throws StorageException
     {
         SQLStatement stmt;
@@ -108,7 +112,7 @@ public class StorageSQL extends Storage
         }
     }
 
-    public StorageSQL(String url)
+    public SQLEngine(String url)
         throws StorageException
     {
         this(url, null, null, null);
@@ -120,7 +124,7 @@ public class StorageSQL extends Storage
             database.close();
     }
 
-    public void add(APIAddress aa)
+    public void add(StorageLogin login)
         throws StorageException
     {
         SQLStatement stmt;
@@ -130,7 +134,7 @@ public class StorageSQL extends Storage
             "INSERT INTO", TABLE_ADDRESSES,
                 "(player, address, logins, time)",
               "VALUES (?, ?, ?, ?)", null,
-            aa.player, aa.address, aa.logins, aa.time);
+            login.player.ident, login.address.ident, login.count, login.time);
 
         try {
             stmt.execute();
@@ -141,7 +145,7 @@ public class StorageSQL extends Storage
         }
     }
 
-    public void add(APIRecord ar)
+    public void add(StorageRecord recd)
         throws StorageException
     {
         SQLStatement stmt;
@@ -151,7 +155,8 @@ public class StorageSQL extends Storage
             "INSERT INTO", TABLE_RECORDS,
                 "(target, issuer, message, timeout, time, flags)",
               "VALUES (?, ?, ?, ?, ?, ?)", null,
-            ar.target, ar.issuer, ar.message, ar.timeout, ar.time, ar.flags);
+            recd.target.ident, recd.issuer.ident, recd.message,
+            recd.timeout, recd.time, recd.flags);
 
         try {
             stmt.execute();
@@ -162,19 +167,19 @@ public class StorageSQL extends Storage
         }
     }
 
-    public void remove(APIAddress aa)
+    public void remove(StorageLogin login)
         throws StorageException
     {
         SQLStatement stmt;
 
-        if (aa.id < 1)
+        if (login.id < 1)
             return;
 
         stmt = database.createStatement();
         stmt.store(
             "DELETE FROM", TABLE_ADDRESSES,
               "WHERE id = ?", null,
-            aa.id);
+            login.id);
 
         try {
             stmt.executeUpdate();
@@ -185,19 +190,19 @@ public class StorageSQL extends Storage
         }
     }
 
-    public void remove(APIRecord ar)
+    public void remove(StorageRecord recd)
         throws StorageException
     {
         SQLStatement stmt;
 
-        if (ar.id < 1)
+        if (recd.id < 1)
             return;
 
         stmt = database.createStatement();
         stmt.store(
             "DELETE FROM", TABLE_RECORDS,
               "WHERE id = ?", null,
-            ar.id);
+            recd.id);
 
         try {
             stmt.executeUpdate();
@@ -208,12 +213,12 @@ public class StorageSQL extends Storage
         }
     }
 
-    public void update(APIAddress aa)
+    public void update(StorageLogin login)
         throws StorageException
     {
         SQLStatement stmt;
 
-        if (aa.id < 1)
+        if (login.id < 1)
             return;
 
         stmt = database.createStatement();
@@ -224,7 +229,8 @@ public class StorageSQL extends Storage
                 "logins = ?,",
                 "time = ?",
               "WHERE id = ?", null,
-            aa.player, aa.address, aa.logins, aa.time, aa.id);
+            login.player.ident, login.address.ident,
+            login.count, login.time, login.id);
 
         try {
             stmt.execute();
@@ -235,12 +241,12 @@ public class StorageSQL extends Storage
         }
     }
 
-    public void update(APIRecord ar)
+    public void update(StorageRecord recd)
         throws StorageException
     {
         SQLStatement stmt;
 
-        if (ar.id < 1)
+        if (recd.id < 1)
             return;
 
         stmt = database.createStatement();
@@ -253,8 +259,8 @@ public class StorageSQL extends Storage
                 "time = ?,",
                 "flags = ?",
               "WHERE id = ?", null,
-            ar.target, ar.issuer, ar.message, ar.timeout, ar.time, ar.flags,
-            ar.id);
+            recd.target.ident, recd.issuer.ident, recd.message,
+            recd.timeout, recd.time, recd.flags, recd.id);
 
         try {
             stmt.execute();
@@ -265,10 +271,10 @@ public class StorageSQL extends Storage
         }
     }
 
-    public APIAddress getAddress(String player, String address)
+    public StorageLogin getLogin(StorageLogin login)
         throws StorageException
     {
-        List<APIAddress> aas;
+        List<StorageLogin> logins;
         SQLStatement stmt;
 
         stmt = database.createStatement();
@@ -276,27 +282,13 @@ public class StorageSQL extends Storage
             "SELECT * FROM", TABLE_ADDRESSES,
               "WHERE player = ? AND address = ?",
               "LIMIT 1", null,
-            player, address);
+            login.player.ident, login.address.ident);
 
-        aas = getAddressList(stmt);
-        return (aas.size() > 0) ? aas.get(0) : null;
+        logins = getLogins(stmt);
+        return (logins.size() > 0) ? logins.get(0) : null;
     }
 
-    public List<APIAddress> getAddresses(String player)
-        throws StorageException
-    {
-        SQLStatement stmt;
-
-        stmt = database.createStatement();
-        stmt.store(
-            "SELECT * FROM", TABLE_ADDRESSES,
-              "WHERE player = ?", null,
-            player);
-
-        return getAddressList(stmt);
-    }
-
-    public List<APIAddress> getAddressPlayers(String address)
+    public List<StorageLogin> getLogins(StorageAddress addr)
         throws StorageException
     {
         SQLStatement stmt;
@@ -305,33 +297,62 @@ public class StorageSQL extends Storage
         stmt.store(
             "SELECT * FROM", TABLE_ADDRESSES,
               "WHERE address = ?", null,
-            address);
+            addr.ident);
 
-        return getAddressList(stmt);
+        return getLogins(stmt);
     }
 
-    private List<APIAddress> getAddressList(SQLStatement stmt)
+    public List<StorageLogin> getLogins(StoragePlayer plyr)
         throws StorageException
     {
-        ArrayList<APIAddress> aas;
-        APIAddress aa;
-        ResultSet  rs;
+        SQLStatement stmt;
 
-        aas = new ArrayList<APIAddress>();
+        stmt = database.createStatement();
+        stmt.store(
+            "SELECT * FROM", TABLE_ADDRESSES,
+              "WHERE player = ?", null,
+            plyr.ident);
+
+        return getLogins(stmt);
+    }
+
+    public List<StorageRecord> getRecords(StorageAddress addr)
+        throws StorageException
+    {
+        return getRecords(addr.ident);
+    }
+
+    public List<StorageRecord> getRecords(StoragePlayer plyr)
+        throws StorageException
+    {
+        return getRecords(plyr.ident);
+    }
+
+    private List<StorageLogin> getLogins(SQLStatement stmt)
+        throws StorageException
+    {
+        ArrayList<StorageLogin> logins;
+        StorageLogin login;
+        ResultSet    rs;
+        String       name;
+        String       addr;
+
+        logins = new ArrayList<StorageLogin>();
 
         try {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                aa = new APIAddress();
+                name = rs.getString("player");
+                addr = rs.getString("address");
 
-                aa.id      = rs.getInt("id");
-                aa.player  = rs.getString("player");
-                aa.address = rs.getString("address");
-                aa.logins  = rs.getInt("logins");
-                aa.time    = rs.getLong("time");
+                login = new StorageLogin(name, addr);
 
-                aas.add(aa);
+                login.id    = rs.getInt("id");
+                login.count = rs.getInt("logins");
+                login.time  = rs.getLong("time");
+
+                logins.add(login);
             }
 
             stmt.close();
@@ -340,20 +361,20 @@ public class StorageSQL extends Storage
             throw new StorageException(e);
         }
 
-        return aas;
+        return logins;
     }
 
-    public List<APIRecord> getRecords(String target)
+    private List<StorageRecord> getRecords(String target)
         throws StorageException
     {
-        ArrayList<APIRecord> ars;
+        ArrayList<StorageRecord> recds;
+        StorageRecord recd;
+        SQLStatement  stmt;
+        ResultSet     rs;
+        String        issuer;
 
-        SQLStatement stmt;
-        ResultSet    rs;
-        APIRecord    ar;
-
-        ars  = new ArrayList<APIRecord>();
-        stmt = database.createStatement();
+        recds = new ArrayList<StorageRecord>();
+        stmt  = database.createStatement();
 
         stmt.store(
             "SELECT * FROM", TABLE_RECORDS,
@@ -364,17 +385,18 @@ public class StorageSQL extends Storage
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                ar = new APIRecord();
+                target = rs.getString("target");
+                issuer = rs.getString("issuer");
 
-                ar.id      = rs.getInt("id");
-                ar.target  = rs.getString("target");
-                ar.issuer  = rs.getString("issuer");
-                ar.message = rs.getString("message");
-                ar.timeout = rs.getLong("timeout");
-                ar.time    = rs.getLong("time");
-                ar.flags   = rs.getInt("flags");
+                recd = new StorageRecord(target, issuer);
 
-                ars.add(ar);
+                recd.id      = rs.getInt("id");
+                recd.message = rs.getString("message");
+                recd.timeout = rs.getLong("timeout");
+                recd.time    = rs.getLong("time");
+                recd.flags   = rs.getInt("flags");
+
+                recds.add(recd);
             }
 
             stmt.close();
@@ -383,6 +405,6 @@ public class StorageSQL extends Storage
             throw new StorageException(e);
         }
 
-        return ars;
+        return recds;
     }
 }

@@ -21,14 +21,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.jgeboski.vindicator.api.APIException;
-import org.jgeboski.vindicator.api.APIRecord;
-import org.jgeboski.vindicator.api.APIRunnable;
+import org.jgeboski.vindicator.event.VindicatorNoteRemEvent;
+import org.jgeboski.vindicator.storage.StorageException;
+import org.jgeboski.vindicator.storage.StorageRecord;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
+import org.jgeboski.vindicator.VindicatorException;
 
-public class CNoteRem extends APIRunnable implements CommandExecutor
+public class CNoteRem implements CommandExecutor
 {
     public Vindicator vind;
 
@@ -40,7 +41,7 @@ public class CNoteRem extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APIRecord ar;
+        StorageRecord recd;
 
         if (!Utils.hasPermission(sender, "vindicator.noterem"))
             return true;
@@ -50,19 +51,25 @@ public class CNoteRem extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        ar = new APIRecord(this, sender, args[0]);
+        try {
+            recd = new StorageRecord(args[0], sender.getName());
+        } catch (StorageException e) {
+            Message.severe(sender, e.getMessage());
+            return true;
+        }
+
         args[1] = args[1].replaceAll("#", "");
 
         try {
-            ar.id = Integer.parseInt(args[1]);
+            recd.id = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
             Message.severe(sender, "Invalid note index: %s", args[1]);
             return true;
         }
 
         try {
-            vind.api.noteRem(ar);
-        } catch (APIException e) {
+            vind.queue(new VindicatorNoteRemEvent(recd, sender));
+        } catch (VindicatorException e) {
             Message.severe(sender, e.getMessage());
         }
 

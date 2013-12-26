@@ -15,31 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.storage.sql;
+package org.jgeboski.vindicator.storage;
 
-public enum SQLType
+import org.jgeboski.vindicator.util.StrUtils;
+
+import static org.jgeboski.vindicator.util.Message.hl;
+
+public class StorageAddress extends StorageEntity
 {
-    MYSQL,
-    SQLITE;
-
-    public static SQLType fromURL(String url)
+    public StorageAddress(String address)
     {
-        String strs[];
-        String str;
+        super(address, address);
+    }
 
-        str  = url.toLowerCase();
-        strs = str.split(":", 3);
+    public void validate(boolean complete)
+        throws StorageException
+    {
+        String valid;
 
-        if ((strs.length < 2) || !strs[0].equals("jdbc"))
-            return null;
+        if (ident == null)
+            return;
 
-        for (SQLType t : SQLType.values()) {
-            str = t.toString();
+        valid = StrUtils.getAddress(ident);
 
-            if (str.equalsIgnoreCase(strs[1]))
-                return t;
-        }
+        if (valid == null)
+            throw new StorageException("Invalid address: %s", hl(ident));
 
-        return null;
+        ident = valid;
+        alias = valid;
     }
 }

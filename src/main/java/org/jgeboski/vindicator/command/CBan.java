@@ -21,15 +21,16 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.jgeboski.vindicator.api.APIException;
-import org.jgeboski.vindicator.api.APIRecord;
-import org.jgeboski.vindicator.api.APIRunnable;
+import org.jgeboski.vindicator.event.VindicatorBanEvent;
+import org.jgeboski.vindicator.storage.StorageException;
+import org.jgeboski.vindicator.storage.StorageRecord;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
+import org.jgeboski.vindicator.VindicatorException;
 
-public class CBan extends APIRunnable implements CommandExecutor
+public class CBan implements CommandExecutor
 {
     public Vindicator vind;
 
@@ -41,7 +42,8 @@ public class CBan extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APIRecord ar;
+        StorageRecord recd;
+        int offset;
 
         if (!Utils.hasPermission(sender, "vindicator.ban"))
             return true;
@@ -51,16 +53,22 @@ public class CBan extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        ar = new APIRecord(this, sender, args[0]);
+        try {
+            recd = new StorageRecord(args[0], sender.getName());
+        } catch (StorageException e) {
+            Message.severe(sender, e.getMessage());
+            return true;
+        }
 
         if (args.length > 1) {
-            ar.timeout = StrUtils.toSeconds(args[1]);
-            ar.message = StrUtils.join(args, " ", ((ar.timeout == 0) ? 1 : 2));
+            recd.timeout = StrUtils.toSeconds(args[1]);
+            offset       = (recd.timeout == 0) ? 1 : 2;
+            recd.message = StrUtils.join(args, " ", offset);
         }
 
         try {
-            vind.api.ban(ar);
-        } catch (APIException e) {
+            vind.queue(new VindicatorBanEvent(recd, sender));
+        } catch (VindicatorException e) {
             Message.severe(sender, e.getMessage());
         }
 

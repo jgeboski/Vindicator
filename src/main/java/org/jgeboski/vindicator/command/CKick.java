@@ -21,15 +21,16 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.jgeboski.vindicator.api.APIException;
-import org.jgeboski.vindicator.api.APIRecord;
-import org.jgeboski.vindicator.api.APIRunnable;
+import org.jgeboski.vindicator.event.VindicatorKickEvent;
+import org.jgeboski.vindicator.storage.StorageException;
+import org.jgeboski.vindicator.storage.StorageRecord;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
+import org.jgeboski.vindicator.VindicatorException;
 
-public class CKick extends APIRunnable implements CommandExecutor
+public class CKick implements CommandExecutor
 {
     public Vindicator vind;
 
@@ -41,7 +42,7 @@ public class CKick extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APIRecord ar;
+        StorageRecord recd;
 
         if (!Utils.hasPermission(sender, "vindicator.kick"))
             return true;
@@ -51,12 +52,18 @@ public class CKick extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        ar = new APIRecord(this, sender, args[0]);
-        ar.message = StrUtils.join(args, " ", 1);
+        try {
+            recd = new StorageRecord(args[0], sender.getName());
+        } catch (StorageException e) {
+            Message.severe(sender, e.getMessage());
+            return true;
+        }
+
+        recd.message = StrUtils.join(args, " ", 1);
 
         try {
-            vind.api.kick(ar);
-        } catch (APIException e) {
+            vind.queue(new VindicatorKickEvent(recd, sender));
+        } catch (VindicatorException e) {
             Message.severe(sender, e.getMessage());
         }
 

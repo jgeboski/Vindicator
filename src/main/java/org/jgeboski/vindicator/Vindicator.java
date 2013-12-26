@@ -18,6 +18,12 @@
 package org.jgeboski.vindicator;
 
 import java.io.File;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -30,10 +36,14 @@ import com.ensifera.animosity.craftirc.CraftIRC;
 import com.ensifera.animosity.craftirc.EndPoint;
 import com.ensifera.animosity.craftirc.RelayedMessage;
 
-import org.jgeboski.vindicator.api.APIException;
-import org.jgeboski.vindicator.api.VindicatorAPI;
 import org.jgeboski.vindicator.command.*;
+import org.jgeboski.vindicator.event.VindicatorEvent;
 import org.jgeboski.vindicator.listener.PlayerListener;
+import org.jgeboski.vindicator.storage.engine.SQLEngine;
+import org.jgeboski.vindicator.storage.Storage;
+import org.jgeboski.vindicator.storage.StorageException;
+import org.jgeboski.vindicator.storage.StoragePlayer;
+import org.jgeboski.vindicator.storage.StorageRecord;
 import org.jgeboski.vindicator.util.Log;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
@@ -41,7 +51,10 @@ import org.jgeboski.vindicator.util.Utils;
 public class Vindicator extends JavaPlugin
 {
     public Configuration config;
-    public VindicatorAPI api;
+    public Storage       storage;
+
+    public HashMap<String, StorageRecord> mutes;
+    public ThreadPoolExecutor             pool;
 
     public CraftIRC craftirc;
     public VPoint   vPoint;
@@ -49,16 +62,18 @@ public class Vindicator extends JavaPlugin
     public void onLoad()
     {
         config   = new Configuration(new File(getDataFolder(), "config.yml"));
-        api      = null;
-
+        storage  = null;
+        mutes    = new HashMap<String, StorageRecord>();
+        pool     = null;
         craftirc = null;
         vPoint   = null;
     }
 
     public void onEnable()
     {
+        StoragePlayer plyr;
         PluginManager pm;
-        Plugin        p;
+        Plugin        pn;
 
         Log.init(getLogger());
         Message.init(getDescription().getName());
@@ -66,19 +81,42 @@ public class Vindicator extends JavaPlugin
         pm = getServer().getPluginManager();
         config.load();
 
+        pool = new ThreadPoolExecutor(
+            config.poolMinSize, config.poolMaxSize, config.poolKeepAlive,
+            TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
+            Executors.defaultThreadFactory());
+
         try {
-            api = new VindicatorAPI(this);
-        } catch (APIException e) {
-            Log.severe("Failed to enable VindicatorAPI: %s", e.getMessage());
+            /* For now, SQL only */
+            storage = new SQLEngine(
+                config.storeURL, config.storeUser,
+                config.storePass, config.storePrefix);
+        } catch (StorageException e) {
+            Log.severe("Failed to enable EngineSQL: %s", e.getMessage());
+            setEnabled(false);
+            return;
+        }
+
+        try {
+            for (Player p : getServer().getOnlinePlayers()) {
+                plyr = new StoragePlayer(p.getName());
+
+                for (StorageRecord r : storage.getRecords(plyr)) {
+                    if (r.hasFlag(StorageRecord.MUTE))
+                        mutes.put(p.getName(), r);
+                }
+            }
+        } catch (StorageException e) {
+            Log.severe("Failed to acquire muted players: %s", e.getMessage());
             setEnabled(false);
             return;
         }
 
         if (config.ircEnabled) {
-            p = pm.getPlugin("CraftIRC");
+            pn = pm.getPlugin("CraftIRC");
 
-            if ((p != null) && p.isEnabled()) {
-                craftirc = (CraftIRC) p;
+            if ((pn != null) && pn.isEnabled()) {
+                craftirc = (CraftIRC) pn;
                 vPoint   = new VPoint();
             }
 
@@ -105,8 +143,9 @@ public class Vindicator extends JavaPlugin
         if (config.ircEnabled)
             craftirc.unregisterEndPoint(config.ircTag);
 
-        if (api != null)
-            api.close();
+        pool.shutdown();
+        storage.close();
+        mutes.clear();
     }
 
     public void reload()
@@ -162,5 +201,29 @@ public class Vindicator extends JavaPlugin
 
         registerEndPoint(config.ircTag, vPoint);
         rmsg.post();
+    }
+
+    public void execute(VindicatorEvent event)
+        throws VindicatorException
+    {
+        event.vind    = this;
+        event.storage = storage;
+
+        event.execute();
+    }
+
+    public void queue(VindicatorEvent event)
+        throws VindicatorException
+    {
+        event.vind    = this;
+        event.storage = storage;
+
+        try {
+            pool.execute(event);
+        } catch (RejectedExecutionException e) {
+            Log.severe(e.getMessage());
+            throw new VindicatorException("Failed to queue event. " +
+                                          "Notify the administrator");
+        }
     }
 }

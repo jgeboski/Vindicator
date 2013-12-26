@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.storage.sql;
+package org.jgeboski.vindicator.util.sql;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

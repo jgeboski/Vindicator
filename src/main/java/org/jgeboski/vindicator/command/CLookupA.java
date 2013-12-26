@@ -24,17 +24,19 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.jgeboski.vindicator.api.APIAddress;
-import org.jgeboski.vindicator.api.APIException;
-import org.jgeboski.vindicator.api.APIRunnable;
+import org.jgeboski.vindicator.event.VindicatorLookupAEvent;
+import org.jgeboski.vindicator.storage.StorageAddress;
+import org.jgeboski.vindicator.storage.StorageEntity;
+import org.jgeboski.vindicator.storage.StoragePlayer;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
+import org.jgeboski.vindicator.VindicatorException;
 
 import static org.jgeboski.vindicator.util.Message.hl;
 
-public class CLookupA extends APIRunnable implements CommandExecutor
+public class CLookupA implements CommandExecutor
 {
     public Vindicator vind;
 
@@ -46,8 +48,7 @@ public class CLookupA extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APIAddress aa;
-        String     target;
+        StorageEntity entity;
 
         if (!Utils.hasPermission(sender, "vindicator.lookupa"))
             return true;
@@ -57,49 +58,13 @@ public class CLookupA extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        target = sender.getName();
-
-        if (StrUtils.isMinecraftName(args[0])) {
-            aa = new APIAddress(this, sender, args[0], null);
-        } else if (StrUtils.isAddress(args[0])) {
-            aa = new APIAddress(this, sender, null, args[0]);
-        } else {
-            Message.severe(sender, "Invalid player/address: %s.", hl(target));
-            return true;
-        }
-
         try {
-            vind.api.lookupa(aa);
-        } catch (APIException e) {
+            entity = StorageEntity.fromString(args[0]);
+            vind.queue(new VindicatorLookupAEvent(entity, sender));
+        } catch (VindicatorException e) {
             Message.severe(sender, e.getMessage());
         }
 
         return true;
-    }
-
-    public void run(APIAddress aa, List<APIAddress> aas, APIException expt)
-    {
-        String target;
-        String time;
-
-        target = (aa.player != null) ? aa.player : aa.address;
-
-        if (aas.size() < 1) {
-            Message.info(aa.sender, "There are no addresses for %s.",
-                         hl(target));
-            return;
-        }
-
-        for (APIAddress a : aas) {
-            time = Utils.timestr(Utils.DATEF_SHORT, a.time);
-
-            if (aa.player != null) {
-                Message.info(aa.sender, "[%s] %s logins via %s",
-                             hl(time), hl(a.logins), hl(a.address));
-            } else {
-                Message.info(aa.sender, "[%s] %s logins from %s",
-                             hl(time), hl(a.logins), hl(a.player));
-            }
-        }
     }
 }

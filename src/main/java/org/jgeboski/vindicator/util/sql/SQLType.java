@@ -15,22 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.api;
+package org.jgeboski.vindicator.util.sql;
 
-import org.bukkit.entity.Player;
-
-public class APILogin extends APITask<APILogin>
+public enum SQLType
 {
-    public Player player;
-    public String pname;
-    public String address;
+    MYSQL,
+    SQLITE;
 
-    public APILogin(APIRunnable arun, Player player)
+    public static SQLType fromURL(String url)
     {
-        super(APILogin.class, arun, player);
+        String strs[];
+        String str;
 
-        this.player  = player;
-        this.pname   = player.getName();
-        this.address = player.getAddress().getAddress().getHostAddress();
+        str  = url.toLowerCase();
+        strs = str.split(":", 3);
+
+        if ((strs.length < 2) || !strs[0].equals("jdbc"))
+            return null;
+
+        for (SQLType t : SQLType.values()) {
+            str = t.toString();
+
+            if (str.equalsIgnoreCase(strs[1]))
+                return t;
+        }
+
+        return null;
     }
 }

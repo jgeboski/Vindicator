@@ -17,23 +17,20 @@
 
 package org.jgeboski.vindicator.command;
 
-import java.util.List;
-
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.jgeboski.vindicator.api.APIException;
-import org.jgeboski.vindicator.api.APIRecord;
-import org.jgeboski.vindicator.api.APIRunnable;
+import org.jgeboski.vindicator.event.VindicatorLookupEvent;
+import org.jgeboski.vindicator.storage.StorageEntity;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
+import org.jgeboski.vindicator.VindicatorException;
 
 import static org.jgeboski.vindicator.util.Message.hl;
 
-public class CLookup extends APIRunnable implements CommandExecutor
+public class CLookup implements CommandExecutor
 {
     public Vindicator vind;
 
@@ -45,7 +42,7 @@ public class CLookup extends APIRunnable implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command,
                              String label, String[] args)
     {
-        APIRecord ar;
+        StorageEntity entity;
 
         if (!Utils.hasPermission(sender, "vindicator.lookup"))
             return true;
@@ -55,55 +52,13 @@ public class CLookup extends APIRunnable implements CommandExecutor
             return true;
         }
 
-        ar = new APIRecord(this, sender, args[0]);
-
         try {
-            vind.api.lookup(ar);
-        } catch (APIException e) {
+            entity = StorageEntity.fromString(args[0]);
+            vind.queue(new VindicatorLookupEvent(entity, sender));
+        } catch (VindicatorException e) {
             Message.severe(sender, e.getMessage());
         }
 
         return true;
-    }
-
-    public void run(APIRecord ar, List<APIRecord> ars, APIException expt)
-    {
-        String type;
-        String time;
-
-        if (ars.size() < 1) {
-            Message.info(ar.sender, "There are no records for %s.",
-                         hl(ar.target));
-            return;
-        }
-
-        for (APIRecord r : ars) {
-            type = r.hasFlag(APIRecord.ADDRESS) ? "Address" : "Player";
-            time = Utils.timestr(Utils.DATEF_SHORT, r.time);
-
-            if (r.hasFlag(APIRecord.BAN)) {
-                Message.severe(ar.sender, "[%s] %s ban by %s: %s",
-                               hl(time), type, hl(r.issuer), hl(r.message));
-
-                if (r.timeout < 1)
-                    continue;
-
-                Message.severe(ar.sender, "Ban will be removed: %s",
-                               hl(Utils.timestr(Utils.DATEF_LONG, r.timeout)));
-            } else if (r.hasFlag(APIRecord.MUTE)) {
-                Message.severe(ar.sender, "[%s] Mute by %s: %s",
-                               hl(time), hl(r.issuer), hl(r.message));
-
-                if (r.timeout < 1)
-                    continue;
-
-                Message.severe(ar.sender, "Mute will be removed: %s",
-                               hl(Utils.timestr(Utils.DATEF_LONG, r.timeout)));
-            } else if (r.hasFlag(APIRecord.NOTE)) {
-                Message.warning(ar.sender, "[%s] %s note #%s by %s: %s",
-                                hl(time), type, hl(r.id), hl(r.issuer),
-                                hl(r.message));
-            }
-        }
     }
 }

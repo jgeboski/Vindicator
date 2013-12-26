@@ -15,31 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jgeboski.vindicator.api;
+package org.jgeboski.vindicator;
 
-import java.util.List;
-import org.jgeboski.vindicator.util.Message;
+import org.bukkit.ChatColor;
 
-public class APIRunnable
+public class VindicatorException extends Exception
 {
-    public void run(APIAddress aa, List<APIAddress> aas, APIException expt)
+    public VindicatorException(String format, Object ... args)
     {
-
+        super(String.format(format, args));
     }
 
-    public void run(APILogin al, APIException expt)
+    public VindicatorException(Throwable cause)
     {
-
+        super(cause);
     }
 
-    public void run(APIRecord ar, APIException expt)
+    public String getMessage(boolean strip)
     {
-        if (expt != null)
-            Message.severe(ar.sender, expt.getMessage());
-    }
+        if (!strip)
+            return getMessage();
 
-    public void run(APIRecord ar, List<APIRecord> ars, APIException expt)
-    {
-
+        return ChatColor.stripColor(getMessage());
     }
 }
