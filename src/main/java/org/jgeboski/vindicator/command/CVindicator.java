@@ -63,6 +63,6 @@ public class CVindicator implements CommandExecutor
             return;
 
         vind.reload();
-        Message.info(sender, "Configuration successfully reloaded");
+        Message.info(sender, "Plugin successfully reloaded");
     }
 }
