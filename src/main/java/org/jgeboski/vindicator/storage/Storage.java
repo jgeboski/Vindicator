@@ -30,19 +30,25 @@ public abstract class Storage
     public abstract void add(StorageRecord recd)
         throws StorageException;
 
-    public abstract void remove(StorageLogin login)
+    public abstract void addLogins(List<StorageLogin> logins)
         throws StorageException;
 
-    public abstract void remove(StorageRecord recd)
+    public abstract void addRecords(List<StorageRecord> recds)
         throws StorageException;
 
-    public abstract void update(StorageLogin login)
+    public abstract void clearLogins()
         throws StorageException;
 
-    public abstract void update(StorageRecord recd)
+    public abstract void clearRecords()
         throws StorageException;
 
     public abstract StorageLogin getLogin(StorageLogin login)
+        throws StorageException;
+
+    public abstract StorageLogin getLoginLast(StoragePlayer plyr)
+        throws StorageException;
+
+    public abstract List<StorageLogin> getLogins()
         throws StorageException;
 
     public abstract List<StorageLogin> getLogins(StorageAddress addr)
@@ -51,10 +57,31 @@ public abstract class Storage
     public abstract List<StorageLogin> getLogins(StoragePlayer plyr)
         throws StorageException;
 
+    public abstract List<StorageRecord> getRecords()
+        throws StorageException;
+
     public abstract List<StorageRecord> getRecords(StorageAddress addr)
         throws StorageException;
 
     public abstract List<StorageRecord> getRecords(StoragePlayer plyr)
+        throws StorageException;
+
+    public abstract void remove(StorageLogin login)
+        throws StorageException;
+
+    public abstract void remove(StorageRecord recd)
+        throws StorageException;
+
+    public abstract void removeLogins(List<StorageLogin> logins)
+        throws StorageException;
+
+    public abstract void removeRecords(List<StorageRecord> recds)
+        throws StorageException;
+
+    public abstract void update(StorageLogin login)
+        throws StorageException;
+
+    public abstract void update(StorageRecord recd)
         throws StorageException;
 
     public List<StorageLogin> getLogins(StorageEntity entity)

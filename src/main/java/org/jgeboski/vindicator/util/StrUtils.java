@@ -23,6 +23,7 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.List;
 
 public class StrUtils
 {
@@ -67,7 +68,7 @@ public class StrUtils
 
         ret = strs[start];
 
-        for (i = (start + 1); i < end; i++)
+        for (i = start + 1; i < end; i++)
             ret += glue + strs[i];
 
         return ret;
@@ -81,6 +82,39 @@ public class StrUtils
     public static String join(String[] strs, String glue)
     {
         return join(strs, glue, 0, strs.length);
+    }
+
+    public static String join(List<String> strs, String glue, int start,
+                              int end)
+    {
+        String ret;
+        int    size;
+        int    i;
+
+        size = strs.size();
+
+        if (start >= size)
+            return null;
+
+        if (end > size)
+            end = size;
+
+        ret = strs.get(start);
+
+        for (i = start + 1; i < end; i++)
+            ret += glue + strs.get(i);
+
+        return ret;
+    }
+
+    public static String join(List<String> strs, String glue, int start)
+    {
+        return join(strs, glue, start, strs.size());
+    }
+
+    public static String join(List<String> strs, String glue)
+    {
+        return join(strs, glue, 0, strs.size());
     }
 
     public static long toSeconds(String str)

@@ -22,7 +22,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import org.jgeboski.vindicator.util.StrUtils;
 
 public class SQLStatement
 {
@@ -30,98 +34,26 @@ public class SQLStatement
     private PreparedStatement pstatement;
     private int               autogenkeys;
 
-    private String sql;
-    private Object args[];
+    private String       query;
+    private List<Object> parameters;
 
     public SQLStatement(Connection connection, boolean autogenkeys)
     {
         this.connection  = connection;
         this.pstatement  = null;
+        this.autogenkeys = Statement.NO_GENERATED_KEYS;
+        this.query       = new String();
+        this.parameters  = new ArrayList<Object>();
 
         if (autogenkeys)
             this.autogenkeys = Statement.RETURN_GENERATED_KEYS;
-        else
-            this.autogenkeys = Statement.NO_GENERATED_KEYS;
-    }
-
-    private void prepareStatement()
-        throws SQLException
-    {
-        if (sql == null)
-            return;
-
-        close();
-
-        pstatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-
-        for (int i = 0; i < args.length; i++)
-            pstatement.setObject(i + 1, args[i]);
-    }
-
-    public void store(Object ... args)
-    {
-        int i;
-
-        this.sql  = new String();
-        this.args = new Object[0];
-
-        if (args.length < 1)
-            return;
-
-        sql += (String) args[0];
-
-        for (i = 1; (i < args.length) && (args[i] != null); i++)
-            sql += " " + (String) args[i];
-
-        if (sql.length() < 1) {
-            sql = null;
-            return;
-        }
-
-        if (!sql.endsWith(";"))
-            sql += ";";
-
-        i++;
-
-        if (i < args.length)
-            this.args = Arrays.copyOfRange(args, i, args.length);
-    }
-
-    public boolean execute()
-        throws SQLException
-    {
-        prepareStatement();
-
-        if (pstatement == null)
-            return false;
-
-        return pstatement.execute();
-    }
-
-    public ResultSet executeQuery()
-        throws SQLException
-    {
-        prepareStatement();
-
-        if (pstatement == null)
-            return null;
-
-        return pstatement.executeQuery();
-    }
-
-    public int executeUpdate()
-        throws SQLException
-    {
-        prepareStatement();
-
-        if (pstatement == null)
-            return 0;
-
-        return pstatement.executeUpdate();
     }
 
     public void close()
     {
+        query = new String();
+        parameters.clear();
+
         if (pstatement == null)
             return;
 
@@ -132,6 +64,50 @@ public class SQLStatement
         pstatement = null;
     }
 
+    public void query(String ... args)
+    {
+        if (args.length < 1)
+            return;
+
+        if (query.length() > 0)
+            query += " ";
+
+        query += StrUtils.join(args, " ");
+    }
+
+    public void param(Object ... args)
+    {
+        for (Object a : args)
+            parameters.add(a);
+    }
+
+    public boolean execute()
+        throws SQLException
+    {
+        if (!prepareStatement())
+            return false;
+
+        return pstatement.execute();
+    }
+
+    public ResultSet executeQuery()
+        throws SQLException
+    {
+        if (!prepareStatement())
+            return null;
+
+        return pstatement.executeQuery();
+    }
+
+    public int executeUpdate()
+        throws SQLException
+    {
+        if (!prepareStatement())
+            return 0;
+
+        return pstatement.executeUpdate();
+    }
+
     public ResultSet getGeneratedKeys()
         throws SQLException
     {
@@ -139,5 +115,24 @@ public class SQLStatement
             return null;
 
         return pstatement.getGeneratedKeys();
+    }
+
+    private boolean prepareStatement()
+        throws SQLException
+    {
+        int i;
+
+        if (query == null)
+            return false;
+
+        if (!query.endsWith(";"))
+            query += ";";
+
+        pstatement = connection.prepareStatement(query, autogenkeys);
+
+        for (i = 0; i < parameters.size(); i++)
+            pstatement.setObject(i + 1, parameters.get(i));
+
+        return (pstatement != null);
     }
 }
