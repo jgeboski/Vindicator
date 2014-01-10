@@ -54,7 +54,7 @@ Commands:
 
   - /vindicator: Vindicator management
     aliases: vind
-    usage: /<command> reload
+    usage: /<command> [convert|reload]
 
 
 Permissions:
@@ -64,6 +64,7 @@ Permissions:
   - vindicator.lookup:           Lookup a player or IP.
   - vindicator.lookupa:          Lookup the address history of a player or IP.
   - vindicator.manage:           Access to the vindicator command.
+  - vindicator.manage.convert:   Convert the storage data.
   - vindicator.manage.reload:    Reload Vindicator.
   - vindicator.mute:             Mute a player.
   - vindicator.noteadd:          Add a player or IP note.

@@ -45,6 +45,7 @@ import org.jgeboski.vindicator.event.VindicatorLoginEvent;
 import org.jgeboski.vindicator.storage.StorageAddress;
 import org.jgeboski.vindicator.storage.StorageLogin;
 import org.jgeboski.vindicator.storage.StoragePlayer;
+import org.jgeboski.vindicator.util.Kick;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
@@ -66,10 +67,10 @@ public class PlayerListener implements Listener
     {
         StoragePlayer plyr;
         Player        player;
-        String        name;
 
         player = event.getPlayer();
-        name   = player.getName();
+        plyr   = new StoragePlayer(player.getName());
+        plyr.ident = StoragePlayer.getPlayerId(player);
 
         if (player.hasPermission("vindicator.exempt"))
             return;
@@ -80,7 +81,6 @@ public class PlayerListener implements Listener
         }
 
         try {
-            plyr = new StoragePlayer(name);
             vind.execute(new VindicatorChatEvent(plyr, event.getMessage()));
         } catch (VindicatorException e) {
             event.setCancelled(true);
@@ -112,10 +112,11 @@ public class PlayerListener implements Listener
 
         try {
             vind.queue(levnt);
-            checking.add(name);
+            checking.add(login.player.ident);
             event.setJoinMessage(null);
         } catch (VindicatorException e) {
-            levnt.kick(login.player, Message.format(e.getMessage()));
+            Kick.target(vind, login.player.ident,
+                        Message.format(e.getMessage()));
         }
     }
 
@@ -144,14 +145,14 @@ public class PlayerListener implements Listener
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent event)
     {
-        String name;
+        String uuid;
 
-        name = event.getPlayer().getName();
+        uuid = StoragePlayer.getPlayerId(event.getPlayer());
 
-        if (checking.remove(name))
+        if (checking.remove(uuid))
             event.setQuitMessage(null);
 
-        vind.mutes.remove(name);
+        vind.mutes.remove(uuid);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -181,31 +182,31 @@ public class PlayerListener implements Listener
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event)
     {
-        event.setCancelled(isPlayerChecking(event.getPlayer()));
+        event.setCancelled(isEntityChecking(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event)
     {
-        event.setCancelled(isPlayerChecking(event.getPlayer()));
+        event.setCancelled(isEntityChecking(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event)
     {
-        event.setCancelled(isPlayerChecking(event.getPlayer()));
+        event.setCancelled(isEntityChecking(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event)
     {
-        event.setCancelled(isPlayerChecking(event.getPlayer()));
+        event.setCancelled(isEntityChecking(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerPickupItem(PlayerPickupItemEvent event)
     {
-        event.setCancelled(isPlayerChecking(event.getPlayer()));
+        event.setCancelled(isEntityChecking(event.getPlayer()));
     }
 
     private boolean isEntityChecking(Entity entity)
@@ -213,11 +214,6 @@ public class PlayerListener implements Listener
         if (!(entity instanceof Player))
             return false;
 
-        return checking.contains(((Player) entity).getName());
-    }
-
-    private boolean isPlayerChecking(Player player)
-    {
-        return checking.contains(player.getName());
+        return checking.contains(StoragePlayer.getPlayerId((Player) entity));
     }
 }

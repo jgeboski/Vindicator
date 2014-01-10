@@ -20,6 +20,7 @@ package org.jgeboski.vindicator.event;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.storage.StorageRecord;
+import org.jgeboski.vindicator.util.Kick;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.VindicatorException;
 
@@ -42,7 +43,7 @@ public class VindicatorBanEvent extends VindicatorEvent
         String        str;
         String        time;
 
-        record.validate(StorageRecord.BAN, vind.config.autoComplete);
+        record.validate(storage, StorageRecord.BAN, vind.config.autoComplete);
 
         if ((record.message == null) || (record.message.length() < 1)) {
             if (vind.config.mustReason)
@@ -89,7 +90,9 @@ public class VindicatorBanEvent extends VindicatorEvent
             storage.update(record);
         }
 
-        kick(record.target, "Banned%s: %s", time, hl(record.message));
+        Kick.target(vind, record.target.ident,
+                    "Banned%s: %s", time, hl(record.message));
+
         vind.broadcast("vindicator.message.ban",
                        "Ban %s on %s by %s: %s",
                        str, hl(record.target.alias), hl(record.issuer.alias),

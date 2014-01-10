@@ -24,6 +24,8 @@ public abstract class Storage
 {
     public abstract void close();
 
+    public abstract boolean convertible();
+
     public abstract void add(StorageLogin login)
         throws StorageException;
 

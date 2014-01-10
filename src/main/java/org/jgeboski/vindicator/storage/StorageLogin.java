@@ -41,13 +41,24 @@ public class StorageLogin
         this(new StoragePlayer(player), new StorageAddress(address));
     }
 
-    public void validate(boolean complete)
+    public void validate(Storage storage, boolean complete)
         throws StorageException
     {
         if (player != null)
-            player.validate(complete);
+            player.validate(storage, complete);
 
         if (address != null)
-            address.validate(complete);
+            address.validate(storage, complete);
+    }
+
+    public String toString()
+    {
+        String ret;
+
+        ret = String.format("{id: %d, player: %s, address: %s, count: %d, " +
+                            "time: %d}",
+                            id, player, address, count, time);
+
+        return ret;
     }
 }

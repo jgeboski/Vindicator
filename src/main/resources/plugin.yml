@@ -45,7 +45,7 @@ commands:
   vindicator:
     description: Vindicator management
     aliases: [vind]
-    usage: /<command> reload
+    usage: /<command> [convert|reload]
 
 permissions:
   vindicator.ban:
@@ -70,6 +70,11 @@ permissions:
   vindicator.manage:
     description: Access to the vindicator command
     default: op
+  vindicator.manage.convert:
+    description: Convert the storage data
+    default: op
+    children:
+      vindicator.manage: true
   vindicator.manage.reload:
     description: Reload Vindicator
     default: op

@@ -28,18 +28,18 @@ public class StorageAddress extends StorageEntity
         super(address, address);
     }
 
-    public void validate(boolean complete)
+    public void validate(Storage storage, boolean complete)
         throws StorageException
     {
         String valid;
 
-        if (ident == null)
-            return;
+        if (alias == null)
+            throw new StorageException("Invalid address: %s", hl(alias));
 
-        valid = StrUtils.getAddress(ident);
+        valid = StrUtils.getAddress(alias);
 
         if (valid == null)
-            throw new StorageException("Invalid address: %s", hl(ident));
+            throw new StorageException("Invalid address: %s", hl(alias));
 
         ident = valid;
         alias = valid;

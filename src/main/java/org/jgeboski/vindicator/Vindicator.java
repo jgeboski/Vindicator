@@ -37,6 +37,7 @@ import com.ensifera.animosity.craftirc.EndPoint;
 import com.ensifera.animosity.craftirc.RelayedMessage;
 
 import org.jgeboski.vindicator.command.*;
+import org.jgeboski.vindicator.event.VindicatorConvertEvent;
 import org.jgeboski.vindicator.event.VindicatorEvent;
 import org.jgeboski.vindicator.listener.PlayerListener;
 import org.jgeboski.vindicator.storage.engine.SQLEngine;
@@ -92,18 +93,35 @@ public class Vindicator extends JavaPlugin
                 config.storeURL, config.storeUser,
                 config.storePass, config.storePrefix);
         } catch (StorageException e) {
-            Log.severe("Failed to enable EngineSQL: %s", e.getMessage());
+            Log.severe("Failed to enable SQLEngine: %s", e.getMessage());
             setEnabled(false);
+            pool.shutdown();
+            return;
+        }
+
+        if (storage.convertible()) {
+            Log.warning("Storage data conversion required!");
+
+            try {
+                queue(new VindicatorConvertEvent());
+            } catch (VindicatorException e) {
+                Log.severe(e.getMessage());
+                setEnabled(false);
+                pool.shutdown();
+                storage.close();
+            }
+
             return;
         }
 
         try {
             for (Player p : getServer().getOnlinePlayers()) {
                 plyr = new StoragePlayer(p.getName());
+                plyr.validate(storage, config.autoComplete);
 
                 for (StorageRecord r : storage.getRecords(plyr)) {
                     if (r.hasFlag(StorageRecord.MUTE))
-                        mutes.put(p.getName(), r);
+                        mutes.put(StoragePlayer.getPlayerId(p), r);
                 }
             }
         } catch (StorageException e) {
@@ -143,9 +161,16 @@ public class Vindicator extends JavaPlugin
         if (config.ircEnabled)
             craftirc.unregisterEndPoint(config.ircTag);
 
-        pool.shutdown();
-        storage.close();
         mutes.clear();
+
+        if (VindicatorConvertEvent.converter != null)
+            return;
+
+        if (pool != null)
+            pool.shutdown();
+
+        if (storage != null)
+            storage.close();
     }
 
     public void reload()
@@ -173,7 +198,6 @@ public class Vindicator extends JavaPlugin
     public void broadcast(String perm, String format, Object ... args)
     {
         String msg;
-        String name;
 
         msg = Message.format(format, args);
         Utils.broadcast(perm, msg);
@@ -187,13 +211,12 @@ public class Vindicator extends JavaPlugin
          * from being thrown over com.ensifera.animosity.craftirc.EndPoint.
          */
         rmsg = craftirc.newMsg((EndPoint) ((Object) vPoint), null, "chat");
-        name = getDescription().getName();
 
         if (!config.ircColored)
             msg = ChatColor.stripColor(msg);
 
-        rmsg.setField("realSender", name);
-        rmsg.setField("sender",     name);
+        rmsg.setField("realSender", Message.plugin);
+        rmsg.setField("sender",     Message.plugin);
         rmsg.setField("message",    msg);
 
         if (rmsg.post())

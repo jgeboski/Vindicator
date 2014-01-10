@@ -24,6 +24,7 @@ import org.jgeboski.vindicator.storage.StorageLogin;
 import org.jgeboski.vindicator.storage.StoragePlayer;
 import org.jgeboski.vindicator.storage.StorageRecord;
 import org.jgeboski.vindicator.util.Log;
+import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.VindicatorException;
@@ -43,7 +44,7 @@ public class VindicatorLoginEvent extends VindicatorEvent
     public void task()
         throws VindicatorException
     {
-        login.validate(vind.config.autoComplete);
+        login.validate(storage, vind.config.autoComplete);
 
         if (!eventContinue())
             return;
@@ -153,13 +154,13 @@ public class VindicatorLoginEvent extends VindicatorEvent
                                               hl(brecd.message));
             }
 
-            brecd.issuer = new StoragePlayer(vind.getDescription().getName());
+            brecd.issuer = new StoragePlayer(Message.plugin);
             vind.execute(new VindicatorUnbanEvent(brecd, sender));
         }
 
         if (mrecd != null) {
             if ((mrecd.timeout > 0) && (mrecd.timeout < Utils.time())) {
-                mrecd.issuer = new StoragePlayer(vind.getDescription().getName());
+                mrecd.issuer = new StoragePlayer(Message.plugin);
                 vind.execute(new VindicatorUnmuteEvent(mrecd, sender));
                 mrecd = null;
             } else {

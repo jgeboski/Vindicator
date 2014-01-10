@@ -43,7 +43,7 @@ public class VindicatorNoteRemEvent extends VindicatorEvent
         nrecd = null;
         i     = 1;
 
-        record.validate(StorageRecord.NOTE, vind.config.autoComplete);
+        record.validate(storage, StorageRecord.NOTE, vind.config.autoComplete);
 
         for (StorageRecord r : storage.getRecords(record.target)) {
             if (!r.hasFlag(StorageRecord.NOTE))

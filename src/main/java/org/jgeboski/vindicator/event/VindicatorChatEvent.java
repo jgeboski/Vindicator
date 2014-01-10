@@ -22,6 +22,7 @@ import org.bukkit.command.CommandSender;
 import org.jgeboski.vindicator.storage.StoragePlayer;
 import org.jgeboski.vindicator.storage.StorageRecord;
 import org.jgeboski.vindicator.util.Log;
+import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.VindicatorException;
 
@@ -46,7 +47,7 @@ public class VindicatorChatEvent extends VindicatorEvent
 
         mrecd = vind.mutes.get(player.ident);
 
-        if (mrecd == null)
+        if ((mrecd == null) || !eventContinue())
             return;
 
         if ((mrecd.timeout < 1) || (mrecd.timeout > Utils.time())) {
@@ -56,7 +57,7 @@ public class VindicatorChatEvent extends VindicatorEvent
                                           "being muted!");
         }
 
-        mrecd.issuer = new StoragePlayer(vind.getDescription().getName());
+        mrecd.issuer = new StoragePlayer(Message.plugin);
         vind.queue(new VindicatorUnmuteEvent(mrecd, sender));
     }
 }

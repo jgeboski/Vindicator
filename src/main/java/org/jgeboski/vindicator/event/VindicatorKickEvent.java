@@ -20,6 +20,7 @@ package org.jgeboski.vindicator.event;
 import org.bukkit.command.CommandSender;
 
 import org.jgeboski.vindicator.storage.StorageRecord;
+import org.jgeboski.vindicator.util.Kick;
 import org.jgeboski.vindicator.VindicatorException;
 
 import static org.jgeboski.vindicator.util.Message.hl;
@@ -37,7 +38,7 @@ public class VindicatorKickEvent extends VindicatorEvent
     public void task()
         throws VindicatorException
     {
-        record.validate(vind.config.autoComplete);
+        record.validate(storage, vind.config.autoComplete);
 
         if ((record.message == null) || (record.message.length() < 1)) {
             if (vind.config.mustReason)
@@ -49,7 +50,7 @@ public class VindicatorKickEvent extends VindicatorEvent
         if (!eventContinue())
             return;
 
-        if (!kick(record.target, hl(record.message))) {
+        if (!Kick.target(vind, record.target.ident, hl(record.message))) {
             throw new VindicatorException("No player(s) found for %s.",
                                           hl(record.target.alias));
         }

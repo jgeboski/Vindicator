@@ -46,6 +46,7 @@ public class VindicatorLookupEvent extends VindicatorEvent
     {
         String type;
         String time;
+        String str;
 
         int m;
         int b;
@@ -54,7 +55,7 @@ public class VindicatorLookupEvent extends VindicatorEvent
         records = new ArrayList<StorageRecord>();
         m = b = n = 0;
 
-        entity.validate(vind.config.autoComplete);
+        entity.validate(storage, vind.config.autoComplete);
 
         for (StorageRecord r : storage.getRecords(entity)) {
             if (r.hasFlag(StorageRecord.BAN)) {
@@ -78,6 +79,13 @@ public class VindicatorLookupEvent extends VindicatorEvent
                          hl(entity.alias));
             return;
         }
+
+        if (entity.ident != entity.alias)
+            str = String.format(" (%s)", hl(entity.ident));
+        else
+            str = new String();
+
+        Message.info(sender, "Records for %s%s:", hl(entity.alias), str);
 
         for (StorageRecord r : records) {
             type = r.hasFlag(StorageRecord.ADDRESS) ? "Address" : "Player";

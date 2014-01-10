@@ -21,9 +21,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import org.jgeboski.vindicator.event.VindicatorConvertEvent;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.Utils;
 import org.jgeboski.vindicator.Vindicator;
+import org.jgeboski.vindicator.VindicatorException;
 
 public class CVindicator implements CommandExecutor
 {
@@ -39,7 +41,7 @@ public class CVindicator implements CommandExecutor
     {
         String cmd;
 
-        if (!Utils.hasPermission(sender, "vindicator.vindicator"))
+        if (!Utils.hasPermission(sender, "vindicator.manage"))
             return true;
 
         if (args.length < 1) {
@@ -49,12 +51,26 @@ public class CVindicator implements CommandExecutor
 
         cmd = args[0].toLowerCase();
 
+        if (cmd.matches("convert|conv"))
+            convert(sender);
         if (cmd.matches("reload|rel"))
             reload(sender);
         else
             Message.info(sender, command.getUsage());
 
         return true;
+    }
+
+    private void convert(CommandSender sender)
+    {
+        if (!Utils.hasPermission(sender, "vindicator.manage.convert"))
+            return;
+
+        try {
+            vind.queue(new VindicatorConvertEvent(sender));
+        } catch (VindicatorException e) {
+            Message.severe(sender, e.getMessage());
+        }
     }
 
     private void reload(CommandSender sender)

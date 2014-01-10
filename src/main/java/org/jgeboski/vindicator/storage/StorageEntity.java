@@ -32,17 +32,17 @@ public abstract class StorageEntity
         this.alias = alias;
     }
 
-    public abstract void validate(boolean complete)
+    public abstract void validate(Storage storage, boolean complete)
         throws StorageException;
 
     public static StorageEntity fromString(String str)
         throws StorageException
     {
-        if (StrUtils.isMinecraftName(str))
-            return new StoragePlayer(str);
-
         if (StrUtils.isAddress(str))
             return new StorageAddress(str);
+
+        if (StrUtils.isUUID(str) || StrUtils.isMinecraftName(str))
+            return new StoragePlayer(str);
 
         throw new StorageException("Invalid player/address: %s", hl(str));
     }
@@ -54,5 +54,14 @@ public abstract class StorageEntity
 
         type = getClass().getName();
         throw new StorageException("Invalid StorageEntity: %s", hl(type));
+    }
+
+    public String toString()
+    {
+        String ret;
+
+        ret = String.format("{ident: '%s', alias: '%s'}", ident, alias);
+
+        return ret;
     }
 }

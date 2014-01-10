@@ -21,8 +21,10 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 
 public class Database
 {
@@ -71,6 +73,42 @@ public class Database
         return type;
     }
 
+    public int getColumnSize(String table, String column)
+    {
+        ResultSet rs;
+        int       ret;
+
+        try {
+            rs = databasemd.getColumns(null, null, table, column);
+            rs.next();
+
+            ret = rs.getInt("COLUMN_SIZE");
+            rs.close();
+        } catch (SQLException e) {
+            ret = 0;
+        }
+
+        return ret;
+    }
+
+    public int getColumnType(String table, String column)
+    {
+        ResultSet rs;
+        int       ret;
+
+        try {
+            rs = databasemd.getColumns(null, null, table, column);
+            rs.next();
+
+            ret = rs.getInt("DATA_TYPE");
+            rs.close();
+        } catch (SQLException e) {
+            ret = Types.NULL;
+        }
+
+        return ret;
+    }
+
     public boolean hasTable(String table)
     {
         ResultSet rs;
@@ -78,6 +116,22 @@ public class Database
 
         try {
             rs  = databasemd.getTables(null, null, table, null);
+            ret = rs.next();
+            rs.close();
+        } catch (SQLException e) {
+            ret = false;
+        }
+
+        return ret;
+    }
+
+    public boolean hasColumn(String table, String column)
+    {
+        ResultSet rs;
+        boolean   ret;
+
+        try {
+            rs  = databasemd.getColumns(null, null, table, column);
             ret = rs.next();
             rs.close();
         } catch (SQLException e) {

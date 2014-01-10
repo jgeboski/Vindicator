@@ -36,6 +36,7 @@ import org.jgeboski.vindicator.util.StrUtils;
 public class SQLEngine extends Storage
 {
     private String TABLE_ADDRESSES = "addresses";
+    private String TABLE_LOGINS    = "logins";
     private String TABLE_RECORDS   = "records";
 
     private String url;
@@ -49,9 +50,6 @@ public class SQLEngine extends Storage
                      String prefix)
         throws StorageException
     {
-        SQLStatement stmt;
-        String       ainc;
-
         this.url      = url;
         this.username = username;
         this.password = password;
@@ -59,6 +57,7 @@ public class SQLEngine extends Storage
 
         if (prefix != null) {
             TABLE_ADDRESSES = prefix + TABLE_ADDRESSES;
+            TABLE_LOGINS    = prefix + TABLE_LOGINS;
             TABLE_RECORDS   = prefix + TABLE_RECORDS;
         }
 
@@ -84,17 +83,41 @@ public class SQLEngine extends Storage
             database.close();
     }
 
+    public boolean convertible()
+    {
+        int size;
+
+        if (database.hasTable(TABLE_ADDRESSES))
+            return true;
+
+        size = database.getColumnSize(TABLE_RECORDS, "issuer");
+
+        if ((size != 36) && (database.getType() == SQLType.MYSQL))
+            return true;
+
+        return false;
+    }
+
     public void add(StorageLogin login)
         throws StorageException
     {
         SQLStatement stmt;
 
         stmt = database.createStatement();
-        stmt.query("INSERT INTO", TABLE_ADDRESSES,
-                     "(player, address, logins, time)",
-                   "VALUES (?, ?, ?, ?)");
-        stmt.param(login.player.ident, login.address.ident,
-                   login.count, login.time);
+
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            stmt.query("INSERT INTO", TABLE_LOGINS,
+                         "(ident, alias, address, count, time)",
+                       "VALUES (?, ?, ?, ?)");
+            stmt.param(login.player.ident, login.player.alias,
+                       login.address.ident, login.count, login.time);
+        } else {
+            stmt.query("INSERT INTO", TABLE_ADDRESSES,
+                         "(player, address, logins, time)",
+                       "VALUES (?, ?, ?, ?)");
+            stmt.param(login.player.ident, login.address.ident,
+                       login.count, login.time);
+        }
 
         try {
             stmt.executeUpdate();
@@ -137,16 +160,31 @@ public class SQLEngine extends Storage
             return;
 
         queries = new ArrayList<String>();
-        query   = "(?, ?, ?, ?)";
+        stmt    = database.createStatement();
 
-        stmt = database.createStatement();
-        stmt.query("INSERT INTO", TABLE_ADDRESSES,
-                     "(player, address, logins, time)",
-                   "VALUES");
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            query = "(?, ?, ?, ?, ?)";
 
-        for (StorageLogin l : logins) {
-            queries.add(query);
-            stmt.param(l.player.ident, l.address.ident, l.count, l.time);
+            stmt.query("INSERT INTO", TABLE_LOGINS,
+                         "(ident, alias, address, count, time)",
+                       "VALUES");
+
+            for (StorageLogin l : logins) {
+                queries.add(query);
+                stmt.param(l.player.ident, l.player.alias,
+                           l.address.ident, l.count, l.time);
+            }
+        } else {
+            query = "(?, ?, ?, ?)";
+
+            stmt.query("INSERT INTO", TABLE_ADDRESSES,
+                         "(player, address, logins, time)",
+                       "VALUES");
+
+            for (StorageLogin l : logins) {
+                queries.add(query);
+                stmt.param(l.player.ident, l.address.ident, l.count, l.time);
+            }
         }
 
         query = StrUtils.join(queries, ", ");
@@ -173,8 +211,8 @@ public class SQLEngine extends Storage
 
         queries = new ArrayList<String>();
         query   = "(?, ?, ?, ?, ?, ?)";
+        stmt    = database.createStatement();
 
-        stmt = database.createStatement();
         stmt.query("INSERT INTO", TABLE_RECORDS,
                      "(target, issuer, message, timeout, time, flags)",
                    "VALUES");
@@ -205,6 +243,19 @@ public class SQLEngine extends Storage
         if (database.hasTable(TABLE_ADDRESSES)) {
             stmt = database.createStatement();
             stmt.query("DROP TABLE", TABLE_ADDRESSES);
+
+            try {
+                stmt.executeUpdate();
+                stmt.close();
+            } catch (SQLException e) {
+                stmt.close();
+                throw new StorageException(e);
+            }
+        }
+
+        if (database.hasTable(TABLE_LOGINS)) {
+            stmt = database.createStatement();
+            stmt.query("DROP TABLE", TABLE_LOGINS);
 
             try {
                 stmt.executeUpdate();
@@ -246,10 +297,19 @@ public class SQLEngine extends Storage
         SQLStatement stmt;
 
         stmt = database.createStatement();
-        stmt.query("SELECT * FROM", TABLE_ADDRESSES,
-                     "WHERE player = ? AND address = ?",
-                   "ORDER BY time DESC LIMIT 1");
-        stmt.param(login.player.ident, login.address.ident);
+
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            stmt.query("SELECT * FROM", TABLE_LOGINS,
+                         "WHERE ident = ? OR alias = ? AND address = ?",
+                       "ORDER BY time DESC LIMIT 1");
+            stmt.param(login.player.ident, login.player.alias,
+                       login.address.ident);
+        } else {
+            stmt.query("SELECT * FROM", TABLE_ADDRESSES,
+                         "WHERE player = ? AND address = ?",
+                       "ORDER BY time DESC LIMIT 1");
+            stmt.param(login.player.ident, login.address.ident);
+        }
 
         logins = getLogins(stmt);
         return (logins.size() > 0) ? logins.get(0) : null;
@@ -262,10 +322,18 @@ public class SQLEngine extends Storage
         SQLStatement stmt;
 
         stmt = database.createStatement();
-        stmt.query("SELECT * FROM", TABLE_ADDRESSES,
-                     "WHERE player = ?",
-                   "ORDER BY time DESC LIMIT 1");
-        stmt.param(plyr.ident);
+
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            stmt.query("SELECT * FROM", TABLE_LOGINS,
+                         "WHERE ident = ? OR alias = ?",
+                       "ORDER BY time DESC LIMIT 1");
+            stmt.param(plyr.ident, plyr.alias);
+        } else {
+            stmt.query("SELECT * FROM", TABLE_ADDRESSES,
+                         "WHERE player = ?",
+                       "ORDER BY time DESC LIMIT 1");
+            stmt.param(plyr.ident);
+        }
 
         logins = getLogins(stmt);
         return (logins.size() > 0) ? logins.get(0) : null;
@@ -277,7 +345,11 @@ public class SQLEngine extends Storage
         SQLStatement stmt;
 
         stmt = database.createStatement();
-        stmt.query("SELECT * FROM", TABLE_ADDRESSES);
+
+        if (!database.hasTable(TABLE_ADDRESSES))
+            stmt.query("SELECT * FROM", TABLE_LOGINS);
+        else
+            stmt.query("SELECT * FROM", TABLE_ADDRESSES);
 
         return getLogins(stmt);
     }
@@ -288,10 +360,16 @@ public class SQLEngine extends Storage
         SQLStatement stmt;
 
         stmt = database.createStatement();
-        stmt.query("SELECT * FROM", TABLE_ADDRESSES,
-                     "WHERE address = ?");
-        stmt.param(addr.ident);
 
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            stmt.query("SELECT * FROM", TABLE_LOGINS,
+                         "WHERE address = ?");
+        } else {
+            stmt.query("SELECT * FROM", TABLE_ADDRESSES,
+                         "WHERE address = ?");
+        }
+
+        stmt.param(addr.ident);
         return getLogins(stmt);
     }
 
@@ -301,9 +379,16 @@ public class SQLEngine extends Storage
         SQLStatement stmt;
 
         stmt = database.createStatement();
-        stmt.query("SELECT * FROM", TABLE_ADDRESSES,
-                     "WHERE player = ?");
-        stmt.param(plyr.ident);
+
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            stmt.query("SELECT * FROM", TABLE_LOGINS,
+                         "WHERE ident = ? OR alias = ?");
+            stmt.param(plyr.ident, plyr.alias);
+        } else {
+            stmt.query("SELECT * FROM", TABLE_ADDRESSES,
+                         "WHERE player = ?");
+            stmt.param(plyr.ident);
+        }
 
         return getLogins(stmt);
     }
@@ -356,8 +441,15 @@ public class SQLEngine extends Storage
             return;
 
         stmt = database.createStatement();
-        stmt.query("DELETE FROM", TABLE_ADDRESSES,
-                     "WHERE id = ?");
+
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            stmt.query("DELETE FROM", TABLE_LOGINS,
+                         "WHERE id = ?");
+        } else {
+            stmt.query("DELETE FROM", TABLE_ADDRESSES,
+                         "WHERE id = ?");
+        }
+
         stmt.param(login.id);
 
         try {
@@ -403,10 +495,15 @@ public class SQLEngine extends Storage
 
         queries = new ArrayList<String>();
         query   = "id = ?";
+        stmt    = database.createStatement();
 
-        stmt = database.createStatement();
-        stmt.query("DELETE FROM", TABLE_ADDRESSES,
-                     "WHERE");
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            stmt.query("DELETE FROM", TABLE_LOGINS,
+                         "WHERE");
+        } else {
+            stmt.query("DELETE FROM", TABLE_ADDRESSES,
+                         "WHERE");
+        }
 
         for (StorageLogin l : logins) {
             queries.add(query);
@@ -437,8 +534,8 @@ public class SQLEngine extends Storage
 
         queries = new ArrayList<String>();
         query   = "id = ?";
+        stmt    = database.createStatement();
 
-        stmt = database.createStatement();
         stmt.query("DELETE FROM", TABLE_RECORDS,
                      "WHERE");
 
@@ -468,14 +565,28 @@ public class SQLEngine extends Storage
             return;
 
         stmt = database.createStatement();
-        stmt.query("UPDATE", TABLE_ADDRESSES, "SET",
-                     "player = ?,",
-                     "address = ?,",
-                     "logins = ?,",
-                     "time = ?",
-                   "WHERE id = ?");
-        stmt.param(login.player.ident, login.address.ident,
-                   login.count, login.time, login.id);
+
+        if (!database.hasTable(TABLE_ADDRESSES)) {
+            stmt.query("UPDATE", TABLE_LOGINS, "SET",
+                         "ident = ?,",
+                         "alias = ?,",
+                         "address = ?,",
+                         "count = ?,",
+                         "time = ?",
+                       "WHERE id = ?");
+            stmt.param(login.player.ident, login.player.alias,
+                       login.address.ident, login.count, login.time,
+                       login.id);
+        } else {
+            stmt.query("UPDATE", TABLE_ADDRESSES, "SET",
+                         "player = ?,",
+                         "address = ?,",
+                         "logins = ?,",
+                         "time = ?",
+                       "WHERE id = ?");
+            stmt.param(login.player.ident, login.address.ident,
+                       login.count, login.time, login.id);
+        }
 
         try {
             stmt.execute();
@@ -521,17 +632,18 @@ public class SQLEngine extends Storage
         SQLStatement stmt;
         String       ainc;
 
-        if (database.hasTable(TABLE_ADDRESSES))
+        if (database.hasTable(TABLE_LOGINS) || database.hasTable(TABLE_ADDRESSES))
             return;
 
         stmt = database.createStatement();
         ainc = (database.getType() == SQLType.MYSQL) ? "AUTO_INCREMENT" : "";
 
-        stmt.query("CREATE TABLE", TABLE_ADDRESSES, "(",
+        stmt.query("CREATE TABLE", TABLE_LOGINS, "(",
                      "id INTEGER PRIMARY KEY ", ainc, ",",
-                     "player VARCHAR(16) NOT NULL,",
+                     "ident VARCHAR(36) NOT NULL,",
+                     "alias VARCHAR(16) NOT NULL,",
                      "address VARCHAR(45) NOT NULL,",
-                     "logins SMALLINT(6) NOT NULL,",
+                     "count SMALLINT(6) NOT NULL,",
                      "time INTEGER(11) NOT NULL",
                    ")");
 
@@ -559,7 +671,7 @@ public class SQLEngine extends Storage
         stmt.query("CREATE TABLE", TABLE_RECORDS, "(",
                      "id INTEGER PRIMARY KEY ", ainc, ",",
                      "target VARCHAR(45) NOT NULL,",
-                     "issuer VARCHAR(16) NOT NULL,",
+                     "issuer VARCHAR(36) NOT NULL,",
                      "message VARCHAR(255) NOT NULL,",
                      "timeout INTEGER(11) NOT NULL,",
                      "time INTEGER(11) NOT NULL,",
@@ -579,27 +691,48 @@ public class SQLEngine extends Storage
         throws StorageException
     {
         ArrayList<StorageLogin> logins;
-        StorageLogin login;
-        ResultSet    rs;
-        String       name;
-        String       addr;
+        StorageLogin   login;
+        StoragePlayer  plyr;
+        StorageAddress addr;
+        ResultSet      rs;
+        String         ident;
+        String         alias;
+        String         saddr;
 
         logins = new ArrayList<StorageLogin>();
 
         try {
             rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                name = rs.getString("player");
-                addr = rs.getString("address");
+            if (!database.hasTable(TABLE_ADDRESSES)) {
+                while (rs.next()) {
+                    ident = rs.getString("ident");
+                    alias = rs.getString("alias");
+                    saddr = rs.getString("address");
 
-                login = new StorageLogin(name, addr);
+                    plyr  = new StoragePlayer(ident, alias);
+                    addr  = new StorageAddress(saddr);
+                    login = new StorageLogin(plyr, addr);
 
-                login.id    = rs.getInt("id");
-                login.count = rs.getInt("logins");
-                login.time  = rs.getLong("time");
+                    login.id    = rs.getInt("id");
+                    login.count = rs.getInt("count");
+                    login.time  = rs.getLong("time");
 
-                logins.add(login);
+                    logins.add(login);
+                }
+            } else {
+                while (rs.next()) {
+                    ident = rs.getString("player");
+                    saddr = rs.getString("address");
+
+                    login = new StorageLogin(ident, saddr);
+
+                    login.id    = rs.getInt("id");
+                    login.count = rs.getInt("logins");
+                    login.time  = rs.getLong("time");
+
+                    logins.add(login);
+                }
             }
 
             stmt.close();

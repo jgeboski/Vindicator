@@ -47,7 +47,7 @@ public class VindicatorLookupAEvent extends VindicatorEvent
     {
         String time;
 
-        entity.validate(vind.config.autoComplete);
+        entity.validate(storage, vind.config.autoComplete);
         logins = storage.getLogins(entity);
 
         if (!eventContinue())

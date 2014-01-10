@@ -39,7 +39,7 @@ public class VindicatorUnbanEvent extends VindicatorEvent
     {
         StorageRecord brecd;
 
-        record.validate(StorageRecord.BAN, vind.config.autoComplete);
+        record.validate(storage, StorageRecord.BAN, vind.config.autoComplete);
         brecd = null;
 
         for (StorageRecord r : storage.getRecords(record.target)) {
@@ -66,6 +66,7 @@ public class VindicatorUnbanEvent extends VindicatorEvent
         if (!vind.config.unbanNote)
             return;
 
+        brecd.target  = record.target;
         brecd.issuer  = record.issuer;
         brecd.message = "Unbanned: " + brecd.message;
 

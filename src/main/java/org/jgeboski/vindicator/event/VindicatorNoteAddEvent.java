@@ -40,7 +40,7 @@ public class VindicatorNoteAddEvent extends VindicatorEvent
         if ((record.message == null) || (record.message.length() < 1))
             throw new VindicatorException("A note must be provided.");
 
-        record.validate(StorageRecord.NOTE, vind.config.autoComplete);
+        record.validate(storage, StorageRecord.NOTE, vind.config.autoComplete);
 
         if (!eventContinue())
             return;

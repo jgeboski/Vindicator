@@ -31,28 +31,51 @@ public class StrUtils
     {
         InetAddress ia;
 
+        if (str == null)
+            return null;
+
         ia = getInetAddress(str);
         return (ia != null) ? ia.getHostAddress() : null;
     }
 
     public static boolean isAddress(String str)
     {
+        if (str == null)
+            return false;
+
         return (getInetAddress(str) != null);
     }
 
     public static boolean isAddress4(String str)
     {
+        if (str == null)
+            return false;
+
         return (getInetAddress(str) instanceof Inet4Address);
     }
 
     public static boolean isAddress6(String str)
     {
+        if (str == null)
+            return false;
+
         return (getInetAddress(str) instanceof Inet6Address);
     }
 
     public static boolean isMinecraftName(String str)
     {
+        if (str == null)
+            return false;
+
         return str.matches("\\w{2,16}");
+    }
+
+    public static boolean isUUID(String str)
+    {
+        if (str == null)
+            return false;
+
+        return str.matches("[\\w]{8}-[\\w]{4}-[\\w]{4}-[\\w]{4}-[\\w]{12}");
     }
 
     public static String join(String[] strs, String glue, int start, int end)

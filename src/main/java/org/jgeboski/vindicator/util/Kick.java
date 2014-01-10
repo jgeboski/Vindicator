@@ -37,36 +37,28 @@ public class Kick implements Runnable
                           .scheduleSyncDelayedTask(plugin, this, 10);
     }
 
-    public static boolean player(Plugin plugin, Player player, String message)
+    public static boolean target(Plugin plugin, String target, String message,
+                                 String ... args)
     {
-        ArrayList<Player> players;
+        if (StrUtils.isAddress(target))
+            return Kick.address(plugin, target, message, args);
+        if (StrUtils.isUUID(target))
+            return Kick.uuid(plugin, target, message, args);
+        else if (StrUtils.isMinecraftName(target))
+            return Kick.player(plugin, target, message, args);
 
-        players = new ArrayList<Player>();
-        players.add(player);
-
-        new Kick(plugin, players, message);
-        return true;
+        return false;
     }
 
-    public static boolean player(Plugin plugin, String player, String message)
-    {
-        Player p;
-
-        p = plugin.getServer().getPlayerExact(player);
-
-        if (p == null)
-            return false;
-
-        return player(plugin, p, message);
-    }
-
-    public static boolean address(Plugin plugin, String address, String message)
+    public static boolean address(Plugin plugin, String address, String message,
+                                  String ... args)
     {
         ArrayList<Player> players;
         String addr;
         int    i;
 
         players = new ArrayList<Player>();
+        message = String.format(message, args);
         i       = 0;
 
         for(Player p : plugin.getServer().getOnlinePlayers()) {
@@ -87,9 +79,46 @@ public class Kick implements Runnable
         return (i > 0);
     }
 
+    public static boolean player(Plugin plugin, Player player, String message,
+                                 String ... args)
+    {
+        ArrayList<Player> players;
+
+        players = new ArrayList<Player>();
+        message = String.format(message, args);
+
+        players.add(player);
+        new Kick(plugin, players, message);
+        return true;
+    }
+
+    public static boolean player(Plugin plugin, String player, String message,
+                                 String ... args)
+    {
+        Player p;
+
+        p = plugin.getServer().getPlayerExact(player);
+
+        if (p == null)
+            return false;
+
+        return player(plugin, p, message, args);
+    }
+
+    public static boolean uuid(Plugin plugin, String uuid, String message,
+                               String ... args)
+    {
+        for(Player p : plugin.getServer().getOnlinePlayers()) {
+            if (uuid.equalsIgnoreCase(p.getUniqueId().toString()))
+                return player(plugin, p, message, args);
+        }
+
+        return false;
+    }
+
     public void run()
     {
-        for(Player p : players)
+        for (Player p : players)
             p.kickPlayer(message);
     }
 }

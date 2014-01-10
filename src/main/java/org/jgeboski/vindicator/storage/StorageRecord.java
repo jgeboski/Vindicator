@@ -79,13 +79,13 @@ public class StorageRecord
         flags &= ~flag;
     }
 
-    public void validate(int type, boolean complete)
+    public void validate(Storage storage, int type, boolean complete)
         throws StorageException
     {
         int valid;
 
         if (issuer != null)
-            issuer.validate(complete);
+            issuer.validate(storage, complete);
 
         if (target == null)
             return;
@@ -94,10 +94,10 @@ public class StorageRecord
 
         if (target instanceof StorageAddress) {
             valid |= ADDRESS;
-            ((StorageAddress) target).validate(complete);
+            ((StorageAddress) target).validate(storage, complete);
         } else if (target instanceof StoragePlayer) {
             valid |= PLAYER;
-            ((StoragePlayer) target).validate(complete);
+            ((StoragePlayer) target).validate(storage, complete);
         } else {
             target.invalid();
         }
@@ -105,9 +105,20 @@ public class StorageRecord
         flags = valid | type;
     }
 
-    public void validate(boolean complete)
+    public void validate(Storage storage, boolean complete)
         throws StorageException
     {
-        validate(0, complete);
+        validate(storage, 0, complete);
+    }
+
+    public String toString()
+    {
+        String ret;
+
+        ret = String.format("{id: %d, target: %s, issuer: %s, message: '%s', " +
+                            "timeout: %d, time: %d, flags: %d}",
+                            id, target, issuer, message, timeout, time, flags);
+
+        return ret;
     }
 }

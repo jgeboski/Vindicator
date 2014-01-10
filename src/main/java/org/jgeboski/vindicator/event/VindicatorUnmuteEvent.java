@@ -39,7 +39,7 @@ public class VindicatorUnmuteEvent extends VindicatorEvent
     {
         StorageRecord mrecd;
 
-        record.validate(StorageRecord.MUTE, vind.config.autoComplete);
+        record.validate(storage, StorageRecord.MUTE, vind.config.autoComplete);
         mrecd = null;
 
         for (StorageRecord r : storage.getRecords(record.target)) {
@@ -67,6 +67,7 @@ public class VindicatorUnmuteEvent extends VindicatorEvent
         if (!vind.config.unmuteNote)
             return;
 
+        mrecd.target  = record.target;
         mrecd.issuer  = record.issuer;
         mrecd.message = "Unmuted: " + mrecd.message;
 

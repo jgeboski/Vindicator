@@ -27,7 +27,6 @@ import org.jgeboski.vindicator.storage.StorageAddress;
 import org.jgeboski.vindicator.storage.StorageEntity;
 import org.jgeboski.vindicator.storage.StorageException;
 import org.jgeboski.vindicator.storage.StoragePlayer;
-import org.jgeboski.vindicator.util.Kick;
 import org.jgeboski.vindicator.util.Log;
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.Vindicator;
@@ -113,21 +112,6 @@ public class VindicatorEvent extends Event implements Cancellable, Runnable
         }
 
         return !cancelled;
-    }
-
-    public boolean kick(StorageEntity entity, String format, String ... args)
-    {
-        String str;
-
-        str = Message.format(format, args);
-
-        if (entity instanceof StorageAddress)
-            return Kick.address(vind, entity.ident, str);
-
-        if (entity instanceof StoragePlayer)
-            return Kick.player(vind, entity.ident, str);
-
-        return false;
     }
 
     public HandlerList getHandlers()

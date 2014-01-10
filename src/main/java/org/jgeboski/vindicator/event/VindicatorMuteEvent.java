@@ -48,7 +48,7 @@ public class VindicatorMuteEvent extends VindicatorEvent
             record.message = vind.config.defMuteReason;
         }
 
-        record.validate(StorageRecord.MUTE, vind.config.autoComplete);
+        record.validate(storage, StorageRecord.MUTE, vind.config.autoComplete);
 
         mrecd = null;
 
