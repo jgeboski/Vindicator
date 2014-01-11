@@ -18,6 +18,8 @@
 package org.jgeboski.vindicator;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -50,6 +52,8 @@ public class Configuration extends YamlConfiguration
     public int     altInfoLogins;
     public long    altInfoTime;
 
+    public HashSet<String> muteCommands;
+
     public String  ircTag;
     public boolean ircEnabled;
     public boolean ircColored;
@@ -80,15 +84,19 @@ public class Configuration extends YamlConfiguration
         this.unmuteNote    = false;
         this.altInfoLogins = -1;
         this.altInfoTime   = -1;
+        this.muteCommands  = new HashSet<String>();
 
         this.ircTag        = "vindicator";
         this.ircEnabled    = false;
         this.ircColored    = true;
+
+        muteCommands.add("me");
     }
 
     public void load()
     {
         ConfigurationSection cs;
+        List<String>         sl;
 
         try {
             super.load(file);
@@ -120,6 +128,15 @@ public class Configuration extends YamlConfiguration
         unmuteNote    = cs.getBoolean("unmute-to-note", unmuteNote);
         altInfoLogins = cs.getInt("alt-info-logins",    altInfoLogins);
         altInfoTime   = cs.getLong("alt-info-time",     altInfoTime);
+
+        sl = cs.getStringList("mute-commands");
+
+        if (sl.size() > 0) {
+            muteCommands.clear();
+
+            for (String s : sl)
+                muteCommands.add(s.toLowerCase());
+        }
 
         cs            = getConfigurationSection("irc");
         ircTag        = cs.getString("tag",      ircTag);
@@ -158,6 +175,7 @@ public class Configuration extends YamlConfiguration
         cs.set("unmute-to-note",  unmuteNote);
         cs.set("alt-info-logins", altInfoLogins);
         cs.set("alt-info-time",   altInfoTime);
+        cs.set("mute-commands",   muteCommands.toArray());
 
         cs = getConfigurationSection("irc");
         cs.set("tag",     ircTag);

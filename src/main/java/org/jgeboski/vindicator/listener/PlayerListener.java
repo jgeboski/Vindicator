@@ -41,6 +41,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import org.jgeboski.vindicator.event.VindicatorChatEvent;
+import org.jgeboski.vindicator.event.VindicatorCommandEvent;
 import org.jgeboski.vindicator.event.VindicatorLoginEvent;
 import org.jgeboski.vindicator.storage.StorageAddress;
 import org.jgeboski.vindicator.storage.StorageLogin;
@@ -62,14 +63,14 @@ public class PlayerListener implements Listener
         this.checking = new HashSet<String>();
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event)
     {
         StoragePlayer plyr;
         Player        player;
 
-        player = event.getPlayer();
-        plyr   = new StoragePlayer(player.getName());
+        player     = event.getPlayer();
+        plyr       = new StoragePlayer(player.getName());
         plyr.ident = StoragePlayer.getPlayerId(player);
 
         if (player.hasPermission("vindicator.exempt"))
@@ -82,6 +83,32 @@ public class PlayerListener implements Listener
 
         try {
             vind.execute(new VindicatorChatEvent(plyr, event.getMessage()));
+        } catch (VindicatorException e) {
+            event.setCancelled(true);
+            Message.severe(player, e.getMessage());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event)
+    {
+        StoragePlayer plyr;
+        Player        player;
+
+        player     = event.getPlayer();
+        plyr       = new StoragePlayer(player.getName());
+        plyr.ident = StoragePlayer.getPlayerId(player);
+
+        if (player.hasPermission("vindicator.exempt"))
+            return;
+
+        if (isEntityChecking(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        try {
+            vind.execute(new VindicatorCommandEvent(plyr, event.getMessage()));
         } catch (VindicatorException e) {
             event.setCancelled(true);
             Message.severe(player, e.getMessage());
@@ -177,12 +204,6 @@ public class PlayerListener implements Listener
     public void onFoodLevelChange(FoodLevelChangeEvent event)
     {
         event.setCancelled(isEntityChecking(event.getEntity()));
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event)
-    {
-        event.setCancelled(isEntityChecking(event.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
