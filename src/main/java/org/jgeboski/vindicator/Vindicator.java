@@ -158,19 +158,19 @@ public class Vindicator extends JavaPlugin
 
     public void onDisable()
     {
-        if (config.ircEnabled)
-            craftirc.unregisterEndPoint(config.ircTag);
-
-        mutes.clear();
-
         if (VindicatorConvertEvent.converter != null)
             return;
+
+        if (config.ircEnabled && (craftirc != null))
+            craftirc.unregisterEndPoint(config.ircTag);
 
         if (pool != null)
             pool.shutdown();
 
         if (storage != null)
             storage.close();
+
+        mutes.clear();
     }
 
     public void reload()
