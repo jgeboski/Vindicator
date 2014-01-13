@@ -111,7 +111,7 @@ public class VindicatorConvertEvent extends VindicatorEvent
             login = iter.next();
 
             try {
-                login.player.validate(storage, false);
+                login.validate(storage, false);
             } catch (StorageException e) {
                 message("%s", e.getMessage());
                 message("Login removed: %s", login);
@@ -138,9 +138,8 @@ public class VindicatorConvertEvent extends VindicatorEvent
         List<StorageRecord>     recds;
         Iterator<StorageRecord> iter;
         StorageRecord           recd;
-        boolean remove;
-        int     size;
-        int     i;
+        int size;
+        int i;
 
         message("Loading records...");
 
@@ -152,26 +151,14 @@ public class VindicatorConvertEvent extends VindicatorEvent
         message("Validating records...");
 
         for (i = 1; iter.hasNext(); i++) {
-            recd   = iter.next();
-            remove = false;
+            recd = iter.next();
 
             try {
-                recd.target.validate(storage, false);
+                recd.validate(storage, false);
             } catch (StorageException e) {
                 message("%s", e.getMessage());
-                remove = true;
-            }
-
-            try {
-                recd.issuer.validate(storage, false);
-            } catch (StorageException e) {
-                message("%s", e.getMessage());
-                remove = true;
-            }
-
-            if (remove) {
-                iter.remove();
                 message("Record removed: %s", recd);
+                iter.remove();
             }
 
             if ((i % 100) == 0)
