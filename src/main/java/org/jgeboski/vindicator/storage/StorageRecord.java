@@ -103,6 +103,9 @@ public class StorageRecord
         }
 
         flags = valid | type;
+
+        if (hasFlag(NOTE))
+            timeout = 0;
     }
 
     public void validate(Storage storage, boolean complete)
