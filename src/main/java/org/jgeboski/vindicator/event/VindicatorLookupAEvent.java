@@ -46,6 +46,7 @@ public class VindicatorLookupAEvent extends VindicatorEvent
         throws VindicatorException
     {
         String time;
+        String str;
 
         entity.validate(storage, vind.config.autoComplete);
         logins = storage.getLogins(entity);
@@ -58,6 +59,13 @@ public class VindicatorLookupAEvent extends VindicatorEvent
                          hl(entity.alias));
             return;
         }
+
+        if (!entity.ident.equalsIgnoreCase(entity.alias))
+            str = String.format(" (%s)", hl(entity.ident));
+        else
+            str = new String();
+
+        Message.info(sender, "Logins for %s%s:", hl(entity.alias), str);
 
         for (StorageLogin l : logins) {
             l.validate(storage, false);

@@ -80,7 +80,7 @@ public class VindicatorLookupEvent extends VindicatorEvent
             return;
         }
 
-        if (entity.ident != entity.alias)
+        if (!entity.ident.equalsIgnoreCase(entity.alias))
             str = String.format(" (%s)", hl(entity.ident));
         else
             str = new String();
