@@ -88,6 +88,8 @@ public class VindicatorLookupEvent extends VindicatorEvent
         Message.info(sender, "Records for %s%s:", hl(entity.alias), str);
 
         for (StorageRecord r : records) {
+            r.validate(storage, false);
+
             type = r.hasFlag(StorageRecord.ADDRESS) ? "Address" : "Player";
             time = Utils.timestr(Utils.DATEF_SHORT, r.time);
 

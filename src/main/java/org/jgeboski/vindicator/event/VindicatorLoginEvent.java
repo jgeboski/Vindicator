@@ -164,6 +164,7 @@ public class VindicatorLoginEvent extends VindicatorEvent
                 vind.execute(new VindicatorUnmuteEvent(mrecd, sender));
                 mrecd = null;
             } else {
+                mrecd.validate(storage, false);
                 vind.mutes.put(mrecd.target.ident, mrecd);
             }
         }

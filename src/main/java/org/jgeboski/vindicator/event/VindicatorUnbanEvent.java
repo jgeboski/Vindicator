@@ -58,7 +58,9 @@ public class VindicatorUnbanEvent extends VindicatorEvent
         if (!eventContinue())
             return;
 
+        brecd.validate(storage, false);
         storage.remove(brecd);
+
         vind.broadcast("vindicator.message.unban",
                        "Ban removed from %s by %s.",
                        hl(brecd.target.alias), hl(record.issuer.alias));

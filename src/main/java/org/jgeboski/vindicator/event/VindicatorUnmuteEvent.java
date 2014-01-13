@@ -58,8 +58,10 @@ public class VindicatorUnmuteEvent extends VindicatorEvent
         if (!eventContinue())
             return;
 
+        mrecd.validate(storage, false);
         storage.remove(mrecd);
         vind.mutes.remove(mrecd.target.ident);
+
         vind.broadcast("vindicator.message.unmute",
                        "Mute removed from %s by %s.",
                        hl(record.target.alias), hl(record.issuer.alias));

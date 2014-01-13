@@ -108,7 +108,10 @@ public class StorageRecord
     public void validate(Storage storage, boolean complete)
         throws StorageException
     {
-        validate(storage, 0, complete);
+        int type;
+
+        type = flags & ~(ADDRESS | PLAYER);
+        validate(storage, type, complete);
     }
 
     public String toString()

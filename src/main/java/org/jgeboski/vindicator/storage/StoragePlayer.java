@@ -156,6 +156,6 @@ public class StoragePlayer extends StorageEntity
         if (login == null)
             return uuid;
 
-        return login.player.ident;
+        return login.player.alias;
     }
 }

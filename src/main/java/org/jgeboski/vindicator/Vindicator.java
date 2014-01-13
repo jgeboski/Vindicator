@@ -117,7 +117,7 @@ public class Vindicator extends JavaPlugin
         try {
             for (Player p : getServer().getOnlinePlayers()) {
                 plyr = new StoragePlayer(p.getName());
-                plyr.validate(storage, config.autoComplete);
+                plyr.validate(storage, false);
 
                 for (StorageRecord r : storage.getRecords(plyr)) {
                     if (r.hasFlag(StorageRecord.MUTE))

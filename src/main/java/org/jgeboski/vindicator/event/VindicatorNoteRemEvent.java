@@ -65,7 +65,9 @@ public class VindicatorNoteRemEvent extends VindicatorEvent
         if (!eventContinue())
             return;
 
+        nrecd.validate(storage, false);
         storage.remove(nrecd);
+
         vind.broadcast("vindicator.message.noterem",
                        "Note removed from %s by %s.",
                        hl(nrecd.target.alias), hl(record.issuer.alias));

@@ -60,6 +60,8 @@ public class VindicatorLookupAEvent extends VindicatorEvent
         }
 
         for (StorageLogin l : logins) {
+            l.validate(storage, false);
+
             time = Utils.timestr(Utils.DATEF_SHORT, l.time);
 
             if (entity instanceof StorageAddress) {
