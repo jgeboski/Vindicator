@@ -49,17 +49,8 @@ public class VindicatorLoginEvent extends VindicatorEvent
         if (!eventContinue())
             return;
 
-        try {
-            checkAddresses(login);
-            checkRecords(login);
-        } catch (VindicatorException e) {
-            if (!(e instanceof StorageException))
-                throw e;
-
-            Log.severe(e.getMessage());
-            throw new VindicatorException("Failed username check. " +
-                                          "Notify the administrator.");
-        }
+        checkAddresses(login);
+        checkRecords(login);
     }
 
     private void checkAddresses(StorageLogin login)

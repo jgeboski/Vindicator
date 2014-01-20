@@ -108,7 +108,7 @@ public class SQLEngine extends Storage
         if (!database.hasTable(TABLE_ADDRESSES)) {
             stmt.query("INSERT INTO", TABLE_LOGINS,
                          "(ident, alias, address, count, time)",
-                       "VALUES (?, ?, ?, ?)");
+                       "VALUES (?, ?, ?, ?, ?)");
             stmt.param(login.player.ident, login.player.alias,
                        login.address.ident, login.count, login.time);
         } else {
