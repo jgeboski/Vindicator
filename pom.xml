@@ -139,7 +139,7 @@
                             <artifactSet>
                                 <includes>
                                     <include>com.google.code.gson:gson</include>
-                                    <include>com.mojang:AccountsClient</include>
+                                    <include>com.mojang.api:AccountsClient</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
