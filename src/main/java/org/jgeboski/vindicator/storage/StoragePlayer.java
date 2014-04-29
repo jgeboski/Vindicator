@@ -24,7 +24,6 @@ import org.bukkit.entity.Player;
 
 import com.mojang.api.profiles.HttpProfileRepository;
 import com.mojang.api.profiles.Profile;
-import com.mojang.api.profiles.ProfileCriteria;
 
 import org.jgeboski.vindicator.util.Message;
 import org.jgeboski.vindicator.util.StrUtils;
@@ -96,7 +95,6 @@ public class StoragePlayer extends StorageEntity
         throws StorageException
     {
         HttpProfileRepository repo;
-        ProfileCriteria       crit;
         Profile               prfs[];
         Player                plyr;
         String                uuid;
@@ -115,9 +113,8 @@ public class StoragePlayer extends StorageEntity
         if (plyr != null)
             return getPlayerId(plyr);
 
-        repo = new HttpProfileRepository();
-        crit = new ProfileCriteria(player, "minecraft");
-        prfs = repo.findProfilesByCriteria(crit);
+        repo = new HttpProfileRepository("minecraft");
+        prfs = repo.findProfilesByNames(player);
 
         if (prfs.length != 1)
             throw new StorageException("Failed to obtain UUID: %s", player);
@@ -126,7 +123,6 @@ public class StoragePlayer extends StorageEntity
         uuid = String.format("%s-%s-%s-%s-%s", uuid.substring(0, 8),
                              uuid.substring(8, 12), uuid.substring(12, 16),
                              uuid.substring(16, 20), uuid.substring(20, 32));
-
         return uuid;
     }
 
